@@ -8,10 +8,11 @@ namespace WpfViewer
     /// </summary>
     public partial class MainWindow : Window
     {
+        MainVM vm = new MainVM();
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new MainVM();
+            DataContext = vm;
         }
     }
 }

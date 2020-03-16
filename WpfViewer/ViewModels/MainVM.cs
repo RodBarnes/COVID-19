@@ -11,7 +11,6 @@ using Common;
 using DataClasses;
 using LiveCharts;
 using LiveCharts.Wpf;
-using WpfViewer.Views;
 
 namespace WpfViewer.ViewModels
 {
@@ -86,7 +85,7 @@ namespace WpfViewer.ViewModels
             }
         }
 
-        private string chartButtonContent = "Show Chart";
+        private string chartButtonContent = "China Chart";
         public string ChartButtonContent
         {
             get => chartButtonContent;
@@ -116,29 +115,14 @@ namespace WpfViewer.ViewModels
 
         public void ShowChartAction(object obj)
         {
-            switch (ChartButtonContent)
-            {
-                case "Show Chart":
-                    Chart1();
-                    ChartButtonContent = "Add Series";
-                    break;
-                case "Add Series":
-                    Chart2();
-                    ChartButtonContent = "Extend Series";
-                    break;
-                default:
-                    Chart3();
-                    ChartButtonContent = "Show Chart";
-                    break;
-            }
-
+            ShowChart("Mainland China", "Hubei");
         }
 
         #endregion
 
         #region Methods
 
-        private void UpdateChart(string region = "", string province = "")
+        private void ShowChart(string region = "", string province = "")
         {
 
             List<DailyReport> list = reports.ToList();
@@ -152,54 +136,33 @@ namespace WpfViewer.ViewModels
                 }
 
             }
-        }
 
-        private void Chart1()
-        {
+            var confirmed = list.Select(r => r.Confirmed);
+            var recovered = list.Select(r => r.Recovered);
+            var deaths = list.Select(r => r.Deaths);
+            var dates = list.Select(r => r.RecordDate.ToString("MMM-dd"));
+
             SeriesCollection = new SeriesCollection
             {
                 new LineSeries
                 {
-                    Title = "Series 1",
-                    Values = new ChartValues<double> { 4, 6, 5, 2 ,4 }
+                    Title = "Confirmed",
+                    Values = new ChartValues<int>(list.Select(r => r.Confirmed))
                 },
                 new LineSeries
                 {
-                    Title = "Series 2",
-                    Values = new ChartValues<double> { 6, 7, 3, 4 ,6 },
-                    PointGeometry = null
+                    Title = "Recovered",
+                    Values = new ChartValues<int>(list.Select(r => r.Recovered))
                 },
                 new LineSeries
                 {
-                    Title = "Series 3",
-                    Values = new ChartValues<double> { 4,2,7,2,7 },
-                    PointGeometry = DefaultGeometries.Square,
-                    PointGeometrySize = 15
+                    Title = "Deaths",
+                    Values = new ChartValues<int>(list.Select(r => r.Deaths))
                 }
             };
 
-            Labels = new[] { "Jan", "Feb", "Mar", "Apr", "May" };
-            YFormatter = value => value.ToString("C");
-        }
-
-        private void Chart2()
-        {
-            //modifying the series collection will animate and update the chart
-            SeriesCollection.Add(new LineSeries
-            {
-                Title = "Series 4",
-                Values = new ChartValues<double> { 5, 3, 2, 4 },
-                LineSmoothness = 0, //0: straight lines, 1: really smooth lines
-                PointGeometry = Geometry.Parse("m 25 70.36218 20 -28 -20 22 -8 -6 z"),
-                PointGeometrySize = 50,
-                PointForeground = Brushes.Gray
-            });
-        }
-
-        private void Chart3()
-        {
-            //modifying any series values will also animate and update the chart
-            SeriesCollection[3].Values.Add(5d);
+            Labels = dates.ToArray();
+            YFormatter = value => value.ToString();
         }
 
         #endregion
