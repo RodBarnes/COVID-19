@@ -40,9 +40,6 @@ namespace WpfViewer.ViewModels
                 reports = new DailyReports();
                 reports.MergeData(readPath);
             }
-
-            List<DailyReport> china = reports.Where(r => r.CountryRegion == "Mainland China" && r.ProvinceState == "Hubei").ToList();
-
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -108,20 +105,32 @@ namespace WpfViewer.ViewModels
 
         public void ShowChartAction(object obj)
         {
-            UpdateChart();
+            UpdateChart("Mainland China", "Hubei");
         }
 
         #endregion
 
         #region Methods
 
-        private void UpdateChart()
+        private void UpdateChart(string region = "", string province = "")
         {
+
+            List<DailyReport> list = reports.ToList();
+
+            if (!string.IsNullOrEmpty(region))
+            {
+                list = reports.Where(r => r.CountryRegion == region).ToList();
+                if (!string.IsNullOrEmpty(province))
+                {
+                    list = list.Where(r => r.ProvinceState == province).ToList();
+                }
+            }
+
             SeriesCollection = new SeriesCollection
             {
                 new LineSeries
                 {
-                    Title = reports.ColumnHeader1,
+                    Title = "Series 1",
                     Values = new ChartValues<double> { 4, 6, 5, 2 ,4 }
                 },
                 new LineSeries
