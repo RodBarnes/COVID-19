@@ -86,7 +86,7 @@ namespace WpfViewer.ViewModels
             }
         }
 
-        private string chartButtonContent = "Chart 1";
+        private string chartButtonContent = "Show Chart";
         public string ChartButtonContent
         {
             get => chartButtonContent;
@@ -118,17 +118,17 @@ namespace WpfViewer.ViewModels
         {
             switch (ChartButtonContent)
             {
-                case "Chart 1":
+                case "Show Chart":
                     Chart1();
-                    ChartButtonContent = "Chart 2";
+                    ChartButtonContent = "Add Series";
                     break;
-                case "Chart 2":
+                case "Add Series":
                     Chart2();
-                    ChartButtonContent = "Chart 3";
+                    ChartButtonContent = "Extend Series";
                     break;
                 default:
                     Chart3();
-                    ChartButtonContent = "Chart 1";
+                    ChartButtonContent = "Show Chart";
                     break;
             }
 
