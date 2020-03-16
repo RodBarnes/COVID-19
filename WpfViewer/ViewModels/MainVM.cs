@@ -86,6 +86,17 @@ namespace WpfViewer.ViewModels
             }
         }
 
+        private string chartButtonContent = "Chart 1";
+        public string ChartButtonContent
+        {
+            get => chartButtonContent;
+            set
+            {
+                chartButtonContent = value;
+                NotifyPropertyChanged();
+            }
+        }
+            
         #endregion
 
         #region Actions
@@ -105,7 +116,22 @@ namespace WpfViewer.ViewModels
 
         public void ShowChartAction(object obj)
         {
-            UpdateChart("Mainland China", "Hubei");
+            switch (ChartButtonContent)
+            {
+                case "Chart 1":
+                    Chart1();
+                    ChartButtonContent = "Chart 2";
+                    break;
+                case "Chart 2":
+                    Chart2();
+                    ChartButtonContent = "Chart 3";
+                    break;
+                default:
+                    Chart3();
+                    ChartButtonContent = "Chart 1";
+                    break;
+            }
+
         }
 
         #endregion
@@ -125,7 +151,10 @@ namespace WpfViewer.ViewModels
                     list = list.Where(r => r.ProvinceState == province).ToList();
                 }
             }
+        }
 
+        private void Chart1()
+        {
             SeriesCollection = new SeriesCollection
             {
                 new LineSeries
@@ -150,7 +179,10 @@ namespace WpfViewer.ViewModels
 
             Labels = new[] { "Jan", "Feb", "Mar", "Apr", "May" };
             YFormatter = value => value.ToString("C");
+        }
 
+        private void Chart2()
+        {
             //modifying the series collection will animate and update the chart
             SeriesCollection.Add(new LineSeries
             {
@@ -161,7 +193,10 @@ namespace WpfViewer.ViewModels
                 PointGeometrySize = 50,
                 PointForeground = Brushes.Gray
             });
+        }
 
+        private void Chart3()
+        {
             //modifying any series values will also animate and update the chart
             SeriesCollection[3].Values.Add(5d);
         }
