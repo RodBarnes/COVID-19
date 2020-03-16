@@ -4,10 +4,10 @@ namespace DataClasses
 {
     public class DailyReport
     {
-        public DailyReport(string provinceState, string countryRegion, DateTime recordDate, int confirmed, int deaths, int recovered)
+        public DailyReport(string countryRegion, string provinceState, DateTime recordDate, int confirmed, int deaths, int recovered)
         {
-            ProvinceState = provinceState;
             CountryRegion = countryRegion;
+            ProvinceState = provinceState;
             RecordDate = recordDate;
             Confirmed = confirmed;
             Deaths = deaths;
@@ -19,8 +19,8 @@ namespace DataClasses
             return $"\"{CountryRegion}\",\"{ProvinceState}\",{RecordDate},{Confirmed},{Deaths},{Recovered}";
         }
 
-        public string ProvinceState { get; set; }
         public string CountryRegion { get; set; }
+        public string ProvinceState { get; set; }
         public DateTime RecordDate { get; set; }
         public int Confirmed { get; set; }
         public int Deaths { get; set; }

@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Input;
@@ -16,8 +19,9 @@ namespace WpfViewer.ViewModels
     {
         private readonly DailyReports reports;
         private readonly string readPath = @"D:\Source\BitBucket\3rd Party\COVID-19\csse_covid_19_data\csse_covid_19_daily_reports";
-        private readonly string writePath = @"D:\Source\BitBucket\3rd Party\COVID-19";
+        private readonly string writePath = @"D:\Source\BitBucket\COVID-19\Data";
         private readonly string writeFilename = "DailyReport.csv";
+        private readonly string writeFilepath;
 
         public MainVM()
         {
@@ -25,7 +29,19 @@ namespace WpfViewer.ViewModels
             WriteDataCommand = new Command(WriteDataAction);
             ShowChartCommand = new Command(ShowChartAction);
 
-            reports = new DailyReports();
+            writeFilepath = $@"{writePath}\{writeFilename}";
+
+            if (File.Exists(writeFilepath))
+            {
+                reports = new DailyReports(writeFilepath);
+            }
+            else
+            {
+                reports = new DailyReports();
+                reports.MergeData(readPath);
+            }
+
+            List<DailyReport> china = reports.Where(r => r.CountryRegion == "Mainland China" && r.ProvinceState == "Hubei").ToList();
 
         }
 
@@ -33,6 +49,8 @@ namespace WpfViewer.ViewModels
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
+
+        #region Properties
 
         public ICommand MergeDataCommand { get; set; }
         public ICommand WriteDataCommand { get; set; }
@@ -71,16 +89,21 @@ namespace WpfViewer.ViewModels
             }
         }
 
+        #endregion
+
+        #region Actions
+
         public void MergeDataAction(object obj)
         {
-            reports.ReadData(readPath);
-            MessageBox.Show($"Read is complete.");
+            reports.MergeData(readPath);
+            MessageBox.Show($@"Merge is complete from '{readPath}'");
         }
 
         public void WriteDataAction(object obj)
         {
-            reports.WriteData($@"{writePath}\{writeFilename}");
-            MessageBox.Show($"Write is complete.");
+            var writeFilepath = $@"{writePath}\{writeFilename}";
+            reports.WriteData(writeFilepath);
+            MessageBox.Show($@"Write is complete to '{writeFilepath}'");
         }
 
         public void ShowChartAction(object obj)
@@ -88,13 +111,17 @@ namespace WpfViewer.ViewModels
             UpdateChart();
         }
 
+        #endregion
+
+        #region Methods
+
         private void UpdateChart()
         {
             SeriesCollection = new SeriesCollection
             {
                 new LineSeries
                 {
-                    Title = "Series 1",
+                    Title = reports.ColumnHeader1,
                     Values = new ChartValues<double> { 4, 6, 5, 2 ,4 }
                 },
                 new LineSeries
@@ -129,5 +156,7 @@ namespace WpfViewer.ViewModels
             //modifying any series values will also animate and update the chart
             SeriesCollection[3].Values.Add(5d);
         }
+
+        #endregion
     }
 }

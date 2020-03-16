@@ -11,49 +11,33 @@ namespace DataClasses
     {
         private readonly List<DailyReport> list;
         private TextFieldParser parser;
+        private bool readHeaders = true;
 
-        public DailyReports(string path = "")
+        public DailyReports(string filepath = "")
         {
             list = new List<DailyReport>();
-            if (!string.IsNullOrEmpty(path))
+            if (!string.IsNullOrEmpty(filepath))
             {
-                ReadData(path);
+                ReadData(filepath);
             }
         }
 
-        public void ReadData(string path)
+        public void ReadData(string filePath)
         {
+           ParseData(filePath, false);
+        }
+
+        public void MergeData(string path)
+        {
+            readHeaders = true;
+
             var filePaths = Directory.GetFiles(path, "*.csv");
 
             if (filePaths.Length > 0)
             {
                 foreach (var filePath in filePaths)
                 {
-                    parser = new TextFieldParser(filePath);
-                    parser.SetDelimiters(",");
-                    parser.HasFieldsEnclosedInQuotes = true;
-                    var firstLine = true;
-                    do
-                    {
-                        var fields = parser.ReadFields();
-                        if (!firstLine)
-                        {
-                            var provinceState = fields[0];
-                            var countryRegion = fields[1];
-                            var lastUpdate = DateTime.Parse(fields[2]);
-                            int.TryParse(fields[3], out int confirmed);
-                            int.TryParse(fields[4], out int deaths);
-                            int.TryParse(fields[5], out int recovered);
-
-                            var report = new DailyReport(provinceState, countryRegion, lastUpdate, confirmed, deaths, recovered);
-                            list.Add(report);
-                        }
-                        else
-                        {
-                            firstLine = false;
-                        }
-                    }
-                    while (!parser.EndOfData);
+                    ParseData(filePath, true);
                 }
             }
             else
@@ -70,6 +54,7 @@ namespace DataClasses
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
+            sb.Append($"\"{ColumnHeader1}\",\"{ColumnHeader2}\",\"{ColumnHeader3}\",\"{ColumnHeader4}\",\"{ColumnHeader5}\"\n");
             foreach (var report in list)
             {
                 sb.Append($"{report.ToString()}\n");
@@ -77,6 +62,73 @@ namespace DataClasses
 
             return sb.ToString();
         }
+
+        private void ParseData(string filePath, bool merging)
+        {
+            var firstLine = true;
+
+            parser = new TextFieldParser(filePath);
+            parser.SetDelimiters(",");
+            parser.HasFieldsEnclosedInQuotes = true;
+            do
+            {
+                var fields = parser.ReadFields();
+                if (!firstLine)
+                {
+                    string provinceState;
+                    string countryRegion;
+
+                    if (merging)
+                    {
+                        provinceState = fields[0];
+                        countryRegion = fields[1];
+                    }
+                    else
+                    {
+                        countryRegion = fields[0];
+                        provinceState = fields[1];
+                    }
+                    var lastUpdate = DateTime.Parse(fields[2]);
+                    int.TryParse(fields[3], out int confirmed);
+                    int.TryParse(fields[4], out int deaths);
+                    int.TryParse(fields[5], out int recovered);
+
+                    var report = new DailyReport(countryRegion, provinceState, lastUpdate, confirmed, deaths, recovered);
+                    list.Add(report);
+                }
+                else
+                {
+                    if (readHeaders)
+                    {
+                        if (merging)
+                        {
+                            ColumnHeader1 = fields[1];
+                            ColumnHeader2 = fields[0];
+                        }
+                        else
+                        {
+                            ColumnHeader1 = fields[0];
+                            ColumnHeader2 = fields[1];
+                        }
+
+                        ColumnHeader3 = fields[2];
+                        ColumnHeader4 = fields[3];
+                        ColumnHeader5 = fields[4];
+                        readHeaders = false;
+                    }
+                    firstLine = false;
+                }
+            }
+            while (!parser.EndOfData);
+        }
+
+        public string ColumnHeader1 { get; set; }   
+        public string ColumnHeader2 { get; set; }
+        public string ColumnHeader3 { get; set; }
+        public string ColumnHeader4 { get; set; }
+        public string ColumnHeader5 { get; set; }
+
+        #region Standard List Operations
 
         public DailyReport this[int index] { get => ((IList<DailyReport>)list)[index]; set => ((IList<DailyReport>)list)[index] = value; }
 
@@ -103,5 +155,7 @@ namespace DataClasses
         public void RemoveAt(int index) => ((IList<DailyReport>)list).RemoveAt(index);
 
         IEnumerator IEnumerable.GetEnumerator() => ((IList<DailyReport>)list).GetEnumerator();
+
+        #endregion
     }
 }
