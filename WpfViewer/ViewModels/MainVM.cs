@@ -150,6 +150,7 @@ namespace WpfViewer.ViewModels
                 {
                     list = list.Where(r => r.ProvinceState == province).ToList();
                 }
+
             }
         }
 
