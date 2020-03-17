@@ -80,13 +80,13 @@ namespace DataClasses
 
                     if (merging)
                     {
-                        provinceState = fields[0];
-                        countryRegion = fields[1];
+                        provinceState = fields[0].Trim();
+                        countryRegion = fields[1].Trim();
                     }
                     else
                     {
-                        countryRegion = fields[0];
-                        provinceState = fields[1];
+                        countryRegion = fields[0].Trim();
+                        provinceState = fields[1].Trim();
                     }
                     var lastUpdate = DateTime.Parse(fields[2]);
                     int.TryParse(fields[3], out int confirmed);
@@ -102,18 +102,18 @@ namespace DataClasses
                     {
                         if (merging)
                         {
-                            ColumnHeader1 = fields[1];
-                            ColumnHeader2 = fields[0];
+                            ColumnHeader1 = fields[1].Trim();
+                            ColumnHeader2 = fields[0].Trim();
                         }
                         else
                         {
-                            ColumnHeader1 = fields[0];
-                            ColumnHeader2 = fields[1];
+                            ColumnHeader1 = fields[0].Trim();
+                            ColumnHeader2 = fields[1].Trim();
                         }
 
-                        ColumnHeader3 = fields[2];
-                        ColumnHeader4 = fields[3];
-                        ColumnHeader5 = fields[4];
+                        ColumnHeader3 = fields[2].Trim();
+                        ColumnHeader4 = fields[3].Trim();
+                        ColumnHeader5 = fields[4].Trim();
                         readHeaders = false;
                     }
                     firstLine = false;

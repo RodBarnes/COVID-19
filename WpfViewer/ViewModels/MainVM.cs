@@ -27,7 +27,6 @@ namespace WpfViewer.ViewModels
         {
             MergeDataCommand = new Command(MergeDataAction);
             WriteDataCommand = new Command(WriteDataAction);
-            ShowChartCommand = new Command(ShowChartAction, param => SelectedArea != null);
 
             writeFilepath = $@"{writePath}\{writeFilename}";
 
@@ -44,6 +43,7 @@ namespace WpfViewer.ViewModels
                 reports.MergeData(readPath);
             }
 
+            // Get the list of areas for the combo box
             var areas =
                 reports
                 .GroupBy(r => new 
@@ -56,7 +56,6 @@ namespace WpfViewer.ViewModels
                     Region = g.Key.CountryRegion,
                     Province = g.Key.ProvinceState
                 });
-
             Areas = new ObservableCollection<Area>(areas.Distinct().OrderBy(a => a.RegionProvince));
         }
 
@@ -69,7 +68,6 @@ namespace WpfViewer.ViewModels
 
         public ICommand MergeDataCommand { get; set; }
         public ICommand WriteDataCommand { get; set; }
-        public ICommand ShowChartCommand { get; set; }
 
         private ObservableCollection<Area> areas;
         public ObservableCollection<Area> Areas
@@ -90,6 +88,10 @@ namespace WpfViewer.ViewModels
             {
                 selectedArea = value;
                 NotifyPropertyChanged();
+                if (selectedArea != null)
+                {
+                    ShowChart(SelectedArea);
+                }
             }
         }
 
@@ -142,11 +144,6 @@ namespace WpfViewer.ViewModels
             MessageBox.Show($@"Write is complete to '{writeFilepath}'");
         }
 
-        public void ShowChartAction(object obj)
-        {
-            ShowChart(SelectedArea);
-        }
-
         #endregion
 
         #region Methods
@@ -194,7 +191,7 @@ namespace WpfViewer.ViewModels
                     Values = new ChartValues<int>(deaths)
                 }
             };
-
+            
             Labels = dates.ToArray();
             //YFormatter = value => value.ToString();
         }
