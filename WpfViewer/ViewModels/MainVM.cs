@@ -30,18 +30,8 @@ namespace WpfViewer.ViewModels
 
             writeFilepath = $@"{writePath}\{writeFilename}";
 
-            // If there is an existing merged data file,
-            // open and read its data; else, go to the
-            // original data and merge it in
-            if (File.Exists(writeFilepath))
-            {
-                reports = new DailyReports(writeFilepath);
-            }
-            else
-            {
-                reports = new DailyReports();
-                reports.MergeData(readPath);
-            }
+            reports = new DailyReports();
+            reports.MergeData(readPath);
 
             // Get the list of areas for the combo box
             var areas =
