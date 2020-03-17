@@ -136,11 +136,6 @@ namespace WpfViewer.ViewModels
 
             }
 
-            var confirmed = list.Select(r => r.Confirmed);
-            var recovered = list.Select(r => r.Recovered);
-            var deaths = list.Select(r => r.Deaths);
-            var dates = list.Select(r => r.RecordDate.ToString("MMM-dd"));
-
             SeriesCollection = new SeriesCollection
             {
                 new LineSeries
@@ -166,7 +161,7 @@ namespace WpfViewer.ViewModels
                 }
             };
 
-            Labels = dates.ToArray();
+            Labels = list.Select(r => r.RecordDate.ToString("MMM-dd")).ToArray();
             YFormatter = value => value.ToString();
         }
 
