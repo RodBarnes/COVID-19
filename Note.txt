@@ -1,2 +1,3 @@
 Need to look at some of the data anomallies such as "China,Hubei" and "Mainland China,Hubei"
 Need to figure how to consolidate all of a region; e.g., sum all of US to a single "US,All"
+Similarly, some of the reports are by county so rollup by state
