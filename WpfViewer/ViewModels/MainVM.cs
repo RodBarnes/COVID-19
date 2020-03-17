@@ -124,7 +124,6 @@ namespace WpfViewer.ViewModels
 
         private void ShowChart(string region = "", string province = "")
         {
-
             List<DailyReport> list = reports.ToList();
 
             if (!string.IsNullOrEmpty(region))
@@ -147,16 +146,22 @@ namespace WpfViewer.ViewModels
                 new LineSeries
                 {
                     Title = "Confirmed",
+                    Stroke = Brushes.Yellow,
+                    Fill = Brushes.LightYellow,
                     Values = new ChartValues<int>(list.Select(r => r.Confirmed))
                 },
                 new LineSeries
                 {
                     Title = "Recovered",
+                    Stroke = Brushes.Green,
+                    Fill = Brushes.LightGreen,
                     Values = new ChartValues<int>(list.Select(r => r.Recovered))
                 },
                 new LineSeries
                 {
                     Title = "Deaths",
+                    Stroke = Brushes.Red,
+                    Fill = Brushes.LightCyan,
                     Values = new ChartValues<int>(list.Select(r => r.Deaths))
                 }
             };

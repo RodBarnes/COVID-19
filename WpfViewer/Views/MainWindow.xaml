@@ -28,7 +28,7 @@
         <Grid Grid.Row="2" Grid.Column="1" >
             <lvc:CartesianChart Series="{Binding SeriesCollection}" LegendLocation="Right" >
                 <lvc:CartesianChart.AxisY>
-                    <lvc:Axis Title="Sales" LabelFormatter="{Binding YFormatter}"></lvc:Axis>
+                    <lvc:Axis Title="Cases" LabelFormatter="{Binding YFormatter}"></lvc:Axis>
                 </lvc:CartesianChart.AxisY>
                 <lvc:CartesianChart.AxisX>
                     <lvc:Axis Title="Month" Labels="{Binding Labels}"></lvc:Axis>
