@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -26,10 +27,13 @@ namespace WpfViewer.ViewModels
         {
             MergeDataCommand = new Command(MergeDataAction);
             WriteDataCommand = new Command(WriteDataAction);
-            ShowChartCommand = new Command(ShowChartAction);
+            ShowChartCommand = new Command(ShowChartAction, param => SelectedArea != null);
 
             writeFilepath = $@"{writePath}\{writeFilename}";
 
+            // If there is an existing merged data file,
+            // open and read its data; else, go to the
+            // original data and merge it in
             if (File.Exists(writeFilepath))
             {
                 reports = new DailyReports(writeFilepath);
@@ -39,6 +43,21 @@ namespace WpfViewer.ViewModels
                 reports = new DailyReports();
                 reports.MergeData(readPath);
             }
+
+            var areas =
+                reports
+                .GroupBy(r => new 
+                {
+                    r.CountryRegion,
+                    r.ProvinceState
+                })
+                .Select(g => new Area()
+                {
+                    Region = g.Key.CountryRegion,
+                    Province = g.Key.ProvinceState
+                });
+
+            Areas = new ObservableCollection<Area>(areas.Distinct().OrderBy(a => a.RegionProvince));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -51,6 +70,28 @@ namespace WpfViewer.ViewModels
         public ICommand MergeDataCommand { get; set; }
         public ICommand WriteDataCommand { get; set; }
         public ICommand ShowChartCommand { get; set; }
+
+        private ObservableCollection<Area> areas;
+        public ObservableCollection<Area> Areas
+        {
+            get => areas;
+            set
+            {
+                areas = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private Area selectedArea;
+        public Area SelectedArea
+        {
+            get => selectedArea;
+            set
+            {
+                selectedArea = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         private SeriesCollection seriesCollection;
         public SeriesCollection SeriesCollection
@@ -85,17 +126,6 @@ namespace WpfViewer.ViewModels
             }
         }
 
-        private string chartButtonContent = "China Chart";
-        public string ChartButtonContent
-        {
-            get => chartButtonContent;
-            set
-            {
-                chartButtonContent = value;
-                NotifyPropertyChanged();
-            }
-        }
-            
         #endregion
 
         #region Actions
@@ -108,33 +138,37 @@ namespace WpfViewer.ViewModels
 
         public void WriteDataAction(object obj)
         {
-            var writeFilepath = $@"{writePath}\{writeFilename}";
             reports.WriteData(writeFilepath);
             MessageBox.Show($@"Write is complete to '{writeFilepath}'");
         }
 
         public void ShowChartAction(object obj)
         {
-            ShowChart("Mainland China", "Hubei");
+            ShowChart(SelectedArea);
         }
 
         #endregion
 
         #region Methods
 
-        private void ShowChart(string region = "", string province = "")
+        private void ShowChart(Area area)
         {
             List<DailyReport> list = reports.ToList();
 
-            if (!string.IsNullOrEmpty(region))
+            if (!string.IsNullOrEmpty(area.Region))
             {
-                list = reports.Where(r => r.CountryRegion == region).ToList();
-                if (!string.IsNullOrEmpty(province))
+                list = reports.Where(r => r.CountryRegion == area.Region).ToList();
+                if (!string.IsNullOrEmpty(area.Province))
                 {
-                    list = list.Where(r => r.ProvinceState == province).ToList();
+                    list = list.Where(r => r.ProvinceState == area.Province).ToList();
                 }
 
             }
+
+            var confirmed = list.Select(r => r.Confirmed);
+            var recovered = list.Select(r => r.Recovered);
+            var deaths = list.Select(r => r.Deaths);
+            var dates = list.Select(r => r.RecordDate.ToString("MMM-dd"));
 
             SeriesCollection = new SeriesCollection
             {
@@ -143,28 +177,45 @@ namespace WpfViewer.ViewModels
                     Title = "Confirmed",
                     Stroke = Brushes.Yellow,
                     Fill = Brushes.LightYellow,
-                    Values = new ChartValues<int>(list.Select(r => r.Confirmed))
+                    Values = new ChartValues<int>(confirmed)
                 },
                 new LineSeries
                 {
                     Title = "Recovered",
                     Stroke = Brushes.Green,
                     Fill = Brushes.LightGreen,
-                    Values = new ChartValues<int>(list.Select(r => r.Recovered))
+                    Values = new ChartValues<int>(recovered)
                 },
                 new LineSeries
                 {
                     Title = "Deaths",
                     Stroke = Brushes.Red,
                     Fill = Brushes.LightCyan,
-                    Values = new ChartValues<int>(list.Select(r => r.Deaths))
+                    Values = new ChartValues<int>(deaths)
                 }
             };
 
-            Labels = list.Select(r => r.RecordDate.ToString("MMM-dd")).ToArray();
-            YFormatter = value => value.ToString();
+            Labels = dates.ToArray();
+            //YFormatter = value => value.ToString();
         }
 
         #endregion
+    }
+
+    public class Area
+    {
+        public Area() { }
+
+        public Area(string region, string province)
+        {
+            Region = region;
+            Province = province;
+        }
+        public string Region { get; set; }
+        public string Province { get; set; }
+        public string RegionProvince
+        {
+            get => $"{Region},{Province}";
+        }
     }
 }

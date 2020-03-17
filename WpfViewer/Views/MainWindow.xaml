@@ -23,7 +23,8 @@
             <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" >
             <Button Content="Merge" Command="{Binding MergeDataCommand}" Margin="5,5" HorizontalAlignment="Left" VerticalAlignment="Center" Width="75"/>
             <Button Content="Write" Command="{Binding WriteDataCommand}" Margin="5,5" HorizontalAlignment="Left" VerticalAlignment="Center" Width="75"/>
-            <Button Content="{Binding ChartButtonContent}" Command="{Binding ShowChartCommand}" Margin="5,5" HorizontalAlignment="Left"  VerticalAlignment="Center" Width="75"/>
+            <Button Content="Show Chart" Command="{Binding ShowChartCommand}" Margin="5,5" HorizontalAlignment="Left"  VerticalAlignment="Center" Width="75"/>
+            <ComboBox ItemsSource="{Binding Areas}" SelectedItem="{Binding SelectedArea}" DisplayMemberPath="RegionProvince" IsEditable="True" Width="200"/>
         </StackPanel>
         <Grid Grid.Row="2" Grid.Column="1" >
             <lvc:CartesianChart Series="{Binding SeriesCollection}" LegendLocation="Right" >
