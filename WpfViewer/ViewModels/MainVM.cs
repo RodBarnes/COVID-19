@@ -2,13 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media;
-using Common;
 using DataClasses;
 using LiveCharts;
 using LiveCharts.Wpf;
@@ -21,17 +17,10 @@ namespace WpfViewer.ViewModels
         private readonly string readPath = @"D:\Source\BitBucket\3rd Party\COVID-19\csse_covid_19_data\csse_covid_19_daily_reports";
         private readonly string writePath = @"D:\Source\BitBucket\COVID-19\Data";
         private readonly string writeFilename = "DailyReport.csv";
-        private readonly string writeFilepath;
 
         public MainVM()
         {
-            MergeDataCommand = new Command(MergeDataAction);
-            WriteDataCommand = new Command(WriteDataAction);
-
-            writeFilepath = $@"{writePath}\{writeFilename}";
-
-            reports = new DailyReports();
-            reports.MergeData(readPath);
+            reports = new DailyReports(readPath);
 
             // Get the list of areas for the combo box
             var areas =
@@ -53,11 +42,7 @@ namespace WpfViewer.ViewModels
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-
         #region Properties
-
-        public ICommand MergeDataCommand { get; set; }
-        public ICommand WriteDataCommand { get; set; }
 
         private ObservableCollection<Area> areas;
         public ObservableCollection<Area> Areas
@@ -116,22 +101,6 @@ namespace WpfViewer.ViewModels
                 yFormatter = value;
                 NotifyPropertyChanged();
             }
-        }
-
-        #endregion
-
-        #region Actions
-
-        public void MergeDataAction(object obj)
-        {
-            reports.MergeData(readPath);
-            MessageBox.Show($@"Merge is complete from '{readPath}'");
-        }
-
-        public void WriteDataAction(object obj)
-        {
-            reports.WriteData(writeFilepath);
-            MessageBox.Show($@"Write is complete to '{writeFilepath}'");
         }
 
         #endregion
