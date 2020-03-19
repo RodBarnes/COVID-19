@@ -38,6 +38,7 @@ namespace WpfViewer.ViewModels
 
                 });
             Areas = new ObservableCollection<Area>(areas.Distinct().OrderBy(a => a.RegionProvince));
+            SelectedArea = Areas.Where(a => a.Region == "(All)").FirstOrDefault();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

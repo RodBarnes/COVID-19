@@ -21,6 +21,18 @@ namespace DataClasses
             MergeData(path);
         }
 
+        #region Properties
+
+        public string ColumnHeader1 { get; set; }
+        public string ColumnHeader2 { get; set; }
+        public string ColumnHeader3 { get; set; }
+        public string ColumnHeader4 { get; set; }
+        public string ColumnHeader5 { get; set; }
+
+        #endregion
+
+        #region Methods
+
         public void MergeData(string path)
         {
             readHeaders = true;
@@ -61,7 +73,7 @@ namespace DataClasses
 
         private void AddDataForCountryRegion()
         {
-            var sums = reports
+            var regionSums = reports
                 .GroupBy(r => new { r.CountryRegion, r.RecordDate })
                 .Select(cr => new DailyReport
                 {
@@ -73,9 +85,37 @@ namespace DataClasses
                     Deaths = cr.Sum(c => c.Deaths)
                 }).ToList();
 
-            foreach (DailyReport report in sums)
+            var alls = reports
+                .GroupBy(r => new { r.CountryRegion, r.ProvinceState })
+                .Select(r => new { r.Key.CountryRegion, r.Key.ProvinceState })
+                .Where(r => !string.IsNullOrEmpty(r.CountryRegion) && string.IsNullOrEmpty(r.ProvinceState)).ToList();
+
+            //foreach (var all in alls)
+            //{
+            //    System.Diagnostics.Debug.WriteLine($"alls:{all.CountryRegion},{all.ProvinceState}");
+            //}
+
+            foreach (DailyReport regionSum in regionSums)
             {
-                reports.Add(report);
+                //System.Diagnostics.Debug.WriteLine($"sums:{regionSum.CountryRegion},{regionSum.ProvinceState}");
+
+                var all = alls.Where(a => a.CountryRegion == regionSum.CountryRegion);
+                var chk = alls.Where(a => a.CountryRegion == regionSum.CountryRegion).Count();
+                if (chk == 0)
+                {
+                    // Add the regionSum
+                    reports.Add(regionSum);
+                }
+                else
+                {
+
+                    // Update the existing region for the records with province 'All'
+                    var fixex = reports.Where(r => r.CountryRegion == regionSum.CountryRegion).ToList();
+                    foreach (var fix in fixex)
+                    {
+                        fix.ProvinceState = "(All)";
+                    }
+                }
             }
         }
 
@@ -150,11 +190,7 @@ namespace DataClasses
             while (!parser.EndOfData);
         }
 
-        public string ColumnHeader1 { get; set; }   
-        public string ColumnHeader2 { get; set; }
-        public string ColumnHeader3 { get; set; }
-        public string ColumnHeader4 { get; set; }
-        public string ColumnHeader5 { get; set; }
+        #endregion
 
         #region Standard List Operations
 

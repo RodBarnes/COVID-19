@@ -16,10 +16,7 @@ namespace DataClasses
             Recovered = recovered;
         }
 
-        public override string ToString()
-        {
-            return $"\"{CountryRegion}\",\"{ProvinceState}\",{RecordDate},{Confirmed},{Deaths},{Recovered}";
-        }
+        #region Properties
 
         public string CountryRegion { get; set; }
         public string ProvinceState { get; set; }
@@ -33,6 +30,17 @@ namespace DataClasses
             get => DateTime.Parse(recordDate.ToString("yyyy-MM-dd"));
             set => recordDate = value;
         }
+
+        #endregion
+
+        #region Methods
+
+        public override string ToString()
+        {
+            return $"\"{CountryRegion}\",\"{ProvinceState}\",{RecordDate},{Confirmed},{Deaths},{Recovered}";
+        }
+
+        #endregion
 
     }
 }
