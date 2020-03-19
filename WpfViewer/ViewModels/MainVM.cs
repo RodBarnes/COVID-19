@@ -15,8 +15,6 @@ namespace WpfViewer.ViewModels
     {
         private readonly DailyReports reports;
         private readonly string readPath = @"D:\Source\BitBucket\3rd Party\COVID-19\csse_covid_19_data\csse_covid_19_daily_reports";
-        private readonly string writePath = @"D:\Source\BitBucket\COVID-19\Data";
-        private readonly string writeFilename = "DailyReport.csv";
 
         public MainVM()
         {
@@ -33,7 +31,11 @@ namespace WpfViewer.ViewModels
                 .Select(g => new Area()
                 {
                     Region = g.Key.CountryRegion,
-                    Province = g.Key.ProvinceState
+                    Province = g.Key.ProvinceState,
+                    Confirmed = g.Sum(s => s.Confirmed),
+                    Recovered = g.Sum(s => s.Recovered),
+                    Deaths = g.Sum(s => s.Deaths)
+
                 });
             Areas = new ObservableCollection<Area>(areas.Distinct().OrderBy(a => a.RegionProvince));
         }
@@ -65,8 +67,49 @@ namespace WpfViewer.ViewModels
                 NotifyPropertyChanged();
                 if (selectedArea != null)
                 {
+                    var deathsCnt = ((double)SelectedArea.Deaths);
+                    var recoveredCnt = ((double)SelectedArea.Recovered);
+                    var confirmedCnt = ((double)SelectedArea.Confirmed);
+                    var activeCnt = confirmedCnt - deathsCnt - recoveredCnt;
+
+                    DeathsPct = Math.Round(deathsCnt / confirmedCnt * 100, 2);
+                    RecoveredPct = Math.Round(recoveredCnt / confirmedCnt * 100, 2);
+                    ActivePct = Math.Round(activeCnt / confirmedCnt * 100, 2);
                     ShowChart(SelectedArea);
                 }
+            }
+        }
+
+        private double deathsPct = 0;
+        public double DeathsPct
+        {
+            get => deathsPct;
+            set
+            {
+                deathsPct = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private double recoveredPct = 0;
+        public double RecoveredPct
+        {
+            get => recoveredPct;
+            set
+            {
+                recoveredPct = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private double activePct = 0;
+        public double ActivePct
+        {
+            get => activePct;
+            set
+            {
+                activePct = value;
+                NotifyPropertyChanged();
             }
         }
 
@@ -162,13 +205,19 @@ namespace WpfViewer.ViewModels
     {
         public Area() { }
 
-        public Area(string region, string province)
+        public Area(string region, string province, int confirmed, int recovered, int deaths)
         {
             Region = region;
             Province = province;
+            Confirmed = confirmed;
+            Recovered = recovered;
+            Deaths = deaths;
         }
         public string Region { get; set; }
         public string Province { get; set; }
+        public int Confirmed { get; set; }
+        public int Recovered { get; set; }
+        public int Deaths { get; set; }
         public string RegionProvince
         {
             get => $"{Region},{Province}";

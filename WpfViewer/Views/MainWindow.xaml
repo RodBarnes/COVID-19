@@ -21,7 +21,21 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="10" />
         </Grid.RowDefinitions>
-        <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding SelectedArea.RegionProvince}" FontSize="18" />
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" >
+            <StackPanel Orientation="Horizontal" Margin="5,5">
+                <TextBlock Text="Act% " />
+                <TextBlock Text="{Binding ActivePct}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="5,5">
+                <TextBlock Text="Rcv% " />
+                <TextBlock Text="{Binding RecoveredPct}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="5,5">
+                <TextBlock Text="Dth% " />
+                <TextBlock Text="{Binding DeathsPct}" />
+            </StackPanel>
+        </StackPanel>
+        <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding SelectedArea.RegionProvince}" HorizontalAlignment="Center" FontSize="18" />
         <ListBox Grid.Column="1" Grid.Row="2" ItemsSource="{Binding Areas}" SelectedItem="{Binding SelectedArea}" DisplayMemberPath="RegionProvince" />
         <lvc:CartesianChart Grid.Column="2" Grid.Row="2" Series="{Binding SeriesCollection}" LegendLocation="Right" Background="LightBlue" >
             <lvc:CartesianChart.AxisY>
