@@ -7,6 +7,7 @@
         xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         mc:Ignorable="d"
         Title="MainWindow"
+        Icon="/Images/coronavirus.ico"
         Height="759.019" Width="1144.62">
     <Grid>
         <Grid.ColumnDefinitions>
