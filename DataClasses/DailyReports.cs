@@ -33,11 +33,8 @@ namespace DataClasses
                 {
                     ParseData(filePath);
                 }
-                var sums = SumData();
-                foreach (DailyReport report in sums)
-                {
-                    reports.Add(report);
-                }
+                AddDataForCountryRegion();
+                AddDataForGlobal();
             }
             else
             {
@@ -62,9 +59,9 @@ namespace DataClasses
             }
         }
 
-        private List<DailyReport> SumData()
+        private void AddDataForCountryRegion()
         {
-            return reports
+            var sums = reports
                 .GroupBy(r => new { r.CountryRegion, r.RecordDate })
                 .Select(cr => new DailyReport
                 {
@@ -75,6 +72,31 @@ namespace DataClasses
                     Recovered = cr.Sum(c => c.Recovered),
                     Deaths = cr.Sum(c => c.Deaths)
                 }).ToList();
+
+            foreach (DailyReport report in sums)
+            {
+                reports.Add(report);
+            }
+        }
+
+        private void AddDataForGlobal()
+        {
+            var sums = reports
+                .GroupBy(r => r.RecordDate)
+                .Select(cr => new DailyReport
+                {
+                    CountryRegion = "(All)",
+                    ProvinceState = "(All)",
+                    RecordDate = cr.Key,
+                    Confirmed = cr.Sum(c => c.Confirmed),
+                    Recovered = cr.Sum(c => c.Recovered),
+                    Deaths = cr.Sum(c => c.Deaths)
+                }).ToList();
+
+            foreach (DailyReport report in sums)
+            {
+                reports.Add(report);
+            }
         }
 
         private void ParseData(string filePath)

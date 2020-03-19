@@ -161,7 +161,6 @@ namespace WpfViewer.ViewModels
                 {
                     list = list.Where(r => r.ProvinceState == area.Province).ToList();
                 }
-
             }
 
             var confirmed = list.Select(r => r.Confirmed);
