@@ -6,15 +6,18 @@ namespace DataClasses
     {
         public DailyReport() { }
 
-        public DailyReport(string region, string state, string district, DateTime recordDate, int confirmed, int deaths, int recovered)
+        public DailyReport(string region, string state, string district, DateTime recordDate, int totalConfirmed, int newConfirmed, int totalDeaths, int newDeaths, int totalRecoverd, int newRecovered)
         {
             Region = region;
             State = state;
             District = district;
             RecordDate = recordDate;
-            Confirmed = confirmed;
-            Deaths = deaths;
-            Recovered = recovered;
+            TotalConfirmed = totalConfirmed;
+            NewConfirmed = newConfirmed;
+            TotalDeaths = totalDeaths;
+            NewDeaths = newDeaths;
+            TotalRecovered = totalRecoverd;
+            NewRecovered = newRecovered;
         }
 
         #region Properties
@@ -22,9 +25,12 @@ namespace DataClasses
         public string Region { get; set; }
         public string State { get; set; }
         public string District { get; set; }
-        public int Confirmed { get; set; }
-        public int Deaths { get; set; }
-        public int Recovered { get; set; }
+        public int TotalConfirmed { get; set; }
+        public int NewConfirmed { get; set; }
+        public int TotalDeaths { get; set; }
+        public int NewDeaths { get; set; }
+        public int TotalRecovered { get; set; }
+        public int NewRecovered { get; set; }
 
         private DateTime recordDate;
         public DateTime RecordDate
@@ -39,7 +45,7 @@ namespace DataClasses
 
         public override string ToString()
         {
-            return $"\"{Region}\",\"{State}\",{RecordDate},{Confirmed},{Deaths},{Recovered}";
+            return $"\"{Region}\",\"{State}\",{RecordDate},{TotalConfirmed},{TotalDeaths},{TotalRecovered}";
         }
 
         #endregion

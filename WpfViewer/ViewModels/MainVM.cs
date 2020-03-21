@@ -35,9 +35,9 @@ namespace WpfViewer.ViewModels
                     {
                         Region = g.Key.Region,
                         State = g.Key.State,
-                        Confirmed = g.Sum(s => s.Confirmed),
-                        Recovered = g.Sum(s => s.Recovered),
-                        Deaths = g.Sum(s => s.Deaths)
+                        Confirmed = g.Sum(s => s.TotalConfirmed),
+                        Recovered = g.Sum(s => s.TotalRecovered),
+                        Deaths = g.Sum(s => s.TotalDeaths)
 
                     });
 
@@ -169,9 +169,9 @@ namespace WpfViewer.ViewModels
                 }
             }
 
-            var confirmed = list.Select(r => r.Confirmed);
-            var recovered = list.Select(r => r.Recovered);
-            var deaths = list.Select(r => r.Deaths);
+            var confirmed = list.Select(r => r.TotalConfirmed);
+            var recovered = list.Select(r => r.TotalRecovered);
+            var deaths = list.Select(r => r.TotalDeaths);
             var dates = list.Select(r => r.RecordDate.ToString("MMM-dd"));
 
             SeriesCollection = new SeriesCollection

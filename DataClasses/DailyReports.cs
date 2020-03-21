@@ -34,7 +34,7 @@ namespace DataClasses
 
         #region Methods
 
-        private void ParseData(string filePath)
+        private void LoadData(string filePath)
         {
             var firstLine = true;
 
@@ -74,12 +74,12 @@ namespace DataClasses
                         state = fields[0].Trim();
                         region = fields[1].Trim();
                     }
-                    ////System.Diagnostics.Debug.WriteLine($"ParseData BEFORE:{region},{state},{district}");
+                    //System.Diagnostics.Debug.WriteLine($"ParseData BEFORE:{region},{state},{district}");
 
                     var lastUpdate = DateTime.Parse(fields[2]);
-                    int.TryParse(fields[3], out int confirmed);
-                    int.TryParse(fields[4], out int deaths);
-                    int.TryParse(fields[5], out int recovered);
+                    int.TryParse(fields[3], out int totalConfirmed);
+                    int.TryParse(fields[4], out int totalDeaths);
+                    int.TryParse(fields[5], out int totalRecovered);
 
                     foreach (var rep in replacements)
                     {
@@ -110,9 +110,27 @@ namespace DataClasses
                                 break;
                         }
                     }
-                    //System.Diagnostics.Debug.WriteLine($"ParseData  AFTER:{region},{state},{district}");
 
-                    var report = new DailyReport(region, state, district, lastUpdate, confirmed, deaths, recovered);
+                    // Calculate the daily change
+                    var newConfirmed = 0;
+                    var newDeaths = 0;
+                    var newRecovered = 0;
+                    var prevDateObj = from rep in reports
+                                             group rep by new { rep.Region, rep.State } into g
+                                             where g.Key.Region == region && g.Key.State == state
+                                             select g.OrderByDescending(t => t.RecordDate).FirstOrDefault();
+                    if (prevDateObj.Count() > 0)
+                    {
+                        var prevReport = prevDateObj.First();
+                        newConfirmed = totalConfirmed - prevReport.TotalConfirmed;
+                        newDeaths = totalDeaths - prevReport.TotalDeaths;
+                        newRecovered = totalRecovered - prevReport.TotalRecovered;
+                    }
+
+                    System.Diagnostics.Debug.WriteLine($"ParseData  AFTER:{region},{state},{district},{lastUpdate},{totalConfirmed},{newConfirmed}");
+
+                    // Add the report to the collection
+                    var report = new DailyReport(region, state, district, lastUpdate, totalConfirmed, newConfirmed, totalDeaths, newDeaths, totalRecovered, newRecovered);
                     reports.Add(report);
                 }
                 else
@@ -142,9 +160,9 @@ namespace DataClasses
                     State = "(All)",
                     District = "(All)",
                     RecordDate = cr.Key.RecordDate,
-                    Confirmed = cr.Sum(c => c.Confirmed),
-                    Recovered = cr.Sum(c => c.Recovered),
-                    Deaths = cr.Sum(c => c.Deaths)
+                    TotalConfirmed = cr.Sum(c => c.TotalConfirmed),
+                    TotalRecovered = cr.Sum(c => c.TotalRecovered),
+                    TotalDeaths = cr.Sum(c => c.TotalDeaths)
                 }).ToList();
 
             var allSums = reports
@@ -191,9 +209,9 @@ namespace DataClasses
                     Region = "(All)",
                     State = "(All)",
                     RecordDate = cr.Key,
-                    Confirmed = cr.Sum(c => c.Confirmed),
-                    Recovered = cr.Sum(c => c.Recovered),
-                    Deaths = cr.Sum(c => c.Deaths)
+                    TotalConfirmed = cr.Sum(c => c.TotalConfirmed),
+                    TotalRecovered = cr.Sum(c => c.TotalRecovered),
+                    TotalDeaths = cr.Sum(c => c.TotalDeaths)
                 }).ToList();
 
             foreach (DailyReport report in sums)
@@ -212,7 +230,7 @@ namespace DataClasses
             {
                 foreach (var filePath in filePaths)
                 {
-                    ParseData(filePath);
+                    LoadData(filePath);
                 }
                 AddSumsForRegion();
                 AddSumsForGlobal();
