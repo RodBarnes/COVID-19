@@ -35,10 +35,41 @@ namespace DataClasses
         private DateTime recordDate;
         public DateTime RecordDate
         {
-            get => DateTime.Parse(recordDate.ToString("yyyy-MM-dd"));
-            set => recordDate = value;
+            get => recordDate;
+            set => recordDate = new DateTime(value.Year, value.Month, value.Day);
         }
 
+        public string RegionState
+        {
+            get
+            {
+                var result = Region;
+                if (!string.IsNullOrEmpty(State))
+                {
+                    result += $",{State}";
+                }
+
+                return result;
+            }
+        }
+
+        public string RegionStateDistrict
+        {
+            get
+            {
+                var result = Region;
+                if (!string.IsNullOrEmpty(State))
+                {
+                    result += $",{State}";
+                }
+                if (!string.IsNullOrEmpty(District))
+                {
+                    result += $",{District}";
+                }
+
+                return result;
+            }
+        }
         #endregion
 
         #region Methods
