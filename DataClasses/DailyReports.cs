@@ -34,7 +34,7 @@ namespace DataClasses
 
         #region Methods
 
-        private void LoadData(string filePath)
+        private void ReadDataFromFile(string filePath)
         {
             var firstLine = true;
 
@@ -57,7 +57,7 @@ namespace DataClasses
                 //    else
                 //        sb.Append($",{fields[i]}");
                 //}
-                //System.Diagnostics.Debug.WriteLine($"FIELDS:{sb}");
+                //System.Diagnostics.Debug.WriteLine($"LoadData  FIELDS:{sb}");
 
                 if (!firstLine)
                 {
@@ -70,17 +70,18 @@ namespace DataClasses
                     }
                     else
                     {
-                        district = null;
+                        district = "";
                         state = fields[0].Trim();
                         region = fields[1].Trim();
                     }
 
-                    var lastUpdate = DateTime.Parse(fields[2]);
+                    var dateTime = DateTime.Parse(fields[2]);
+                    var recordDate = new DateTime(dateTime.Year, dateTime.Month, dateTime.Day);
                     int.TryParse(fields[3], out int totalConfirmed);
                     int.TryParse(fields[4], out int totalDeaths);
                     int.TryParse(fields[5], out int totalRecovered);
 
-                    //System.Diagnostics.Debug.WriteLine($"ParseData BEFORE:{region},{state},{district},{lastUpdate},{totalConfirmed},{totalRecovered},{totalDeaths}");
+                    //System.Diagnostics.Debug.WriteLine($"LoadData BEFORE:{region},{state},{district},{recordDate},{totalConfirmed},{totalRecovered},{totalDeaths}");
 
                     foreach (var rep in replacements)
                     {
@@ -128,14 +129,29 @@ namespace DataClasses
                         newRecovered = totalRecovered - prevReport.TotalRecovered;
                     }
 
-                    //System.Diagnostics.Debug.WriteLine($"ParseData  AFTER:{region},{state},{district},{lastUpdate},{totalConfirmed},{totalRecovered},{totalDeaths},{newConfirmed},{newRecovered},{newDeaths}");
-                    //if (region == "US" && state == "Washington")
+                    System.Diagnostics.Debug.WriteLine($"LoadData  AFTER:{region},{state},{district},{recordDate},{totalConfirmed},{totalRecovered},{totalDeaths},{newConfirmed},{newRecovered},{newDeaths}");
+                    //if (region == "Afghanistan")
                     //{
                     //    System.Diagnostics.Debugger.Break();
                     //}
-                    // Add the report to the collection
-                    var report = new DailyReport(region, state, district, lastUpdate, totalConfirmed, newConfirmed, totalDeaths, newDeaths, totalRecovered, newRecovered);
-                    reports.Add(report);
+
+                    var existingReport = reports.Where(i => i.Region == region && i.State == state && i.RecordDate == recordDate).FirstOrDefault();
+                    if (existingReport != null)
+                    {
+                        // Update the existing report
+                        existingReport.TotalConfirmed = totalConfirmed;
+                        existingReport.TotalRecovered = totalRecovered;
+                        existingReport.TotalDeaths = totalDeaths;
+                        existingReport.NewConfirmed = newConfirmed;
+                        existingReport.NewRecovered = newRecovered;
+                        existingReport.NewDeaths = newDeaths;
+                    }
+                    else
+                    {
+                        // Add the report to the collection
+                        var report = new DailyReport(region, state, district, recordDate, totalConfirmed, newConfirmed, totalDeaths, newDeaths, totalRecovered, newRecovered);
+                        reports.Add(report);
+                    }
                 }
                 else
                 {
@@ -234,15 +250,10 @@ namespace DataClasses
             {
                 foreach (var filePath in filePaths)
                 {
-                    LoadData(filePath);
+                    ReadDataFromFile(filePath);
                 }
-                AddSumsForRegion();
-                AddSumsForGlobal();
-
-                //foreach (var report in reports)
-                //{
-                //    System.Diagnostics.Debug.WriteLine($"MERGE:{report.Region},{report.State}");
-                //}
+                //AddSumsForRegion();
+                //AddSumsForGlobal();
             }
             else
             {
