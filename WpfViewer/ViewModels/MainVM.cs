@@ -25,13 +25,13 @@ namespace WpfViewer.ViewModels
                 reports
                 .GroupBy(r => new 
                 {
-                    r.CountryRegion,
-                    r.ProvinceState
+                    r.Region,
+                    r.State
                 })
                 .Select(g => new Area()
                 {
-                    Region = g.Key.CountryRegion,
-                    Province = g.Key.ProvinceState,
+                    Region = g.Key.Region,
+                    Province = g.Key.State,
                     Confirmed = g.Sum(s => s.Confirmed),
                     Recovered = g.Sum(s => s.Recovered),
                     Deaths = g.Sum(s => s.Deaths)
@@ -157,10 +157,10 @@ namespace WpfViewer.ViewModels
 
             if (!string.IsNullOrEmpty(area.Region))
             {
-                list = reports.Where(r => r.CountryRegion == area.Region).ToList();
+                list = reports.Where(r => r.Region == area.Region).ToList();
                 if (!string.IsNullOrEmpty(area.Province))
                 {
-                    list = list.Where(r => r.ProvinceState == area.Province).ToList();
+                    list = list.Where(r => r.State == area.Province).ToList();
                 }
             }
 

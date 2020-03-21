@@ -45,8 +45,8 @@ namespace DataClasses
                 {
                     ParseData(filePath);
                 }
-                AddDataForCountryRegion();
-                AddDataForGlobal();
+                AddSumsForRegion();
+                AddSumsForGlobal();
             }
             else
             {
@@ -65,68 +65,62 @@ namespace DataClasses
                 do
                 {
                     var fields = parser.ReadFields();
-                    replacements.Add(new Replacement(fields[0], fields[1]));
+                    replacements.Add(new Replacement(fields));
                 }
                 while (!parser.EndOfData);
             }
         }
 
-        private void AddDataForCountryRegion()
+        private void AddSumsForRegion()
         {
             var regionSums = reports
-                .GroupBy(r => new { r.CountryRegion, r.RecordDate })
+                .GroupBy(r => new { r.Region, r.RecordDate })
                 .Select(cr => new DailyReport
                 {
-                    CountryRegion = cr.Key.CountryRegion,
-                    ProvinceState = "(All)",
+                    Region = cr.Key.Region,
+                    State = "(All)",
+                    District = "(All)",
                     RecordDate = cr.Key.RecordDate,
                     Confirmed = cr.Sum(c => c.Confirmed),
                     Recovered = cr.Sum(c => c.Recovered),
                     Deaths = cr.Sum(c => c.Deaths)
                 }).ToList();
 
-            var alls = reports
-                .GroupBy(r => new { r.CountryRegion, r.ProvinceState })
-                .Select(r => new { r.Key.CountryRegion, r.Key.ProvinceState })
-                .Where(r => !string.IsNullOrEmpty(r.CountryRegion) && string.IsNullOrEmpty(r.ProvinceState)).ToList();
-
-            //foreach (var all in alls)
-            //{
-            //    System.Diagnostics.Debug.WriteLine($"alls:{all.CountryRegion},{all.ProvinceState}");
-            //}
+            var allSums = reports
+                .GroupBy(r => new { r.Region, r.State })
+                .Select(r => new { r.Key.Region, r.Key.State })
+                .Where(r => !string.IsNullOrEmpty(r.Region) && string.IsNullOrEmpty(r.State)).ToList();
 
             foreach (DailyReport regionSum in regionSums)
             {
-                //System.Diagnostics.Debug.WriteLine($"sums:{regionSum.CountryRegion},{regionSum.ProvinceState}");
-
-                var all = alls.Where(a => a.CountryRegion == regionSum.CountryRegion);
-                var chk = alls.Where(a => a.CountryRegion == regionSum.CountryRegion).Count();
+                // If there is no existing (All) record, add one
+                var all = allSums.Where(a => a.Region == regionSum.Region);
+                var chk = allSums.Where(a => a.Region == regionSum.Region).Count();
                 if (chk == 0)
                 {
-                    // Add the regionSum
+                    // Add the (All) for the region
                     reports.Add(regionSum);
                 }
                 else
                 {
-
-                    // Update the existing region for the records with province 'All'
-                    var fixex = reports.Where(r => r.CountryRegion == regionSum.CountryRegion).ToList();
+                    //Else, update the existing (All) record
+                    var fixex = reports.Where(r => r.Region == regionSum.Region).ToList();
                     foreach (var fix in fixex)
                     {
-                        fix.ProvinceState = "(All)";
+                        fix.State = "(All)";
                     }
                 }
             }
         }
 
-        private void AddDataForGlobal()
+        private void AddSumsForGlobal()
         {
             var sums = reports
                 .GroupBy(r => r.RecordDate)
                 .Select(cr => new DailyReport
                 {
-                    CountryRegion = "(All)",
-                    ProvinceState = "(All)",
+                    Region = "(All)",
+                    State = "(All)",
                     RecordDate = cr.Key,
                     Confirmed = cr.Sum(c => c.Confirmed),
                     Recovered = cr.Sum(c => c.Recovered),
@@ -148,11 +142,43 @@ namespace DataClasses
             parser.HasFieldsEnclosedInQuotes = true;
             do
             {
+                string state;
+                string region;
+                string district;
+
                 var fields = parser.ReadFields();
+
+                //var sb = new System.Text.StringBuilder();
+                //foreach (var field in fields)
+                //{
+                //    if (sb.Length == 0)
+                //    {
+                //        sb.Append(field);
+                //    }
+                //    else
+                //    {
+                //        sb.Append($",{field}");
+                //    }
+                //}
+                //System.Diagnostics.Debug.WriteLine($"{sb}");
+
                 if (!firstLine)
                 {
-                    string provinceState = fields[0].Trim();
-                    string countryRegion = fields[1].Trim();
+                    if (fields[0].Contains(','))
+                    {
+                        var split = fields[0].Split(',');
+                        district = split[0].Trim();
+                        state = split[1].Trim();
+                        region = fields[1].Trim();
+                    }
+                    else
+                    {
+                        district = null;
+                        state = fields[0].Trim();
+                        region = fields[1].Trim();
+                    }
+                    //System.Diagnostics.Debug.WriteLine($"{region},{state},{district}");
+
                     var lastUpdate = DateTime.Parse(fields[2]);
                     int.TryParse(fields[3], out int confirmed);
                     int.TryParse(fields[4], out int deaths);
@@ -160,17 +186,35 @@ namespace DataClasses
 
                     foreach (var rep in replacements)
                     {
-                        if (countryRegion == rep.From)
+                        switch (rep.ReplacementType)
                         {
-                            countryRegion = rep.To;
-                        }
-                        if (provinceState == rep.From)
-                        {
-                            provinceState = rep.To;
+                            case 1:
+                                if (region == rep.FromRegion)
+                                {
+                                    region = rep.ToRegion;
+                                }
+                                break;
+                            case 2:
+                                if (region == rep.FromRegion && state == rep.FromState)
+                                {
+                                    region = rep.ToRegion;
+                                    state = rep.ToState;
+                                }
+                                break;
+                            case 3:
+                                if (region == rep.FromRegion && state == rep.FromState && district == rep.FromDistrict)
+                                {
+                                    region = rep.ToRegion;
+                                    state = rep.ToState;
+                                    district = rep.ToDistrict;
+                                }
+                                break;
+                            default:
+                                break;
                         }
                     }
 
-                    var report = new DailyReport(countryRegion, provinceState, lastUpdate, confirmed, deaths, recovered);
+                    var report = new DailyReport(region, state, district, lastUpdate, confirmed, deaths, recovered);
                     reports.Add(report);
                 }
                 else

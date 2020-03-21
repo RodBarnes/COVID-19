@@ -6,10 +6,11 @@ namespace DataClasses
     {
         public DailyReport() { }
 
-        public DailyReport(string countryRegion, string provinceState, DateTime recordDate, int confirmed, int deaths, int recovered)
+        public DailyReport(string region, string state, string district, DateTime recordDate, int confirmed, int deaths, int recovered)
         {
-            CountryRegion = countryRegion;
-            ProvinceState = provinceState;
+            Region = region;
+            State = state;
+            District = district;
             RecordDate = recordDate;
             Confirmed = confirmed;
             Deaths = deaths;
@@ -18,8 +19,9 @@ namespace DataClasses
 
         #region Properties
 
-        public string CountryRegion { get; set; }
-        public string ProvinceState { get; set; }
+        public string Region { get; set; }
+        public string State { get; set; }
+        public string District { get; set; }
         public int Confirmed { get; set; }
         public int Deaths { get; set; }
         public int Recovered { get; set; }
@@ -37,7 +39,7 @@ namespace DataClasses
 
         public override string ToString()
         {
-            return $"\"{CountryRegion}\",\"{ProvinceState}\",{RecordDate},{Confirmed},{Deaths},{Recovered}";
+            return $"\"{Region}\",\"{State}\",{RecordDate},{Confirmed},{Deaths},{Recovered}";
         }
 
         #endregion
