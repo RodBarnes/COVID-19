@@ -74,12 +74,13 @@ namespace DataClasses
                         state = fields[0].Trim();
                         region = fields[1].Trim();
                     }
-                    //System.Diagnostics.Debug.WriteLine($"ParseData BEFORE:{region},{state},{district}");
 
                     var lastUpdate = DateTime.Parse(fields[2]);
                     int.TryParse(fields[3], out int totalConfirmed);
                     int.TryParse(fields[4], out int totalDeaths);
                     int.TryParse(fields[5], out int totalRecovered);
+
+                    //System.Diagnostics.Debug.WriteLine($"ParseData BEFORE:{region},{state},{district},{lastUpdate},{totalConfirmed},{totalRecovered},{totalDeaths}");
 
                     foreach (var rep in replacements)
                     {
@@ -116,9 +117,9 @@ namespace DataClasses
                     var newDeaths = 0;
                     var newRecovered = 0;
                     var prevDateObj = from rep in reports
-                                             group rep by new { rep.Region, rep.State } into g
-                                             where g.Key.Region == region && g.Key.State == state
-                                             select g.OrderByDescending(t => t.RecordDate).FirstOrDefault();
+                                    group rep by new { rep.Region, rep.State, rep.District } into g
+                                    where g.Key.Region == region && g.Key.State == state && g.Key.District == district
+                                    select g.OrderByDescending(t => t.RecordDate).FirstOrDefault();
                     if (prevDateObj.Count() > 0)
                     {
                         var prevReport = prevDateObj.First();
@@ -127,8 +128,11 @@ namespace DataClasses
                         newRecovered = totalRecovered - prevReport.TotalRecovered;
                     }
 
-                    System.Diagnostics.Debug.WriteLine($"ParseData  AFTER:{region},{state},{district},{lastUpdate},{totalConfirmed},{newConfirmed}");
-
+                    //System.Diagnostics.Debug.WriteLine($"ParseData  AFTER:{region},{state},{district},{lastUpdate},{totalConfirmed},{totalRecovered},{totalDeaths},{newConfirmed},{newRecovered},{newDeaths}");
+                    //if (region == "US" && state == "Washington")
+                    //{
+                    //    System.Diagnostics.Debugger.Break();
+                    //}
                     // Add the report to the collection
                     var report = new DailyReport(region, state, district, lastUpdate, totalConfirmed, newConfirmed, totalDeaths, newDeaths, totalRecovered, newRecovered);
                     reports.Add(report);
