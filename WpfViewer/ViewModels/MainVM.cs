@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
+using Common;
 using DataClasses;
 using LiveCharts;
 using LiveCharts.Wpf;
@@ -18,27 +19,31 @@ namespace WpfViewer.ViewModels
 
         public MainVM()
         {
-            reports = new DailyReports(readPath);
+            using (new WaitCursor())
+            {
+                reports = new DailyReports(readPath);
 
-            // Get the list of areas for the combo box
-            var areas =
-                reports
-                .GroupBy(r => new 
-                {
-                    r.Region,
-                    r.State
-                })
-                .Select(g => new Area()
-                {
-                    Region = g.Key.Region,
-                    Province = g.Key.State,
-                    Confirmed = g.Sum(s => s.Confirmed),
-                    Recovered = g.Sum(s => s.Recovered),
-                    Deaths = g.Sum(s => s.Deaths)
+                // Get the list of areas for the combo box
+                var areas =
+                    reports
+                    .GroupBy(r => new 
+                    {
+                        r.Region,
+                        r.State
+                    })
+                    .Select(g => new Area()
+                    {
+                        Region = g.Key.Region,
+                        State = g.Key.State,
+                        Confirmed = g.Sum(s => s.Confirmed),
+                        Recovered = g.Sum(s => s.Recovered),
+                        Deaths = g.Sum(s => s.Deaths)
 
-                });
-            Areas = new ObservableCollection<Area>(areas.Distinct().OrderBy(a => a.RegionProvince));
-            SelectedArea = Areas.Where(a => a.Region == "(All)").FirstOrDefault();
+                    });
+
+                Areas = new ObservableCollection<Area>(areas.Distinct().OrderBy(a => a.RegionState));
+                SelectedArea = Areas.Where(a => a.Region == "(All)").FirstOrDefault();
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -158,9 +163,9 @@ namespace WpfViewer.ViewModels
             if (!string.IsNullOrEmpty(area.Region))
             {
                 list = reports.Where(r => r.Region == area.Region).ToList();
-                if (!string.IsNullOrEmpty(area.Province))
+                if (!string.IsNullOrEmpty(area.State))
                 {
-                    list = list.Where(r => r.State == area.Province).ToList();
+                    list = list.Where(r => r.State == area.State).ToList();
                 }
             }
 
@@ -205,22 +210,22 @@ namespace WpfViewer.ViewModels
     {
         public Area() { }
 
-        public Area(string region, string province, int confirmed, int recovered, int deaths)
+        public Area(string region, string state, int confirmed, int recovered, int deaths)
         {
             Region = region;
-            Province = province;
+            State = state;
             Confirmed = confirmed;
             Recovered = recovered;
             Deaths = deaths;
         }
         public string Region { get; set; }
-        public string Province { get; set; }
+        public string State { get; set; }
         public int Confirmed { get; set; }
         public int Recovered { get; set; }
         public int Deaths { get; set; }
-        public string RegionProvince
+        public string RegionState
         {
-            get => $"{Region},{Province}";
+            get => $"{Region},{State}";
         }
     }
 }

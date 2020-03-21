@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace DataClasses
 {
@@ -33,106 +34,6 @@ namespace DataClasses
 
         #region Methods
 
-        public void MergeData(string path)
-        {
-            readHeaders = true;
-
-            var filePaths = Directory.GetFiles(path, "*.csv");
-
-            if (filePaths.Length > 0)
-            {
-                foreach (var filePath in filePaths)
-                {
-                    ParseData(filePath);
-                }
-                AddSumsForRegion();
-                AddSumsForGlobal();
-            }
-            else
-            {
-                throw new FileNotFoundException($"No files found at path '{path}'.");
-            }
-        }
-
-        private void ReadReplacements()
-        {
-            var dir = Directory.GetCurrentDirectory();
-            var filePath = $@"{dir}\Replacements.csv";
-            using (parser = new TextFieldParser(filePath))
-            {
-                parser.SetDelimiters(",");
-                parser.HasFieldsEnclosedInQuotes = true;
-                do
-                {
-                    var fields = parser.ReadFields();
-                    replacements.Add(new Replacement(fields));
-                }
-                while (!parser.EndOfData);
-            }
-        }
-
-        private void AddSumsForRegion()
-        {
-            var regionSums = reports
-                .GroupBy(r => new { r.Region, r.RecordDate })
-                .Select(cr => new DailyReport
-                {
-                    Region = cr.Key.Region,
-                    State = "(All)",
-                    District = "(All)",
-                    RecordDate = cr.Key.RecordDate,
-                    Confirmed = cr.Sum(c => c.Confirmed),
-                    Recovered = cr.Sum(c => c.Recovered),
-                    Deaths = cr.Sum(c => c.Deaths)
-                }).ToList();
-
-            var allSums = reports
-                .GroupBy(r => new { r.Region, r.State })
-                .Select(r => new { r.Key.Region, r.Key.State })
-                .Where(r => !string.IsNullOrEmpty(r.Region) && string.IsNullOrEmpty(r.State)).ToList();
-
-            foreach (DailyReport regionSum in regionSums)
-            {
-                // If there is no existing (All) record, add one
-                var all = allSums.Where(a => a.Region == regionSum.Region);
-                var chk = allSums.Where(a => a.Region == regionSum.Region).Count();
-                if (chk == 0)
-                {
-                    // Add the (All) for the region
-                    reports.Add(regionSum);
-                }
-                else
-                {
-                    //Else, update the existing (All) record
-                    var fixex = reports.Where(r => r.Region == regionSum.Region).ToList();
-                    foreach (var fix in fixex)
-                    {
-                        fix.State = "(All)";
-                    }
-                }
-            }
-        }
-
-        private void AddSumsForGlobal()
-        {
-            var sums = reports
-                .GroupBy(r => r.RecordDate)
-                .Select(cr => new DailyReport
-                {
-                    Region = "(All)",
-                    State = "(All)",
-                    RecordDate = cr.Key,
-                    Confirmed = cr.Sum(c => c.Confirmed),
-                    Recovered = cr.Sum(c => c.Recovered),
-                    Deaths = cr.Sum(c => c.Deaths)
-                }).ToList();
-
-            foreach (DailyReport report in sums)
-            {
-                reports.Add(report);
-            }
-        }
-
         private void ParseData(string filePath)
         {
             var firstLine = true;
@@ -148,19 +49,15 @@ namespace DataClasses
 
                 var fields = parser.ReadFields();
 
-                //var sb = new System.Text.StringBuilder();
-                //foreach (var field in fields)
+                //var sb = new StringBuilder();
+                //for (int i = 0; i<fields.Length; i++)
                 //{
-                //    if (sb.Length == 0)
-                //    {
-                //        sb.Append(field);
-                //    }
+                //    if (i == 0)
+                //        sb.Append(fields[i]);
                 //    else
-                //    {
-                //        sb.Append($",{field}");
-                //    }
+                //        sb.Append($",{fields[i]}");
                 //}
-                //System.Diagnostics.Debug.WriteLine($"{sb}");
+                //System.Diagnostics.Debug.WriteLine($"FIELDS:{sb}");
 
                 if (!firstLine)
                 {
@@ -177,7 +74,7 @@ namespace DataClasses
                         state = fields[0].Trim();
                         region = fields[1].Trim();
                     }
-                    //System.Diagnostics.Debug.WriteLine($"{region},{state},{district}");
+                    ////System.Diagnostics.Debug.WriteLine($"ParseData BEFORE:{region},{state},{district}");
 
                     var lastUpdate = DateTime.Parse(fields[2]);
                     int.TryParse(fields[3], out int confirmed);
@@ -213,6 +110,7 @@ namespace DataClasses
                                 break;
                         }
                     }
+                    //System.Diagnostics.Debug.WriteLine($"ParseData  AFTER:{region},{state},{district}");
 
                     var report = new DailyReport(region, state, district, lastUpdate, confirmed, deaths, recovered);
                     reports.Add(report);
@@ -232,6 +130,119 @@ namespace DataClasses
                 }
             }
             while (!parser.EndOfData);
+        }
+
+        private void AddSumsForRegion()
+        {
+            var regionSums = reports
+                .GroupBy(r => new { r.Region, r.RecordDate })
+                .Select(cr => new DailyReport
+                {
+                    Region = cr.Key.Region,
+                    State = "(All)",
+                    District = "(All)",
+                    RecordDate = cr.Key.RecordDate,
+                    Confirmed = cr.Sum(c => c.Confirmed),
+                    Recovered = cr.Sum(c => c.Recovered),
+                    Deaths = cr.Sum(c => c.Deaths)
+                }).ToList();
+
+            var allSums = reports
+                .GroupBy(r => new { r.Region, r.State })
+                .Select(r => new { r.Key.Region, r.Key.State })
+                .Where(r => !string.IsNullOrEmpty(r.Region) && string.IsNullOrEmpty(r.State)).ToList();
+
+            foreach (DailyReport regionSum in regionSums)
+            {
+                //System.Diagnostics.Debug.WriteLine($"TEST:{regionSum.Region},{regionSum.State},{regionSum.District}");
+
+                //var tests = regionSums.Where(r => r.Region == "Taiwan").ToList();
+                //foreach (var test in tests)
+                //{
+                //    System.Diagnostics.Debug.WriteLine($"TEST:{test.Region},{test.State},{test.District}");
+                //}
+
+                // If there is no existing (All) record, add one
+                var all = allSums.Where(a => a.Region == regionSum.Region);
+                var chk = allSums.Where(a => a.Region == regionSum.Region).Count();
+                if (chk == 0)
+                {
+                    // Add the (All) for the region
+                    reports.Add(regionSum);
+                }
+                else
+                {
+                    //Else, update the existing (All) record
+                    var fixes = reports.Where(r => r.Region == regionSum.Region).ToList();
+                    foreach (var fix in fixes)
+                    {
+                        fix.State = "(All)";
+                    }
+                }
+            }
+        }
+
+        private void AddSumsForGlobal()
+        {
+            var sums = reports
+                .GroupBy(r => r.RecordDate)
+                .Select(cr => new DailyReport
+                {
+                    Region = "(All)",
+                    State = "(All)",
+                    RecordDate = cr.Key,
+                    Confirmed = cr.Sum(c => c.Confirmed),
+                    Recovered = cr.Sum(c => c.Recovered),
+                    Deaths = cr.Sum(c => c.Deaths)
+                }).ToList();
+
+            foreach (DailyReport report in sums)
+            {
+                reports.Add(report);
+            }
+        }
+
+        public void MergeData(string path)
+        {
+            readHeaders = true;
+
+            var filePaths = Directory.GetFiles(path, "*.csv");
+
+            if (filePaths.Length > 0)
+            {
+                foreach (var filePath in filePaths)
+                {
+                    ParseData(filePath);
+                }
+                AddSumsForRegion();
+                AddSumsForGlobal();
+
+                //foreach (var report in reports)
+                //{
+                //    System.Diagnostics.Debug.WriteLine($"MERGE:{report.Region},{report.State}");
+                //}
+            }
+            else
+            {
+                throw new FileNotFoundException($"No files found at path '{path}'.");
+            }
+        }
+
+        private void ReadReplacements()
+        {
+            var dir = Directory.GetCurrentDirectory();
+            var filePath = $@"{dir}\Replacements.csv";
+            using (parser = new TextFieldParser(filePath))
+            {
+                parser.SetDelimiters(",");
+                parser.HasFieldsEnclosedInQuotes = true;
+                do
+                {
+                    var fields = parser.ReadFields();
+                    replacements.Add(new Replacement(fields));
+                }
+                while (!parser.EndOfData);
+            }
         }
 
         #endregion

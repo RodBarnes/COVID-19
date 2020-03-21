@@ -36,8 +36,8 @@
                 <TextBlock Text="{Binding DeathsPct}" />
             </StackPanel>
         </StackPanel>
-        <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding SelectedArea.RegionProvince}" HorizontalAlignment="Center" FontSize="18" />
-        <ListBox Grid.Column="1" Grid.Row="2" ItemsSource="{Binding Areas}" SelectedItem="{Binding SelectedArea}" DisplayMemberPath="RegionProvince" />
+        <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding SelectedArea.RegionState}" HorizontalAlignment="Center" FontSize="18" />
+        <ListBox Grid.Column="1" Grid.Row="2" ItemsSource="{Binding Areas}" SelectedItem="{Binding SelectedArea}" DisplayMemberPath="RegionState" />
         <lvc:CartesianChart Grid.Column="2" Grid.Row="2" Series="{Binding SeriesCollection}" LegendLocation="Right" Background="LightBlue" >
             <lvc:CartesianChart.AxisY>
                 <lvc:Axis Title="Cases" LabelFormatter="{Binding YFormatter}"></lvc:Axis>

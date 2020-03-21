@@ -6,22 +6,6 @@
         {
             ReplacementType = int.Parse(fields[0]);
 
-
-            //var sb = new System.Text.StringBuilder();
-            //foreach (var field in fields)
-            //{
-            //    if (sb.Length == 0)
-            //    {
-            //        sb.Append(field);
-            //    }
-            //    else
-            //    {
-            //        sb.Append($",{field}");
-            //    }
-            //}
-            //System.Diagnostics.Debug.WriteLine($"{sb}");
-
-
             switch (ReplacementType)
             {
                 case 1:
