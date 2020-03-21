@@ -37,9 +37,10 @@ namespace WpfViewer.ViewModels
                         Recovered = g.Sum(s => s.TotalRecovered),
                         Deaths = g.Sum(s => s.TotalDeaths)
 
-                    });
+                    })
+                    .OrderBy(a => a.RegionState);
 
-                Areas = new ObservableCollection<Area>(areas.Distinct().OrderBy(a => a.RegionState));
+                Areas = new ObservableCollection<Area>(areas);
                 SelectedArea = Areas.Where(a => a.Region == "(All)").FirstOrDefault();
             }
         }

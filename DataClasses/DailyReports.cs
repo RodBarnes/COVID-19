@@ -10,7 +10,7 @@ namespace DataClasses
 {
     public class DailyReports : IList<DailyReport>
     {
-        private readonly List<DailyReport> reports = new List<DailyReport>();
+        private readonly List<DailyReport> list = new List<DailyReport>();
         private TextFieldParser parser;
         private bool readHeaders = true;
 
@@ -117,7 +117,7 @@ namespace DataClasses
                     var newConfirmed = 0;
                     var newDeaths = 0;
                     var newRecovered = 0;
-                    var prevDateObj = from rep in reports
+                    var prevDateObj = from rep in list
                                     group rep by new { rep.Region, rep.State, rep.District } into g
                                     where g.Key.Region == region && g.Key.State == state && g.Key.District == district
                                     select g.OrderByDescending(t => t.RecordDate).FirstOrDefault();
@@ -135,7 +135,7 @@ namespace DataClasses
                     //    System.Diagnostics.Debugger.Break();
                     //}
 
-                    var existingReport = reports.Where(i => i.Region == region && i.State == state && i.RecordDate == recordDate).FirstOrDefault();
+                    var existingReport = list.Where(i => i.Region == region && i.State == state && i.RecordDate == recordDate).FirstOrDefault();
                     if (existingReport != null)
                     {
                         // Update the existing report
@@ -150,7 +150,7 @@ namespace DataClasses
                     {
                         // Add the report to the collection
                         var report = new DailyReport(region, state, district, recordDate, totalConfirmed, newConfirmed, totalDeaths, newDeaths, totalRecovered, newRecovered);
-                        reports.Add(report);
+                        list.Add(report);
                     }
                 }
                 else
@@ -172,7 +172,7 @@ namespace DataClasses
 
         private void AddSumsForRegion()
         {
-            var regionSums = reports
+            var regionSums = list
                 .GroupBy(r => new { r.Region, r.RecordDate })
                 .Select(cr => new DailyReport
                 {
@@ -185,7 +185,7 @@ namespace DataClasses
                     TotalDeaths = cr.Sum(c => c.TotalDeaths)
                 }).ToList();
 
-            var allSums = reports
+            var allSums = list
                 .GroupBy(r => new { r.Region, r.State })
                 .Select(r => new { r.Key.Region, r.Key.State })
                 .Where(r => !string.IsNullOrEmpty(r.Region) && string.IsNullOrEmpty(r.State)).ToList();
@@ -206,12 +206,12 @@ namespace DataClasses
                 if (chk == 0)
                 {
                     // Add the (All) for the region
-                    reports.Add(regionSum);
+                    list.Add(regionSum);
                 }
                 else
                 {
                     //Else, update the existing (All) record
-                    var fixes = reports.Where(r => r.Region == regionSum.Region).ToList();
+                    var fixes = list.Where(r => r.Region == regionSum.Region).ToList();
                     foreach (var fix in fixes)
                     {
                         fix.State = "(All)";
@@ -222,7 +222,7 @@ namespace DataClasses
 
         private void AddSumsForGlobal()
         {
-            var sums = reports
+            var sums = list
                 .GroupBy(r => r.RecordDate)
                 .Select(cr => new DailyReport
                 {
@@ -236,7 +236,7 @@ namespace DataClasses
 
             foreach (DailyReport report in sums)
             {
-                reports.Add(report);
+                list.Add(report);
             }
         }
 
@@ -252,8 +252,8 @@ namespace DataClasses
                 {
                     ReadDataFromFile(filePath);
                 }
-                //AddSumsForRegion();
-                //AddSumsForGlobal();
+                AddSumsForRegion();
+                AddSumsForGlobal();
             }
             else
             {
@@ -282,31 +282,31 @@ namespace DataClasses
 
         #region Standard List Operations
 
-        public DailyReport this[int index] { get => reports[index]; set => reports[index] = value; }
+        public DailyReport this[int index] { get => list[index]; set => list[index] = value; }
 
-        public int Count => reports.Count;
+        public int Count => list.Count;
 
-        public bool IsReadOnly => ((IList<DailyReport>)reports).IsReadOnly;
+        public bool IsReadOnly => ((IList<DailyReport>)list).IsReadOnly;
 
-        public void Add(DailyReport item) => reports.Add(item);
+        public void Add(DailyReport item) => list.Add(item);
 
-        public void Clear() => reports.Clear();
+        public void Clear() => list.Clear();
 
-        public bool Contains(DailyReport item) => reports.Contains(item);
+        public bool Contains(DailyReport item) => list.Contains(item);
 
-        public void CopyTo(DailyReport[] array, int arrayIndex) => reports.CopyTo(array, arrayIndex);
+        public void CopyTo(DailyReport[] array, int arrayIndex) => list.CopyTo(array, arrayIndex);
 
-        public IEnumerator<DailyReport> GetEnumerator() => ((IList<DailyReport>)reports).GetEnumerator();
+        public IEnumerator<DailyReport> GetEnumerator() => ((IList<DailyReport>)list).GetEnumerator();
         
-        public int IndexOf(DailyReport item) => reports.IndexOf(item);
+        public int IndexOf(DailyReport item) => list.IndexOf(item);
 
-        public void Insert(int index, DailyReport item) => reports.Insert(index, item);
+        public void Insert(int index, DailyReport item) => list.Insert(index, item);
 
-        public bool Remove(DailyReport item) => reports.Remove(item);
+        public bool Remove(DailyReport item) => list.Remove(item);
 
-        public void RemoveAt(int index) => reports.RemoveAt(index);
+        public void RemoveAt(int index) => list.RemoveAt(index);
 
-        IEnumerator IEnumerable.GetEnumerator() => ((IList<DailyReport>)reports).GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => ((IList<DailyReport>)list).GetEnumerator();
 
         #endregion
     }
