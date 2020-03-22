@@ -21,6 +21,9 @@ namespace WpfViewer.ViewModels
 
         public MainVM()
         {
+            InitBusyPanel();
+            InitMessagePanel();
+
             bw = new BackgroundWorker
             {
                 WorkerReportsProgress = true,

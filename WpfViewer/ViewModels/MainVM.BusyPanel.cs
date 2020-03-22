@@ -6,6 +6,7 @@ using Common;
 /// This is kept in the CommonLibrary because it is generic with the exception that:
 /// 1) it has to be copied into the ViewModels folder of the project where it will be used, and
 /// 2) after copying the namespaced must be updated with the project_name.ViewModels
+/// 3) the InitBusyPanel() must be called at the top of public MainVM()
 /// </summary>
 namespace WpfViewer.ViewModels
 {

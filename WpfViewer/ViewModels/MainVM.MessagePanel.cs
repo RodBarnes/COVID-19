@@ -6,6 +6,7 @@ using Common;
 /// This is kept in the CommonLibrary because it is generic with the exception that:
 /// 1) it has to be copied into the ViewModels folder of the project where it will be used, and
 /// 2) after copying the namespaced must be updated with the project_name.ViewModels
+/// 3) the InitMessagePanel() must be called at the top of public MainVM()
 /// </summary>
 namespace WpfViewer.ViewModels
 {
@@ -186,27 +187,6 @@ namespace WpfViewer.ViewModels
             {
                 MessageResponseContent = "Yes";
                 MessageNoVisibility = "Visible";
-            }
-
-            // Additional settings
-            switch (msgAction)
-            {
-                case MessageAction.Acknowledge:
-                    break;
-                case MessageAction.DeleteSubtransaction:
-                    break;
-                case MessageAction.DeleteTransaction:
-                    break;
-                case MessageAction.DeleteAccount:
-                    MessageConfirmContent = "Check this to REALLY proceed!";
-                    break;
-                case MessageAction.ResolveTransfers:
-                    MessageConfirmContent = "Check this to REALLY proceed!";
-                    break;
-                case MessageAction.MergeTransactions:
-                    break;
-                default:
-                    break;
             }
 
             // Used by MessagePanelResponse to determine action
