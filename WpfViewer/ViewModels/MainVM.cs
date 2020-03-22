@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Windows.Media;
 using Common;
 using DataClasses;
@@ -14,6 +12,13 @@ using LiveCharts.Wpf;
 
 namespace WpfViewer.ViewModels
 {
+    enum ViewType
+    {
+        LineChart,
+        BarChart,
+        DataGrid
+    }
+
     public partial class MainVM : INotifyPropertyChanged
     {
         private readonly string readPath = @"D:\Source\BitBucket\3rd Party\COVID-19\csse_covid_19_data\csse_covid_19_daily_reports";
@@ -23,6 +28,7 @@ namespace WpfViewer.ViewModels
         {
             InitBusyPanel();
             InitMessagePanel();
+            InitMainPanel();
 
             bw = new BackgroundWorker
             {
@@ -43,6 +49,104 @@ namespace WpfViewer.ViewModels
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         #region Properties
+
+        private ObservableCollection<string> viewSelections;
+        public ObservableCollection<string> ViewSelections
+        {
+            get => viewSelections;
+            set
+            {
+                viewSelections = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private int viewIndex = 0;
+        public int ViewIndex
+        {
+            get => viewIndex;
+            set
+            {
+                viewIndex = value;
+                NotifyPropertyChanged();
+                if (viewIndex >= 0)
+                {
+                    switch (viewIndex)
+                    {
+                        case 0:
+                            SetDisplayView(ViewType.LineChart);
+                            ShowLineChart(SelectedTotalReport);
+                            break;
+                        case 1:
+                            SetDisplayView(ViewType.BarChart);
+                            ShowBarChar(SelectedTotalReport);
+                            break;
+                        case 2:
+                            SetDisplayView(ViewType.DataGrid);
+                            ShowDataGrid(SelectedTotalReport);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+
+        private ObservableCollection<DailyReport> regionDailyReports;
+        public ObservableCollection<DailyReport> RegionDailyReports
+        {
+            get => regionDailyReports;
+            set
+            {
+                regionDailyReports = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private DailyReport selectedDailyReport;
+
+        public DailyReport SelectedDailyReport
+        {
+            get => selectedDailyReport;
+            set
+            {
+                selectedDailyReport = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private string lineChartVisibility = "Visible";
+        public string LineChartVisibility
+        {
+            get => lineChartVisibility;
+            set
+            {
+                lineChartVisibility = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private string barChartVisibility = "Collapsed";
+        public string BarChartVisibility
+        {
+            get => barChartVisibility;
+            set
+            {
+                barChartVisibility = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private string dataGridVisibility = "Collapsed";
+        public string DataGridVisibility
+        {
+            get => dataGridVisibility;
+            set
+            {
+                dataGridVisibility = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         private ObservableCollection<TotalReport> totalReports;
         public ObservableCollection<TotalReport> TotalReports
@@ -66,17 +170,27 @@ namespace WpfViewer.ViewModels
             }
         }
 
-        private TotalReport selectedReport;
-        public TotalReport SelectedReport
+        private TotalReport selectedTotalReport;
+        public TotalReport SelectedTotalReport
         {
-            get => selectedReport;
+            get => selectedTotalReport;
             set
             {
-                selectedReport = value;
+                selectedTotalReport = value;
                 NotifyPropertyChanged();
-                if (selectedReport != null)
+                if (selectedTotalReport != null)
                 {
-                    UpdateDisplay(SelectedReport);
+                    switch(ViewIndex)
+                    {
+                        case 0:
+                            ShowLineChart(selectedTotalReport);
+                            break;
+                        case 1:
+                            break;
+                        case 2:
+                            ShowDataGrid(SelectedTotalReport);
+                            break;
+                    }
                 }
             }
         }
@@ -151,6 +265,39 @@ namespace WpfViewer.ViewModels
 
         #region Methods
 
+        private void InitMainPanel()
+        {
+            var col = new ObservableCollection<string>();
+            col.Add("Line Chart");
+            col.Add("Bar Chart");
+            col.Add("Data Grid");
+            ViewSelections = col;
+        }
+
+        private void SetDisplayView(ViewType type)
+        {
+            switch(type)
+            {
+                case ViewType.LineChart:
+                    LineChartVisibility = "Visible";
+                    BarChartVisibility = "Collapsed";
+                    DataGridVisibility = "Collapsed";
+                    break;
+                case ViewType.BarChart:
+                    LineChartVisibility = "Collapsed";
+                    BarChartVisibility = "Visible";
+                    DataGridVisibility = "Collapsed";
+                    break;
+                case ViewType.DataGrid:
+                    LineChartVisibility = "Collapsed";
+                    BarChartVisibility = "Collapsed";
+                    DataGridVisibility = "Visible";
+                    break;
+                default:
+                    break;
+            }
+        }
+
         private void PullLastestData()
         {
             var gitCmd = @"""D:\Program Files\Git\cmd\git.exe"" pull";
@@ -163,9 +310,9 @@ namespace WpfViewer.ViewModels
             }
         }
 
-        private void UpdateDisplay(TotalReport report)
+        private void ShowLineChart(TotalReport report)
         {
-            List<DailyReport> list = DailyReports.ToList();
+            List<DailyReport> list;
 
             if (!string.IsNullOrEmpty(report.Region))
             {
@@ -174,6 +321,10 @@ namespace WpfViewer.ViewModels
                 {
                     list = list.Where(r => r.State == report.State).ToList();
                 }
+            }
+            else
+            {
+                list = DailyReports.ToList();
             }
 
             var confirmedValues = list.Select(r => r.TotalConfirmed);
@@ -219,17 +370,42 @@ namespace WpfViewer.ViewModels
             //YFormatter = value => value.ToString();
         }
 
+        private void ShowBarChar(TotalReport report)
+        {
+
+        }
+
+        private void ShowDataGrid(TotalReport report)
+        {
+            List<DailyReport> list;
+
+            if (!string.IsNullOrEmpty(report.Region))
+            {
+                list = DailyReports.Where(r => r.Region == report.Region).ToList();
+                if (!string.IsNullOrEmpty(report.State))
+                {
+                    list = list.Where(r => r.State == report.State).ToList();
+                }
+            }
+            else
+            {
+                list = DailyReports.ToList();
+            }
+
+            RegionDailyReports = new ObservableCollection<DailyReport>(list);
+        }
+
         #endregion
 
         #region Background Workers
 
         private void bw_LoadDataDoWork(object sender, DoWorkEventArgs e)
         {
-            ShowBusyPanel("Pulling latest data from repository...");
+            ShowBusyPanel("Pulling latest data...");
 
             PullLastestData();
 
-            ShowBusyPanel("Importing data and generating charts...");
+            ShowBusyPanel("Importing data...");
 
             DailyReports = new DailyReports(readPath);
 
@@ -270,7 +446,7 @@ namespace WpfViewer.ViewModels
             }
             else
             {
-                SelectedReport = TotalReports.Where(a => a.Region == "(All)").FirstOrDefault();
+                SelectedTotalReport = TotalReports.Where(a => a.Region == "(All)").FirstOrDefault();
                 HideBusyPanel();
             }
         }
