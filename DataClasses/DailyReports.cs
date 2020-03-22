@@ -129,7 +129,7 @@ namespace DataClasses
                         newRecovered = totalRecovered - prevReport.TotalRecovered;
                     }
 
-                    System.Diagnostics.Debug.WriteLine($"LoadData  AFTER:{region},{state},{district},{recordDate},{totalConfirmed},{totalRecovered},{totalDeaths},{newConfirmed},{newRecovered},{newDeaths}");
+                    //System.Diagnostics.Debug.WriteLine($"LoadData  AFTER:{region},{state},{district},{recordDate},{totalConfirmed},{totalRecovered},{totalDeaths},{newConfirmed},{newRecovered},{newDeaths}");
                     //if (region == "Afghanistan")
                     //{
                     //    System.Diagnostics.Debugger.Break();

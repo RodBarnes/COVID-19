@@ -12,36 +12,24 @@ using LiveCharts.Wpf;
 
 namespace WpfViewer.ViewModels
 {
-    public class MainVM : INotifyPropertyChanged
+    public partial class MainVM : INotifyPropertyChanged
     {
         private readonly string readPath = @"D:\Source\BitBucket\3rd Party\COVID-19\csse_covid_19_data\csse_covid_19_daily_reports";
+        private BackgroundWorker bw;
 
         public MainVM()
         {
-            using (new WaitCursor())
+            bw = new BackgroundWorker
             {
-                DailyReports = new DailyReports(readPath);
-
-                // Get the list of areas for the combo box
-                var areas = DailyReports
-                    .GroupBy(r => new 
-                    {
-                        r.Region,
-                        r.State
-                    })
-                    .Select(g => new Area()
-                    {
-                        Region = g.Key.Region,
-                        State = g.Key.State,
-                        Confirmed = g.Sum(s => s.TotalConfirmed),
-                        Recovered = g.Sum(s => s.TotalRecovered),
-                        Deaths = g.Sum(s => s.TotalDeaths)
-
-                    })
-                    .OrderBy(a => a.RegionState);
-
-                Areas = new ObservableCollection<Area>(areas);
-                SelectedArea = Areas.Where(a => a.Region == "(All)").FirstOrDefault();
+                WorkerReportsProgress = true,
+                WorkerSupportsCancellation = true
+            };
+            bw.DoWork += bw_LoadDataDoWork;
+            bw.ProgressChanged += bw_LoadDataProgressChanged;
+            bw.RunWorkerCompleted += bw_LoadDataRunWorkerCompleted;
+            if (!bw.IsBusy)
+            {
+                bw.RunWorkerAsync();
             }
         }
 
@@ -211,6 +199,62 @@ namespace WpfViewer.ViewModels
             
             Labels = dates.ToArray();
             //YFormatter = value => value.ToString();
+        }
+
+        #endregion
+
+        #region Background Workers
+
+        private void bw_LoadDataDoWork(object sender, DoWorkEventArgs e)
+        {
+            ShowBusyPanel("Importing data...");
+
+            DailyReports = new DailyReports(readPath);
+
+            // Get the list of areas for the combo box
+            var areas = DailyReports
+                .GroupBy(r => new
+                {
+                    r.Region,
+                    r.State
+                })
+                .Select(g => new Area()
+                {
+                    Region = g.Key.Region,
+                    State = g.Key.State,
+                    Confirmed = g.Sum(s => s.TotalConfirmed),
+                    Recovered = g.Sum(s => s.TotalRecovered),
+                    Deaths = g.Sum(s => s.TotalDeaths)
+
+                })
+                .OrderBy(a => a.RegionState);
+
+            Areas = new ObservableCollection<Area>(areas);
+        }
+
+        private void bw_LoadDataProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            BusyProgressText = e.ProgressPercentage.ToString();
+        }
+
+        private void bw_LoadDataRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if ((e.Cancelled == true))
+            {
+                HideBusyPanel();
+                ShowMessagePanel("Cancelled", "User cancelled the operation!");
+            }
+            else if (!(e.Error == null))
+            {
+                HideBusyPanel();
+                ShowMessagePanel("Error!!", $"{e.Error.Message}");
+            }
+            else
+            {
+                SelectedArea = Areas.Where(a => a.Region == "(All)").FirstOrDefault();
+
+                HideBusyPanel();
+            }
         }
 
         #endregion
