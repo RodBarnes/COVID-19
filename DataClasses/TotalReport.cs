@@ -1,24 +1,24 @@
 ﻿namespace DataClasses
 {
-    public class Area
+    public class TotalReport
     {
-        public Area() { }
+        public TotalReport() { }
 
-        public Area(string region, string state, string district, int confirmed, int recovered, int deaths)
+        public TotalReport(string region, string state, string district, int confirmed, int recovered, int deaths)
         {
             Region = region;
             State = state;
             District = district;
-            Confirmed = confirmed;
-            Recovered = recovered;
-            Deaths = deaths;
+            TotalConfirmed = confirmed;
+            TotalRecovered = recovered;
+            TotalDeaths = deaths;
         }
         public string Region { get; set; }
         public string State { get; set; }
         public string District { get; set; }
-        public int Confirmed { get; set; }
-        public int Recovered { get; set; }
-        public int Deaths { get; set; }
+        public int TotalConfirmed { get; set; }
+        public int TotalRecovered { get; set; }
+        public int TotalDeaths { get; set; }
 
         public string RegionState
         {

@@ -38,8 +38,8 @@ namespace WpfViewer.ViewModels
 
         #region Properties
 
-        private ObservableCollection<Area> areas;
-        public ObservableCollection<Area> Areas
+        private ObservableCollection<TotalReport> areas;
+        public ObservableCollection<TotalReport> TotalReport
         {
             get => areas;
             set
@@ -60,8 +60,8 @@ namespace WpfViewer.ViewModels
             }
         }
 
-        private Area selectedArea;
-        public Area SelectedArea
+        private TotalReport selectedArea;
+        public TotalReport SelectedArea
         {
             get => selectedArea;
             set
@@ -70,9 +70,9 @@ namespace WpfViewer.ViewModels
                 NotifyPropertyChanged();
                 if (selectedArea != null)
                 {
-                    var deathsCnt = ((double)SelectedArea.Deaths);
-                    var recoveredCnt = ((double)SelectedArea.Recovered);
-                    var confirmedCnt = ((double)SelectedArea.Confirmed);
+                    var deathsCnt = ((double)SelectedArea.TotalDeaths);
+                    var recoveredCnt = ((double)SelectedArea.TotalRecovered);
+                    var confirmedCnt = ((double)SelectedArea.TotalConfirmed);
                     var activeCnt = confirmedCnt - deathsCnt - recoveredCnt;
 
                     DeathsPct = Math.Round(deathsCnt / confirmedCnt * 100, 2);
@@ -153,7 +153,7 @@ namespace WpfViewer.ViewModels
 
         #region Methods
 
-        private void ShowChart(Area area)
+        private void ShowChart(TotalReport area)
         {
             List<DailyReport> list = DailyReports.ToList();
 
@@ -211,24 +211,25 @@ namespace WpfViewer.ViewModels
             DailyReports = new DailyReports(readPath);
 
             // Get the list of areas for the combo box
+            // by Region, State without regard to date
             var areas = DailyReports
                 .GroupBy(r => new
                 {
                     r.Region,
                     r.State
                 })
-                .Select(g => new Area()
+                .Select(g => new TotalReport()
                 {
                     Region = g.Key.Region,
                     State = g.Key.State,
-                    Confirmed = g.Sum(s => s.TotalConfirmed),
-                    Recovered = g.Sum(s => s.TotalRecovered),
-                    Deaths = g.Sum(s => s.TotalDeaths)
+                    TotalConfirmed = g.Sum(s => s.TotalConfirmed),
+                    TotalRecovered = g.Sum(s => s.TotalRecovered),
+                    TotalDeaths = g.Sum(s => s.TotalDeaths)
 
                 })
                 .OrderBy(a => a.RegionState);
 
-            Areas = new ObservableCollection<Area>(areas);
+            TotalReport = new ObservableCollection<TotalReport>(areas);
         }
 
         private void bw_LoadDataProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -250,7 +251,7 @@ namespace WpfViewer.ViewModels
             }
             else
             {
-                SelectedArea = Areas.Where(a => a.Region == "(All)").FirstOrDefault();
+                SelectedArea = TotalReport.Where(a => a.Region == "(All)").FirstOrDefault();
 
                 HideBusyPanel();
             }
