@@ -23,21 +23,22 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="10" />
             </Grid.RowDefinitions>
-            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" >
-                <StackPanel Orientation="Horizontal" Margin="5,5">
-                    <TextBlock Text="Act% " />
-                    <TextBlock Text="{Binding ActivePct}" />
+            <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBlock Text="{Binding SelectedReport.RegionState}" FontSize="18" VerticalAlignment="Center" />
+                <TextBlock Text=" -- " FontSize="18" VerticalAlignment="Center" />
+                <StackPanel Orientation="Horizontal" Margin="5,5" >
+                    <TextBlock Text="Act% " FontSize="18" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding ActivePct}" FontSize="18" VerticalAlignment="Center" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="5,5">
-                    <TextBlock Text="Rcv% " />
-                    <TextBlock Text="{Binding RecoveredPct}" />
+                    <TextBlock Text="Rcv% "  FontSize="18" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding RecoveredPct}" FontSize="18" VerticalAlignment="Center" />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="5,5">
-                    <TextBlock Text="Dth% " />
-                    <TextBlock Text="{Binding DeathsPct}" />
+                    <TextBlock Text="Dth% " FontSize="18" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding DeathsPct}" FontSize="18" VerticalAlignment="Center" />
                 </StackPanel>
             </StackPanel>
-            <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding SelectedReport.RegionState}" HorizontalAlignment="Center" FontSize="18" />
             <ListBox Grid.Column="1" Grid.Row="2" ItemsSource="{Binding TotalReports}" SelectedItem="{Binding SelectedReport}" DisplayMemberPath="RegionState" />
             <lvc:CartesianChart Grid.Column="2" Grid.Row="2" Series="{Binding SeriesCollection}" LegendLocation="Right" Background="LightBlue" >
                 <lvc:CartesianChart.AxisY>
