@@ -39,7 +39,7 @@ namespace WpfViewer.ViewModels
         #region Properties
 
         private ObservableCollection<TotalReport> areas;
-        public ObservableCollection<TotalReport> TotalReport
+        public ObservableCollection<TotalReport> TotalReports
         {
             get => areas;
             set
@@ -60,25 +60,25 @@ namespace WpfViewer.ViewModels
             }
         }
 
-        private TotalReport selectedArea;
-        public TotalReport SelectedArea
+        private TotalReport selectedReport;
+        public TotalReport SelectedReport
         {
-            get => selectedArea;
+            get => selectedReport;
             set
             {
-                selectedArea = value;
+                selectedReport = value;
                 NotifyPropertyChanged();
-                if (selectedArea != null)
+                if (selectedReport != null)
                 {
-                    var deathsCnt = ((double)SelectedArea.TotalDeaths);
-                    var recoveredCnt = ((double)SelectedArea.TotalRecovered);
-                    var confirmedCnt = ((double)SelectedArea.TotalConfirmed);
+                    var deathsCnt = ((double)SelectedReport.TotalDeaths);
+                    var recoveredCnt = ((double)SelectedReport.TotalRecovered);
+                    var confirmedCnt = ((double)SelectedReport.TotalConfirmed);
                     var activeCnt = confirmedCnt - deathsCnt - recoveredCnt;
 
                     DeathsPct = Math.Round(deathsCnt / confirmedCnt * 100, 2);
                     RecoveredPct = Math.Round(recoveredCnt / confirmedCnt * 100, 2);
                     ActivePct = Math.Round(activeCnt / confirmedCnt * 100, 2);
-                    ShowChart(SelectedArea);
+                    ShowChart(SelectedReport);
                 }
             }
         }
@@ -229,7 +229,7 @@ namespace WpfViewer.ViewModels
                 })
                 .OrderBy(a => a.RegionState);
 
-            TotalReport = new ObservableCollection<TotalReport>(areas);
+            TotalReports = new ObservableCollection<TotalReport>(areas);
         }
 
         private void bw_LoadDataProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -251,7 +251,7 @@ namespace WpfViewer.ViewModels
             }
             else
             {
-                SelectedArea = TotalReport.Where(a => a.Region == "(All)").FirstOrDefault();
+                SelectedReport = TotalReports.Where(a => a.Region == "(All)").FirstOrDefault();
 
                 HideBusyPanel();
             }
