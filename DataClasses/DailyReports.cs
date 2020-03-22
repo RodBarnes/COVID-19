@@ -82,6 +82,10 @@ namespace DataClasses
                     int.TryParse(fields[5], out int totalRecovered);
 
                     //System.Diagnostics.Debug.WriteLine($"LoadData BEFORE:{region},{state},{district},{recordDate},{totalConfirmed},{totalRecovered},{totalDeaths}");
+                    //if (region == "Hong Kong SAR")
+                    //{
+                    //    System.Diagnostics.Debugger.Break();
+                    //}
 
                     foreach (var rep in replacements)
                     {
@@ -130,7 +134,7 @@ namespace DataClasses
                     }
 
                     //System.Diagnostics.Debug.WriteLine($"LoadData  AFTER:{region},{state},{district},{recordDate},{totalConfirmed},{totalRecovered},{totalDeaths},{newConfirmed},{newRecovered},{newDeaths}");
-                    //if (region == "Afghanistan")
+                    //if (region == "Hong Kong SAR")
                     //{
                     //    System.Diagnostics.Debugger.Break();
                     //}
