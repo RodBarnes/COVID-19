@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Media;
+using Common;
 using DataClasses;
 using LiveCharts;
 using LiveCharts.Wpf;
@@ -152,52 +153,10 @@ namespace WpfViewer.ViewModels
             var gitCmd = @"""D:\Program Files\Git\cmd\git.exe"" pull";
             var repositoryDir = @"D:\Source\BitBucket\3rd Party\COVID-19";
 
-            var result = Run(gitCmd, repositoryDir);
+            var result = Utility.RunCommand(gitCmd, repositoryDir);
             if (!result.Contains("Already up to date."))
             {
-                throw new Exception(result);
-            }
-        }
-
-        public static string Run(string command, string workingDirectory = null)
-        {
-            try
-            {
-                var procStartInfo = new ProcessStartInfo("cmd", "/c " + command);
-
-                procStartInfo.RedirectStandardError = procStartInfo.RedirectStandardInput = procStartInfo.RedirectStandardOutput = true;
-                procStartInfo.UseShellExecute = false;
-                procStartInfo.CreateNoWindow = true;
-                if (workingDirectory != null)
-                {
-                    procStartInfo.WorkingDirectory = workingDirectory;
-                }
-
-                var proc = new Process
-                {
-                    StartInfo = procStartInfo
-                };
-                proc.Start();
-
-                var sb = new StringBuilder();
-                proc.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e)
-                {
-                    sb.AppendLine(e.Data);
-                };
-                proc.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e)
-                {
-                    sb.AppendLine(e.Data);
-                };
-
-                proc.BeginOutputReadLine();
-                proc.BeginErrorReadLine();
-                proc.WaitForExit();
-
-                return sb.ToString();
-            }
-            catch (Exception objException)
-            {
-                return $"Error in command: {command}, {objException.Message}";
+                ShowMessagePanel("Error!", result);
             }
         }
 
@@ -263,9 +222,11 @@ namespace WpfViewer.ViewModels
 
         private void bw_LoadDataDoWork(object sender, DoWorkEventArgs e)
         {
-            ShowBusyPanel("Importing data...");
+            ShowBusyPanel("Pulling latest data from repository...");
 
             PullLastestData();
+
+            ShowBusyPanel("Importing data and generating charts...");
 
             DailyReports = new DailyReports(readPath);
 
