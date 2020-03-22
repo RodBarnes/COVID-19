@@ -145,6 +145,11 @@ namespace WpfViewer.ViewModels
 
         #region Methods
 
+        private void PullLastestData()
+        {
+
+        }
+
         private void UpdateDisplay(TotalReport report)
         {
             List<DailyReport> list = DailyReports.ToList();
@@ -208,6 +213,8 @@ namespace WpfViewer.ViewModels
         private void bw_LoadDataDoWork(object sender, DoWorkEventArgs e)
         {
             ShowBusyPanel("Importing data...");
+
+            PullLastestData();
 
             DailyReports = new DailyReports(readPath);
 
