@@ -38,13 +38,13 @@ namespace WpfViewer.ViewModels
 
         #region Properties
 
-        private ObservableCollection<TotalReport> areas;
+        private ObservableCollection<TotalReport> totalReports;
         public ObservableCollection<TotalReport> TotalReports
         {
-            get => areas;
+            get => totalReports;
             set
             {
-                areas = value;
+                totalReports = value;
                 NotifyPropertyChanged();
             }
         }
@@ -145,16 +145,16 @@ namespace WpfViewer.ViewModels
 
         #region Methods
 
-        private void UpdateDisplay(TotalReport area)
+        private void UpdateDisplay(TotalReport report)
         {
             List<DailyReport> list = DailyReports.ToList();
 
-            if (!string.IsNullOrEmpty(area.Region))
+            if (!string.IsNullOrEmpty(report.Region))
             {
-                list = DailyReports.Where(r => r.Region == area.Region).ToList();
-                if (!string.IsNullOrEmpty(area.State))
+                list = DailyReports.Where(r => r.Region == report.Region).ToList();
+                if (!string.IsNullOrEmpty(report.State))
                 {
-                    list = list.Where(r => r.State == area.State).ToList();
+                    list = list.Where(r => r.State == report.State).ToList();
                 }
             }
 
@@ -211,9 +211,9 @@ namespace WpfViewer.ViewModels
 
             DailyReports = new DailyReports(readPath);
 
-            // Get the list of areas for the combo box
+            // Get the list of reports for the combo box
             // by Region, State without regard to date
-            var areas = DailyReports
+            var displayNames = DailyReports
                 .GroupBy(r => new
                 {
                     r.Region,
@@ -222,15 +222,11 @@ namespace WpfViewer.ViewModels
                 .Select(g => new TotalReport()
                 {
                     Region = g.Key.Region,
-                    State = g.Key.State,
-                    TotalConfirmed = g.Sum(s => s.TotalConfirmed),
-                    TotalRecovered = g.Sum(s => s.TotalRecovered),
-                    TotalDeaths = g.Sum(s => s.TotalDeaths)
-
+                    State = g.Key.State
                 })
                 .OrderBy(a => a.RegionState);
 
-            TotalReports = new ObservableCollection<TotalReport>(areas);
+            TotalReports = new ObservableCollection<TotalReport>(displayNames);
         }
 
         private void bw_LoadDataProgressChanged(object sender, ProgressChangedEventArgs e)
