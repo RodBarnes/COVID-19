@@ -70,15 +70,7 @@ namespace WpfViewer.ViewModels
                 NotifyPropertyChanged();
                 if (selectedReport != null)
                 {
-                    var deathsCnt = ((double)SelectedReport.TotalDeaths);
-                    var recoveredCnt = ((double)SelectedReport.TotalRecovered);
-                    var confirmedCnt = ((double)SelectedReport.TotalConfirmed);
-                    var activeCnt = confirmedCnt - deathsCnt - recoveredCnt;
-
-                    DeathsPct = Math.Round(deathsCnt / confirmedCnt * 100, 2);
-                    RecoveredPct = Math.Round(recoveredCnt / confirmedCnt * 100, 2);
-                    ActivePct = Math.Round(activeCnt / confirmedCnt * 100, 2);
-                    ShowChart(SelectedReport);
+                    UpdateDisplay(SelectedReport);
                 }
             }
         }
@@ -153,7 +145,7 @@ namespace WpfViewer.ViewModels
 
         #region Methods
 
-        private void ShowChart(TotalReport area)
+        private void UpdateDisplay(TotalReport area)
         {
             List<DailyReport> list = DailyReports.ToList();
 
@@ -166,10 +158,19 @@ namespace WpfViewer.ViewModels
                 }
             }
 
-            var confirmed = list.Select(r => r.TotalConfirmed);
-            var recovered = list.Select(r => r.TotalRecovered);
-            var deaths = list.Select(r => r.TotalDeaths);
-            var dates = list.Select(r => r.RecordDate.ToString("MMM-dd"));
+            var confirmedValues = list.Select(r => r.TotalConfirmed);
+            var recoveredValues = list.Select(r => r.TotalRecovered);
+            var deathsValues = list.Select(r => r.TotalDeaths);
+            var dateValues = list.Select(r => r.RecordDate.ToString("MMM-dd"));
+
+            var deathsCnt = ((double)deathsValues.Sum());
+            var recoveredCnt = ((double)recoveredValues.Sum());
+            var confirmedCnt = ((double)confirmedValues.Sum());
+            var activeCnt = confirmedCnt - deathsCnt - recoveredCnt;
+
+            DeathsPct = Math.Round(deathsCnt / confirmedCnt * 100, 2);
+            RecoveredPct = Math.Round(recoveredCnt / confirmedCnt * 100, 2);
+            ActivePct = Math.Round(activeCnt / confirmedCnt * 100, 2);
 
             SeriesCollection = new SeriesCollection
             {
@@ -178,25 +179,25 @@ namespace WpfViewer.ViewModels
                     Title = "Confirmed",
                     Stroke = Brushes.Yellow,
                     Fill = Brushes.LightYellow,
-                    Values = new ChartValues<int>(confirmed)
+                    Values = new ChartValues<int>(confirmedValues)
                 },
                 new LineSeries
                 {
                     Title = "Recovered",
                     Stroke = Brushes.Green,
                     Fill = Brushes.LightGreen,
-                    Values = new ChartValues<int>(recovered)
+                    Values = new ChartValues<int>(recoveredValues)
                 },
                 new LineSeries
                 {
                     Title = "Deaths",
                     Stroke = Brushes.Red,
                     Fill = Brushes.LightCyan,
-                    Values = new ChartValues<int>(deaths)
+                    Values = new ChartValues<int>(deathsValues)
                 }
             };
             
-            Labels = dates.ToArray();
+            Labels = dateValues.ToArray();
             //YFormatter = value => value.ToString();
         }
 
