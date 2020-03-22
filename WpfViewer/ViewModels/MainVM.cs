@@ -249,7 +249,6 @@ namespace WpfViewer.ViewModels
             else
             {
                 SelectedReport = TotalReports.Where(a => a.Region == "(All)").FirstOrDefault();
-
                 HideBusyPanel();
             }
         }
