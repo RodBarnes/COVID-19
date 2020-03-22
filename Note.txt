@@ -1,1 +1,3 @@
 Somethings wrong with the data for France -- displays as series of peaks
+
+Automate process of retrieving latest data
