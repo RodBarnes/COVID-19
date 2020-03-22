@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataClasses", "DataClasses\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1E194FA0-467D-42B0-A4CA-C68D89387D0A}"
 	ProjectSection(SolutionItems) = preProject
-		Note.txt = Note.txt
+		Notes.txt = Notes.txt
 	EndProjectSection
 EndProject
 Global
