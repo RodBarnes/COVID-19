@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Windows.Media;
 using DataClasses;
 using LiveCharts;
@@ -147,7 +149,56 @@ namespace WpfViewer.ViewModels
 
         private void PullLastestData()
         {
+            var gitCmd = @"""D:\Program Files\Git\cmd\git.exe"" pull";
+            var repositoryDir = @"D:\Source\BitBucket\3rd Party\COVID-19";
 
+            var result = Run(gitCmd, repositoryDir);
+            if (!result.Contains("Already up to date."))
+            {
+                throw new Exception(result);
+            }
+        }
+
+        public static string Run(string command, string workingDirectory = null)
+        {
+            try
+            {
+                var procStartInfo = new ProcessStartInfo("cmd", "/c " + command);
+
+                procStartInfo.RedirectStandardError = procStartInfo.RedirectStandardInput = procStartInfo.RedirectStandardOutput = true;
+                procStartInfo.UseShellExecute = false;
+                procStartInfo.CreateNoWindow = true;
+                if (workingDirectory != null)
+                {
+                    procStartInfo.WorkingDirectory = workingDirectory;
+                }
+
+                var proc = new Process
+                {
+                    StartInfo = procStartInfo
+                };
+                proc.Start();
+
+                var sb = new StringBuilder();
+                proc.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e)
+                {
+                    sb.AppendLine(e.Data);
+                };
+                proc.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e)
+                {
+                    sb.AppendLine(e.Data);
+                };
+
+                proc.BeginOutputReadLine();
+                proc.BeginErrorReadLine();
+                proc.WaitForExit();
+
+                return sb.ToString();
+            }
+            catch (Exception objException)
+            {
+                return $"Error in command: {command}, {objException.Message}";
+            }
         }
 
         private void UpdateDisplay(TotalReport report)
