@@ -1,3 +1,4 @@
 Somethings wrong with the data for France -- displays as series of peaks
 Add program settings for the repository path
 Autmate determining whether there is a git -- do I have to include git in the packge?  Its 44MB.
+What to do with percentages in the title?  Data grid and bar chart, they don't apply.

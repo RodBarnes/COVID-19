@@ -58,8 +58,10 @@ namespace WpfViewer.ViewModels
         #region Properties
 
         // This is the location where the data files are located
-        public string DataPath { get; set; } = @"D:\Source\BitBucket\3rd Party\COVID-19\csse_covid_19_data\csse_covid_19_daily_reports";
-        public string PullData { get; set; } = "True";
+        public string GitCommand { get; set; }
+        public string RepositoryPath { get; set; }
+        public string DataPath { get; set; }
+        public string PullData { get; set; }
 
         private ObservableCollection<string> viewSelections;
         public ObservableCollection<string> ViewSelections
@@ -422,21 +424,21 @@ namespace WpfViewer.ViewModels
 
             BarSeriesCollection = new SeriesCollection
             {
-                new ColumnSeries
+                new StackedColumnSeries
                 {
                     Title = "Confirmed",
                     Stroke = Brushes.Yellow,
                     Fill = Brushes.Yellow,
                     Values = new ChartValues<int>(confirmedValues)
                 },
-                new ColumnSeries
+                new StackedColumnSeries
                 {
                     Title = "Recovered",
                     Stroke = Brushes.Green,
                     Fill = Brushes.Green,
                     Values = new ChartValues<int>(recoveredValues)
                 },
-                new ColumnSeries
+                new StackedColumnSeries
                 {
                     Title = "Deaths",
                     Stroke = Brushes.Red,
@@ -529,7 +531,7 @@ namespace WpfViewer.ViewModels
             }
             else
             {
-                SelectedTotalReport = TotalReports.Where(a => a.Region == "(All)").FirstOrDefault();
+                SelectedTotalReport = TotalReports.Where(a => a.Region == "(GLOBAL)").FirstOrDefault();
                 HideBusyPanel();
             }
         }
@@ -542,10 +544,31 @@ namespace WpfViewer.ViewModels
         {
             var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             var settings = config.AppSettings.Settings;
-            
+
+            if (settings.Count == 0 || settings["GitCommand"] == null || string.IsNullOrEmpty(settings["GitCommand"].Value))
+            {
+                // Use program defaults
+                GitCommand = @"""D:\Program Files\Git\cmd\git.exe"" pull";
+            }
+            else
+            {
+                GitCommand = settings["GitCommand"].Value;
+            }
+
+            if (settings.Count == 0 || settings["RepositoryPath"] == null || string.IsNullOrEmpty(settings["RepositoryPath"].Value))
+            {
+                // Use program defaults
+                RepositoryPath = @"D:\Source\BitBucket\3rd Party\COVID-19";
+            }
+            else
+            {
+                RepositoryPath = settings["RepositoryPath"].Value;
+            }
+
             if (settings.Count == 0 || settings["PullData"] == null || string.IsNullOrEmpty(settings["PullData"].Value))
             {
-               // Use program defaults
+                // Use program defaults
+                PullData = "True";
             }
             else
             {
@@ -555,6 +578,7 @@ namespace WpfViewer.ViewModels
             if (settings.Count == 0 || settings["DataPath"] == null || string.IsNullOrEmpty(settings["DataPath"].Value))
             {
                 // Use program defaults
+                DataPath = $@"{RepositoryPath}\csse_covid_19_data\csse_covid_19_daily_reports";
             }
             else
             {
@@ -566,6 +590,24 @@ namespace WpfViewer.ViewModels
         {
             var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
             var settings = config.AppSettings.Settings;
+
+            if (settings["GitCommand"] == null)
+            {
+                settings.Add("GitCommand", GitCommand);
+            }
+            else
+            {
+                settings["GitCommand"].Value = GitCommand;
+            }
+
+            if (settings["RepositoryPath"] == null)
+            {
+                settings.Add("RepositoryPath", RepositoryPath);
+            }
+            else
+            {
+                settings["RepositoryPath"].Value = RepositoryPath;
+            }
 
             if (settings["PullData"] == null)
             {
