@@ -347,10 +347,7 @@ namespace WpfViewer.ViewModels
 
         private void PullLastestData()
         {
-            var gitCmd = @"""D:\Program Files\Git\cmd\git.exe"" pull";
-            var repositoryDir = @"D:\Source\BitBucket\3rd Party\COVID-19";
-
-            var result = Utility.RunCommand(gitCmd, repositoryDir);
+            var result = Utility.RunCommand(GitCommand, RepositoryPath);
             if (!result.Contains("Already up to date."))
             {
                 ShowMessagePanel("Error!", result);
