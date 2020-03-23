@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Configuration;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
@@ -21,11 +22,12 @@ namespace WpfViewer.ViewModels
 
     public partial class MainVM : INotifyPropertyChanged
     {
-        private readonly string readPath = @"D:\Source\BitBucket\3rd Party\COVID-19\csse_covid_19_data\csse_covid_19_daily_reports";
         private BackgroundWorker bw;
 
         public MainVM()
         {
+            LoadSettings();
+
             InitBusyPanel();
             InitMessagePanel();
             InitMainPanel();
@@ -44,11 +46,20 @@ namespace WpfViewer.ViewModels
             }
         }
 
+        ~MainVM()
+        {
+            SaveSettings();
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         #region Properties
+
+        // This is the location where the data files are located
+        public string DataPath { get; set; } = @"D:\Source\BitBucket\3rd Party\COVID-19\csse_covid_19_data\csse_covid_19_daily_reports";
+        public string PullData { get; set; } = "True";
 
         private ObservableCollection<string> viewSelections;
         public ObservableCollection<string> ViewSelections
@@ -302,9 +313,9 @@ namespace WpfViewer.ViewModels
         private void InitMainPanel()
         {
             var col = new ObservableCollection<string>();
-            col.Add("Line Chart");
-            col.Add("Bar Chart");
-            col.Add("Data Grid");
+            col.Add("Daily Total");
+            col.Add("Daily New");
+            col.Add("Daily Data");
             ViewSelections = col;
         }
 
@@ -471,13 +482,15 @@ namespace WpfViewer.ViewModels
 
         private void bw_LoadDataDoWork(object sender, DoWorkEventArgs e)
         {
-            ShowBusyPanel("Pulling latest data...");
-
-            PullLastestData();
+            if (PullData == "True")
+            {
+                ShowBusyPanel("Pulling latest data...");
+                PullLastestData();
+            }
 
             ShowBusyPanel("Importing data...");
 
-            DailyReports = new DailyReports(readPath);
+            DailyReports = new DailyReports(DataPath);
 
             // Get the list of reports for the combo box
             // by Region, State without regard to date
@@ -519,6 +532,60 @@ namespace WpfViewer.ViewModels
                 SelectedTotalReport = TotalReports.Where(a => a.Region == "(All)").FirstOrDefault();
                 HideBusyPanel();
             }
+        }
+
+        #endregion
+
+        #region Settings Management
+
+        private void LoadSettings()
+        {
+            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            var settings = config.AppSettings.Settings;
+            
+            if (settings.Count == 0 || settings["PullData"] == null || string.IsNullOrEmpty(settings["PullData"].Value))
+            {
+               // Use program defaults
+            }
+            else
+            {
+                PullData = settings["PullData"].Value;
+            }
+
+            if (settings.Count == 0 || settings["DataPath"] == null || string.IsNullOrEmpty(settings["DataPath"].Value))
+            {
+                // Use program defaults
+            }
+            else
+            {
+                DataPath = settings["DataPath"].Value;
+            }
+        }
+
+        private void SaveSettings()
+        {
+            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            var settings = config.AppSettings.Settings;
+
+            if (settings["PullData"] == null)
+            {
+                settings.Add("PullData", PullData);
+            }
+            else
+            {
+                settings["PullData"].Value = PullData;
+            }
+
+            if (settings["DataPath"] == null)
+            {
+                settings.Add("DataPath", DataPath);
+            }
+            else
+            {
+                settings["DataPath"].Value = DataPath;
+            }
+
+            config.Save(ConfigurationSaveMode.Full);
         }
 
         #endregion

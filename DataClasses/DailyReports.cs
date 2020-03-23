@@ -349,12 +349,12 @@ namespace DataClasses
                 {
                     GetDailyFromFile(filePath);
                 }
-                var stateSums = CalculateStateSums();
+                //var stateSums = CalculateStateSums();
                 var regionSums = CalculateRegionSums();
                 var globalSums = CalculateGlobalSums();
-                AddStateSums(stateSums);
-                AddRegionSums(regionSums);
                 AddGlobalSums(globalSums);
+                AddRegionSums(regionSums);
+                //AddStateSums(stateSums);
             }
             else
             {
