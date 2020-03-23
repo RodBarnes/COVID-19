@@ -359,26 +359,48 @@ namespace WpfViewer.ViewModels
 
         private void ShowBarChart(TotalReport report)
         {
+            List<DailyReport> list = GetFilteredList(report);
+
+            var confirmedValues = list.Select(r => r.TotalConfirmed);
+            var recoveredValues = list.Select(r => r.TotalRecovered);
+            var deathsValues = list.Select(r => r.TotalDeaths);
+            var dateValues = list.Select(r => r.RecordDate.ToString("MMM-dd"));
+
+            var deathsCnt = ((double)deathsValues.Sum());
+            var recoveredCnt = ((double)recoveredValues.Sum());
+            var confirmedCnt = ((double)confirmedValues.Sum());
+            var activeCnt = confirmedCnt - deathsCnt - recoveredCnt;
+
+            DeathsPct = Math.Round(deathsCnt / confirmedCnt * 100, 2);
+            RecoveredPct = Math.Round(recoveredCnt / confirmedCnt * 100, 2);
+            ActivePct = Math.Round(activeCnt / confirmedCnt * 100, 2);
+
             SeriesCollection = new SeriesCollection
             {
                 new ColumnSeries
                 {
-                    Title = "2015",
-                    Values = new ChartValues<double> { 10, 50, 39, 50 }
+                    Title = "Confirmed",
+                    Stroke = Brushes.Yellow,
+                    Fill = Brushes.LightYellow,
+                    Values = new ChartValues<int>(confirmedValues)
+                },
+                new ColumnSeries
+                {
+                    Title = "Recovered",
+                    Stroke = Brushes.Green,
+                    Fill = Brushes.LightGreen,
+                    Values = new ChartValues<int>(recoveredValues)
+                },
+                new ColumnSeries
+                {
+                    Title = "Deaths",
+                    Stroke = Brushes.Red,
+                    Fill = Brushes.LightCyan,
+                    Values = new ChartValues<int>(deathsValues)
                 }
             };
 
-            //adding series will update and animate the chart automatically
-            SeriesCollection.Add(new ColumnSeries
-            {
-                Title = "2016",
-                Values = new ChartValues<double> { 11, 56, 42 }
-            });
-
-            //also adding values updates and animates the chart automatically
-            SeriesCollection[1].Values.Add(48d);
-
-            Labels = new[] { "Maria", "Susan", "Charles", "Frida" };
+            Labels = dateValues.ToArray();
             Formatter = value => value.ToString("N");
 
         }
