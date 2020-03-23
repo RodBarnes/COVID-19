@@ -10,7 +10,8 @@ namespace DataClasses
 {
     public class DailyReports : IList<DailyReport>
     {
-        private readonly List<DailyReport> list = new List<DailyReport>();
+        private const string DateFormat = "yyyy-MM-dd";
+        private readonly List<DailyReport> reports = new List<DailyReport>();
         private TextFieldParser parser;
         private bool readHeaders = true;
 
@@ -34,9 +35,10 @@ namespace DataClasses
 
         #region Methods
 
-        private void ReadDataFromFile(string filePath)
+        private void GetDailyFromFile(string filePath)
         {
             var firstLine = true;
+            var fileDate = Path.GetFileNameWithoutExtension(filePath);
 
             parser = new TextFieldParser(filePath);
             parser.SetDelimiters(",");
@@ -121,7 +123,7 @@ namespace DataClasses
                     var newConfirmed = 0;
                     var newDeaths = 0;
                     var newRecovered = 0;
-                    var prevDateObj = from rep in list
+                    var prevDateObj = from rep in reports
                                     group rep by new { rep.Region, rep.State, rep.District } into g
                                     where g.Key.Region == region && g.Key.State == state && g.Key.District == district
                                     select g.OrderByDescending(t => t.RecordDate).FirstOrDefault();
@@ -133,29 +135,31 @@ namespace DataClasses
                         newRecovered = totalRecovered - prevReport.TotalRecovered;
                     }
 
-                    //System.Diagnostics.Debug.WriteLine($"LoadData  AFTER:{region},{state},{district},{recordDate},{totalConfirmed},{totalRecovered},{totalDeaths},{newConfirmed},{newRecovered},{newDeaths}");
+                    //System.Diagnostics.Debug.WriteLine($"DAILY: {region},{state},{district},{recordDate},{totalConfirmed},{totalRecovered},{totalDeaths},{newConfirmed},{newRecovered},{newDeaths}");
                     //if (region == "France" && recordDate > new DateTime(2020, 3, 10))
                     //{
                     //    System.Diagnostics.Debugger.Break();
                     //}
 
-                    var existingReport = list.Where(i => i.Region == region && i.State == state && i.RecordDate == recordDate).FirstOrDefault();
-                    if (existingReport != null)
+                    var report = reports.Where(i => i.Region == region && i.State == state && i.RecordDate == recordDate).FirstOrDefault();
+                    if (report != null)
                     {
                         // Update the existing report
-                        existingReport.TotalConfirmed = totalConfirmed;
-                        existingReport.TotalRecovered = totalRecovered;
-                        existingReport.TotalDeaths = totalDeaths;
-                        existingReport.NewConfirmed = newConfirmed;
-                        existingReport.NewRecovered = newRecovered;
-                        existingReport.NewDeaths = newDeaths;
+                        report.TotalConfirmed = totalConfirmed;
+                        report.TotalRecovered = totalRecovered;
+                        report.TotalDeaths = totalDeaths;
+                        report.NewConfirmed = newConfirmed;
+                        report.NewRecovered = newRecovered;
+                        report.NewDeaths = newDeaths;
                     }
                     else
                     {
                         // Add the report to the collection
-                        var report = new DailyReport(region, state, district, recordDate, totalConfirmed, newConfirmed, totalDeaths, newDeaths, totalRecovered, newRecovered);
-                        list.Add(report);
+                        report = new DailyReport(region, state, district, recordDate, totalConfirmed, newConfirmed, totalDeaths, newDeaths, totalRecovered, newRecovered);
+                        reports.Add(report);
                     }
+
+                    //System.Diagnostics.Debug.WriteLine($"DAILY: {report.RecordDate.ToString(DateFormat)},{report.Region},{report.State},{report.District},{report.TotalConfirmed},{report.TotalRecovered},{report.TotalDeaths}");
                 }
                 else
                 {
@@ -174,48 +178,82 @@ namespace DataClasses
             while (!parser.EndOfData);
         }
 
-        private void AddSumsForRegion()
+        private void AddStateSums(List<DailyReport> sums)
         {
-            var regionSums = list
-                .GroupBy(r => new { r.Region, r.RecordDate })
-                .Select(cr => new DailyReport
-                {
-                    Region = cr.Key.Region,
-                    State = "(All)",
-                    District = "(All)",
-                    RecordDate = cr.Key.RecordDate,
-                    TotalConfirmed = cr.Sum(c => c.TotalConfirmed),
-                    TotalRecovered = cr.Sum(c => c.TotalRecovered),
-                    TotalDeaths = cr.Sum(c => c.TotalDeaths)
-                }).ToList();
+            // Get a list of Region, State, District where District is blank or missing
+            var allSums = reports
+                .GroupBy(i => new { i.Region, i.State, i.District })
+                .Select(i => new { i.Key.Region, i.Key.State, i.Key.District })
+                .Where(i => !string.IsNullOrEmpty(i.Region) && !string.IsNullOrEmpty(i.State) && string.IsNullOrEmpty(i.District)).ToList();
 
-            var allSums = list
+            //foreach (var all in allSums)
+            //{
+            //    System.Diagnostics.Debug.WriteLine($"REGION:{all.Region},{all.State},{all.District}");
+            //}
+
+            foreach (DailyReport sum in sums)
+            {
+                //System.Diagnostics.Debug.WriteLine($"STATE: {sum.RecordDate.ToString(DateFormat)},{sum.Region},{sum.State},{sum.District},{sum.TotalConfirmed},{sum.TotalRecovered},{sum.TotalDeaths}");
+
+                //var tests = sums.Where(r => r.Region == "Taiwan").ToList();
+                //foreach (var test in tests)
+                //{
+                //    System.Diagnostics.Debug.WriteLine($"STATE: {test.Region},{test.State},{test.District}");
+                //}
+
+                // If there is no existing District = (All) record, add one
+                var chk = allSums.Where(a => a.Region == sum.Region && a.State == sum.State).Count();
+                if (chk == 0)
+                {
+                    // Add the (All) for the region
+                    reports.Add(sum);
+                }
+                else
+                {
+                    //Else, update the existing District = (All) record
+                    var fixes = reports.Where(r => r.Region == sum.Region && r.State == sum.State).ToList();
+                    foreach (var fix in fixes)
+                    {
+                        fix.District = "(All)";
+                    }
+                }
+            }
+        }
+
+        private void AddRegionSums(List<DailyReport> sums)
+        {
+            // Get a list of Region, State where State is blank or missing
+            var allSums = reports
                 .GroupBy(r => new { r.Region, r.State })
                 .Select(r => new { r.Key.Region, r.Key.State })
                 .Where(r => !string.IsNullOrEmpty(r.Region) && string.IsNullOrEmpty(r.State)).ToList();
 
-            foreach (DailyReport regionSum in regionSums)
-            {
-                //System.Diagnostics.Debug.WriteLine($"TEST:{regionSum.Region},{regionSum.State},{regionSum.District}");
+            //foreach (var all in allSums)
+            //{
+            //    System.Diagnostics.Debug.WriteLine($"REGION:{all.Region},{all.State}");
+            //}
 
-                //var tests = regionSums.Where(r => r.Region == "Taiwan").ToList();
+            foreach (DailyReport sum in sums)
+            {
+                //System.Diagnostics.Debug.WriteLine($"REGION:{sum.RecordDate.ToString(DateFormat)},{sum.Region},{sum.State},{sum.District},{sum.TotalConfirmed},{sum.TotalRecovered},{sum.TotalDeaths}");
+
+                //var tests = sums.Where(r => r.Region == "Taiwan").ToList();
                 //foreach (var test in tests)
                 //{
-                //    System.Diagnostics.Debug.WriteLine($"TEST:{test.Region},{test.State},{test.District}");
+                //    System.Diagnostics.Debug.WriteLine($"REGION:{test.Region},{test.State},{test.District}");
                 //}
 
-                // If there is no existing (All) record, add one
-                var all = allSums.Where(a => a.Region == regionSum.Region);
-                var chk = allSums.Where(a => a.Region == regionSum.Region).Count();
+                // If there is no existing State = (All) record, add one
+                var chk = allSums.Where(a => a.Region == sum.Region).Count();
                 if (chk == 0)
                 {
                     // Add the (All) for the region
-                    list.Add(regionSum);
+                    reports.Add(sum);
                 }
                 else
                 {
-                    //Else, update the existing (All) record
-                    var fixes = list.Where(r => r.Region == regionSum.Region).ToList();
+                    //Else, update the existing State = (All) record
+                    var fixes = reports.Where(r => r.Region == sum.Region).ToList();
                     foreach (var fix in fixes)
                     {
                         fix.State = "(All)";
@@ -224,24 +262,79 @@ namespace DataClasses
             }
         }
 
-        private void AddSumsForGlobal()
+        private void AddGlobalSums(List<DailyReport> sums)
         {
-            var sums = list
-                .GroupBy(r => r.RecordDate)
-                .Select(cr => new DailyReport
+            foreach (DailyReport sum in sums)
+            {
+                //System.Diagnostics.Debug.WriteLine($"GLOBAL:{sum.RecordDate.ToString(DateFormat)},{sum.Region},{sum.State},{sum.District},{sum.TotalConfirmed},{sum.TotalRecovered},{sum.TotalDeaths}");
+
+                //var tests = sums.Where(r => r.Region == "Taiwan").ToList();
+                //foreach (var test in tests)
+                //{
+                //    System.Diagnostics.Debug.WriteLine($"GLOBAL:{test.Region},{test.State},{test.District}");
+
+                reports.Add(sum);
+            }
+        }
+
+        private List<DailyReport> CalculateStateSums()
+        {
+            // Get a list of counts by date rolled up to Region, State
+            return reports
+                .GroupBy(r => new { r.Region, r.State, r.RecordDate })
+                .Select(g => new DailyReport
+                {
+                    Region = g.Key.Region,
+                    State = g.Key.State,
+                    District = "(All)",
+                    RecordDate = g.Key.RecordDate,
+                    TotalConfirmed = g.Sum(s => s.TotalConfirmed),
+                    TotalRecovered = g.Sum(s => s.TotalRecovered),
+                    TotalDeaths = g.Sum(s => s.TotalDeaths),
+                    NewConfirmed = g.Sum(s => s.NewConfirmed),
+                    NewRecovered = g.Sum(s => s.NewRecovered),
+                    NewDeaths = g.Sum(s => s.NewDeaths)
+                }).ToList();
+        }
+
+        private List<DailyReport> CalculateRegionSums()
+        {
+            // Get a list of counts by date rolled up to region
+            return reports
+                .GroupBy(r => new { r.Region, r.RecordDate })
+                .Select(g => new DailyReport
+                {
+                    Region = g.Key.Region,
+                    State = "(All)",
+                    District = "(All)",
+                    RecordDate = g.Key.RecordDate,
+                    TotalConfirmed = g.Sum(s => s.TotalConfirmed),
+                    TotalRecovered = g.Sum(s => s.TotalRecovered),
+                    TotalDeaths = g.Sum(s => s.TotalDeaths),
+                    NewConfirmed = g.Sum(s => s.NewConfirmed),
+                    NewRecovered = g.Sum(s => s.NewRecovered),
+                    NewDeaths = g.Sum(s => s.NewDeaths)
+                }).ToList();
+        }
+
+        private List<DailyReport> CalculateGlobalSums()
+        {
+            // Get a list by date rolled up across all regions
+            return reports
+                .GroupBy(i => i.RecordDate)
+                .Select(g => new DailyReport
                 {
                     Region = "(All)",
                     State = "(All)",
-                    RecordDate = cr.Key,
-                    TotalConfirmed = cr.Sum(c => c.TotalConfirmed),
-                    TotalRecovered = cr.Sum(c => c.TotalRecovered),
-                    TotalDeaths = cr.Sum(c => c.TotalDeaths)
+                    District = "(All)",
+                    RecordDate = g.Key,
+                    TotalConfirmed = g.Sum(s => s.TotalConfirmed),
+                    TotalRecovered = g.Sum(s => s.TotalRecovered),
+                    TotalDeaths = g.Sum(s => s.TotalDeaths),
+                    NewConfirmed = g.Sum(s => s.NewConfirmed),
+                    NewRecovered = g.Sum(s => s.NewRecovered),
+                    NewDeaths = g.Sum(s => s.NewDeaths)
                 }).ToList();
-
-            foreach (DailyReport report in sums)
-            {
-                list.Add(report);
-            }
         }
 
         public void MergeData(string path)
@@ -254,10 +347,14 @@ namespace DataClasses
             {
                 foreach (var filePath in filePaths)
                 {
-                    ReadDataFromFile(filePath);
+                    GetDailyFromFile(filePath);
                 }
-                AddSumsForRegion();
-                AddSumsForGlobal();
+                var stateSums = CalculateStateSums();
+                var regionSums = CalculateRegionSums();
+                var globalSums = CalculateGlobalSums();
+                AddStateSums(stateSums);
+                AddRegionSums(regionSums);
+                AddGlobalSums(globalSums);
             }
             else
             {
@@ -286,31 +383,31 @@ namespace DataClasses
 
         #region Standard List Operations
 
-        public DailyReport this[int index] { get => list[index]; set => list[index] = value; }
+        public DailyReport this[int index] { get => reports[index]; set => reports[index] = value; }
 
-        public int Count => list.Count;
+        public int Count => reports.Count;
 
-        public bool IsReadOnly => ((IList<DailyReport>)list).IsReadOnly;
+        public bool IsReadOnly => ((IList<DailyReport>)reports).IsReadOnly;
 
-        public void Add(DailyReport item) => list.Add(item);
+        public void Add(DailyReport item) => reports.Add(item);
 
-        public void Clear() => list.Clear();
+        public void Clear() => reports.Clear();
 
-        public bool Contains(DailyReport item) => list.Contains(item);
+        public bool Contains(DailyReport item) => reports.Contains(item);
 
-        public void CopyTo(DailyReport[] array, int arrayIndex) => list.CopyTo(array, arrayIndex);
+        public void CopyTo(DailyReport[] array, int arrayIndex) => reports.CopyTo(array, arrayIndex);
 
-        public IEnumerator<DailyReport> GetEnumerator() => ((IList<DailyReport>)list).GetEnumerator();
+        public IEnumerator<DailyReport> GetEnumerator() => ((IList<DailyReport>)reports).GetEnumerator();
         
-        public int IndexOf(DailyReport item) => list.IndexOf(item);
+        public int IndexOf(DailyReport item) => reports.IndexOf(item);
 
-        public void Insert(int index, DailyReport item) => list.Insert(index, item);
+        public void Insert(int index, DailyReport item) => reports.Insert(index, item);
 
-        public bool Remove(DailyReport item) => list.Remove(item);
+        public bool Remove(DailyReport item) => reports.Remove(item);
 
-        public void RemoveAt(int index) => list.RemoveAt(index);
+        public void RemoveAt(int index) => reports.RemoveAt(index);
 
-        IEnumerator IEnumerable.GetEnumerator() => ((IList<DailyReport>)list).GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => ((IList<DailyReport>)reports).GetEnumerator();
 
         #endregion
     }

@@ -186,6 +186,7 @@ namespace WpfViewer.ViewModels
                             ShowLineChart(selectedTotalReport);
                             break;
                         case 1:
+                            ShowBarChart(selectedTotalReport);
                             break;
                         case 2:
                             ShowDataGrid(SelectedTotalReport);
@@ -381,7 +382,7 @@ namespace WpfViewer.ViewModels
                 {
                     Title = "Deaths",
                     Stroke = Brushes.Red,
-                    Fill = Brushes.LightCyan,
+                    Fill = Brushes.LightCoral,
                     Values = new ChartValues<int>(deathsValues)
                 }
             };
@@ -394,19 +395,19 @@ namespace WpfViewer.ViewModels
         {
             List<DailyReport> list = GetFilteredList(report);
 
-            var confirmedValues = list.Select(r => r.TotalConfirmed);
-            var recoveredValues = list.Select(r => r.TotalRecovered);
-            var deathsValues = list.Select(r => r.TotalDeaths);
+            var confirmedValues = list.Select(r => r.NewConfirmed);
+            var recoveredValues = list.Select(r => r.NewRecovered);
+            var deathsValues = list.Select(r => r.NewDeaths);
             var dateValues = list.Select(r => r.RecordDate.ToString("MMM-dd"));
 
-            var deathsCnt = ((double)deathsValues.Sum());
-            var recoveredCnt = ((double)recoveredValues.Sum());
-            var confirmedCnt = ((double)confirmedValues.Sum());
-            var activeCnt = confirmedCnt - deathsCnt - recoveredCnt;
+            //var deathsCnt = ((double)deathsValues.Sum());
+            //var recoveredCnt = ((double)recoveredValues.Sum());
+            //var confirmedCnt = ((double)confirmedValues.Sum());
+            //var activeCnt = confirmedCnt - deathsCnt - recoveredCnt;
 
-            DeathsPct = Math.Round(deathsCnt / confirmedCnt * 100, 2);
-            RecoveredPct = Math.Round(recoveredCnt / confirmedCnt * 100, 2);
-            ActivePct = Math.Round(activeCnt / confirmedCnt * 100, 2);
+            //DeathsPct = Math.Round(deathsCnt / confirmedCnt * 100, 2);
+            //RecoveredPct = Math.Round(recoveredCnt / confirmedCnt * 100, 2);
+            //ActivePct = Math.Round(activeCnt / confirmedCnt * 100, 2);
 
             BarSeriesCollection = new SeriesCollection
             {
@@ -414,21 +415,21 @@ namespace WpfViewer.ViewModels
                 {
                     Title = "Confirmed",
                     Stroke = Brushes.Yellow,
-                    Fill = Brushes.LightYellow,
+                    Fill = Brushes.Yellow,
                     Values = new ChartValues<int>(confirmedValues)
                 },
                 new ColumnSeries
                 {
                     Title = "Recovered",
                     Stroke = Brushes.Green,
-                    Fill = Brushes.LightGreen,
+                    Fill = Brushes.Green,
                     Values = new ChartValues<int>(recoveredValues)
                 },
                 new ColumnSeries
                 {
                     Title = "Deaths",
                     Stroke = Brushes.Red,
-                    Fill = Brushes.LightCyan,
+                    Fill = Brushes.Red,
                     Values = new ChartValues<int>(deathsValues)
                 }
             };
