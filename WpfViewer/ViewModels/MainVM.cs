@@ -542,92 +542,31 @@ namespace WpfViewer.ViewModels
 
         private void LoadSettings()
         {
-            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            var settings = config.AppSettings.Settings;
-
-            if (settings.Count == 0 || settings["GitCommand"] == null || string.IsNullOrEmpty(settings["GitCommand"].Value))
+            var path = @"D:\Source\BitBucket\3rd Party\COVID-19";
+            var list = new Settings
             {
-                // Use program defaults
-                GitCommand = @"""D:\Program Files\Git\cmd\git.exe"" pull";
-            }
-            else
-            {
-                GitCommand = settings["GitCommand"].Value;
-            }
-
-            if (settings.Count == 0 || settings["RepositoryPath"] == null || string.IsNullOrEmpty(settings["RepositoryPath"].Value))
-            {
-                // Use program defaults
-                RepositoryPath = @"D:\Source\BitBucket\3rd Party\COVID-19";
-            }
-            else
-            {
-                RepositoryPath = settings["RepositoryPath"].Value;
-            }
-
-            if (settings.Count == 0 || settings["PullData"] == null || string.IsNullOrEmpty(settings["PullData"].Value))
-            {
-                // Use program defaults
-                PullData = "True";
-            }
-            else
-            {
-                PullData = settings["PullData"].Value;
-            }
-
-            if (settings.Count == 0 || settings["DataPath"] == null || string.IsNullOrEmpty(settings["DataPath"].Value))
-            {
-                // Use program defaults
-                DataPath = $@"{RepositoryPath}\csse_covid_19_data\csse_covid_19_daily_reports";
-            }
-            else
-            {
-                DataPath = settings["DataPath"].Value;
-            }
+                new Setting(nameof(GitCommand), @"""D:\Program Files\Git\cmd\git.exe"" pull"),
+                new Setting(nameof(RepositoryPath), path),
+                new Setting(nameof(PullData),"True"),
+                new Setting(nameof(DataPath), $@"{path}\csse_covid_19_data\csse_covid_19_daily_reports")
+            };
+            Utility.LoadSettings(list);
+            GitCommand = list[nameof(GitCommand)].Value;
+            RepositoryPath = list[nameof(RepositoryPath)].Value;
+            PullData = list[nameof(PullData)].Value;
+            DataPath = list[nameof(DataPath)].Value;
         }
 
         private void SaveSettings()
         {
-            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            var settings = config.AppSettings.Settings;
-
-            if (settings["GitCommand"] == null)
+            var list = new Settings
             {
-                settings.Add("GitCommand", GitCommand);
-            }
-            else
-            {
-                settings["GitCommand"].Value = GitCommand;
-            }
-
-            if (settings["RepositoryPath"] == null)
-            {
-                settings.Add("RepositoryPath", RepositoryPath);
-            }
-            else
-            {
-                settings["RepositoryPath"].Value = RepositoryPath;
-            }
-
-            if (settings["PullData"] == null)
-            {
-                settings.Add("PullData", PullData);
-            }
-            else
-            {
-                settings["PullData"].Value = PullData;
-            }
-
-            if (settings["DataPath"] == null)
-            {
-                settings.Add("DataPath", DataPath);
-            }
-            else
-            {
-                settings["DataPath"].Value = DataPath;
-            }
-
-            config.Save(ConfigurationSaveMode.Full);
+                new Setting(nameof(GitCommand), GitCommand),
+                new Setting(nameof(RepositoryPath), RepositoryPath),
+                new Setting(nameof(PullData), PullData),
+                new Setting(nameof(DataPath), DataPath)
+            };
+            Utility.SaveSettings(list);
         }
 
         #endregion
