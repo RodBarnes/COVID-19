@@ -228,35 +228,68 @@ namespace WpfViewer.ViewModels
             }
         }
 
-        private SeriesCollection seriesCollection;
-        public SeriesCollection SeriesCollection
+        private SeriesCollection lineSeriesCollection;
+        public SeriesCollection LineSeriesCollection
         {
-            get => seriesCollection;
+            get => lineSeriesCollection;
             set
             {
-                seriesCollection = value;
+                lineSeriesCollection = value;
                 NotifyPropertyChanged();
             }
         }
 
-        private string[] labels;
-        public string[] Labels
+        private string[] lineLabels;
+        public string[] LineLabels
         {
-            get => labels;
+            get => lineLabels;
             set
             {
-                labels = value;
+                lineLabels = value;
                 NotifyPropertyChanged();
             }
         }
 
-        private Func<double, string> formatter;
-        public Func<double, string> Formatter
+        private Func<double, string> lineFormatter;
+        public Func<double, string> LineFormatter
         {
-            get => formatter;
+            get => lineFormatter;
             set
             {
-                formatter = value;
+                lineFormatter = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private SeriesCollection barSeriesCollection;
+        public SeriesCollection BarSeriesCollection
+        {
+            get => barSeriesCollection;
+            set
+            {
+                barSeriesCollection = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private string[] barLabels;
+        public string[] BarLabels
+        {
+            get => barLabels;
+            set
+            {
+                barLabels = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private Func<double, string> barFormatter;
+        public Func<double, string> BarFormatter
+        {
+            get => barFormatter;
+            set
+            {
+                barFormatter = value;
                 NotifyPropertyChanged();
             }
         }
@@ -328,7 +361,7 @@ namespace WpfViewer.ViewModels
             RecoveredPct = Math.Round(recoveredCnt / confirmedCnt * 100, 2);
             ActivePct = Math.Round(activeCnt / confirmedCnt * 100, 2);
 
-            SeriesCollection = new SeriesCollection
+            LineSeriesCollection = new SeriesCollection
             {
                 new LineSeries
                 {
@@ -353,8 +386,8 @@ namespace WpfViewer.ViewModels
                 }
             };
 
-            Labels = dateValues.ToArray();
-            Formatter = value => value.ToString();
+            LineLabels = dateValues.ToArray();
+            LineFormatter = value => value.ToString();
         }
 
         private void ShowBarChart(TotalReport report)
@@ -375,7 +408,7 @@ namespace WpfViewer.ViewModels
             RecoveredPct = Math.Round(recoveredCnt / confirmedCnt * 100, 2);
             ActivePct = Math.Round(activeCnt / confirmedCnt * 100, 2);
 
-            SeriesCollection = new SeriesCollection
+            BarSeriesCollection = new SeriesCollection
             {
                 new ColumnSeries
                 {
@@ -400,9 +433,8 @@ namespace WpfViewer.ViewModels
                 }
             };
 
-            Labels = dateValues.ToArray();
-            Formatter = value => value.ToString("N");
-
+            BarLabels = dateValues.ToArray();
+            BarFormatter = value => value.ToString("N");
         }
 
         private void ShowDataGrid(TotalReport report)

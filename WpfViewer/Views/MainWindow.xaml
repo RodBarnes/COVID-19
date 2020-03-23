@@ -43,24 +43,24 @@
             <ListBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding TotalReports}" SelectedItem="{Binding SelectedTotalReport}" DisplayMemberPath="RegionState" />
 
             <lvc:CartesianChart x:Name="ChartPanel" Grid.Column="2" Grid.Row="2" Visibility="{Binding LineChartVisibility}"
-                                Series="{Binding SeriesCollection}" LegendLocation="Right" Background="LightBlue" >
+                                Series="{Binding LineSeriesCollection}" LegendLocation="Right" Background="LightBlue" >
                 <lvc:CartesianChart.AxisX>
-                    <lvc:Axis Title="Month" Labels="{Binding Labels}" />
+                    <lvc:Axis Title="Month" Labels="{Binding LineLabels}" />
                 </lvc:CartesianChart.AxisX>
                 <lvc:CartesianChart.AxisY>
-                    <lvc:Axis Title="Cases" LabelFormatter="{Binding Formatter}" />
+                    <lvc:Axis Title="Cases" LabelFormatter="{Binding LineFormatter}" />
                 </lvc:CartesianChart.AxisY>
             </lvc:CartesianChart>
 
-            <!--<lvc:CartesianChart x:Name="BarChartPanel" Grid.Column="2" Grid.Row="2" Visibility="{Binding BarChartVisibility}"
-                            Series="{Binding SeriesCollection}" LegendLocation="Right" Background="LightCoral">
+            <lvc:CartesianChart x:Name="BarChartPanel" Grid.Column="2" Grid.Row="2" Visibility="{Binding BarChartVisibility}"
+                            Series="{Binding BarSeriesCollection}" LegendLocation="Right" Background="LightBlue">
                 <lvc:CartesianChart.AxisX>
-                    <lvc:Axis Title="Month" Labels="{Binding Labels}" />
+                    <lvc:Axis Title="Month" Labels="{Binding BarLabels}" />
                 </lvc:CartesianChart.AxisX>
                 <lvc:CartesianChart.AxisY>
-                    <lvc:Axis Title="Cases" LabelFormatter="{Binding Formatter}" />
+                    <lvc:Axis Title="Cases" LabelFormatter="{Binding BarFormatter}" />
                 </lvc:CartesianChart.AxisY>
-            </lvc:CartesianChart>-->
+            </lvc:CartesianChart>
 
             <DataGrid x:Name="DataGridPanel" Grid.Column="2" Grid.Row="2" Visibility="{Binding DataGridVisibility}"
                       ItemsSource="{Binding RegionDailyReports}"
