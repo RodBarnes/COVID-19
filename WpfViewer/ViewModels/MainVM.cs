@@ -312,20 +312,7 @@ namespace WpfViewer.ViewModels
 
         private void ShowLineChart(TotalReport report)
         {
-            List<DailyReport> list;
-
-            if (!string.IsNullOrEmpty(report.Region))
-            {
-                list = DailyReports.Where(r => r.Region == report.Region).ToList();
-                if (!string.IsNullOrEmpty(report.State))
-                {
-                    list = list.Where(r => r.State == report.State).ToList();
-                }
-            }
-            else
-            {
-                list = DailyReports.ToList();
-            }
+            List<DailyReport> list = GetFilteredList(report);
 
             var confirmedValues = list.Select(r => r.TotalConfirmed);
             var recoveredValues = list.Select(r => r.TotalRecovered);
@@ -365,17 +352,45 @@ namespace WpfViewer.ViewModels
                     Values = new ChartValues<int>(deathsValues)
                 }
             };
-            
+
             Labels = dateValues.ToArray();
             //YFormatter = value => value.ToString();
         }
 
         private void ShowBarChar(TotalReport report)
         {
+            SeriesCollection = new SeriesCollection
+            {
+                new ColumnSeries
+                {
+                    Title = "2015",
+                    Values = new ChartValues<double> { 10, 50, 39, 50 }
+                }
+            };
+
+            //adding series will update and animate the chart automatically
+            SeriesCollection.Add(new ColumnSeries
+            {
+                Title = "2016",
+                Values = new ChartValues<double> { 11, 56, 42 }
+            });
+
+            //also adding values updates and animates the chart automatically
+            SeriesCollection[1].Values.Add(48d);
+
+            Labels = new[] { "Maria", "Susan", "Charles", "Frida" };
+            //Formatter = value => value.ToString("N");
 
         }
 
         private void ShowDataGrid(TotalReport report)
+        {
+            var list = GetFilteredList(report);
+
+            RegionDailyReports = new ObservableCollection<DailyReport>(list);
+        }
+
+        private List<DailyReport> GetFilteredList(TotalReport report)
         {
             List<DailyReport> list;
 
@@ -392,7 +407,7 @@ namespace WpfViewer.ViewModels
                 list = DailyReports.ToList();
             }
 
-            RegionDailyReports = new ObservableCollection<DailyReport>(list);
+            return list;
         }
 
         #endregion

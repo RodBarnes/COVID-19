@@ -82,7 +82,7 @@ namespace DataClasses
                     int.TryParse(fields[5], out int totalRecovered);
 
                     //System.Diagnostics.Debug.WriteLine($"LoadData BEFORE:{region},{state},{district},{recordDate},{totalConfirmed},{totalRecovered},{totalDeaths}");
-                    //if (region == "Hong Kong SAR")
+                    //if (region == "France" && recordDate > new DateTime(2020, 3, 10))
                     //{
                     //    System.Diagnostics.Debugger.Break();
                     //}
@@ -134,7 +134,7 @@ namespace DataClasses
                     }
 
                     //System.Diagnostics.Debug.WriteLine($"LoadData  AFTER:{region},{state},{district},{recordDate},{totalConfirmed},{totalRecovered},{totalDeaths},{newConfirmed},{newRecovered},{newDeaths}");
-                    //if (region == "Hong Kong SAR")
+                    //if (region == "France" && recordDate > new DateTime(2020, 3, 10))
                     //{
                     //    System.Diagnostics.Debugger.Break();
                     //}
