@@ -211,11 +211,11 @@ namespace DataClasses
                 else
                 {
                     //Else, update the existing District = (All) record
-                    var fixes = reports.Where(r => r.Region == sum.Region && r.State == sum.State).ToList();
-                    foreach (var fix in fixes)
-                    {
-                        fix.District = "(All)";
-                    }
+                    //var fixes = reports.Where(r => r.Region == sum.Region && r.State == sum.State).ToList();
+                    //foreach (var fix in fixes)
+                    //{
+                    //    fix.District = "(All)";
+                    //}
                 }
             }
         }
@@ -253,11 +253,11 @@ namespace DataClasses
                 else
                 {
                     //Else, update the existing State = (All) record
-                    var fixes = reports.Where(r => r.Region == sum.Region).ToList();
-                    foreach (var fix in fixes)
-                    {
-                        fix.State = "(All)";
-                    }
+                    //var fixes = reports.Where(r => r.Region == sum.Region).ToList();
+                    //foreach (var fix in fixes)
+                    //{
+                    //    fix.State = "(All)";
+                    //}
                 }
             }
         }
@@ -286,7 +286,7 @@ namespace DataClasses
                 {
                     Region = g.Key.Region,
                     State = g.Key.State,
-                    District = "(All)",
+                    //District = "(All)",
                     RecordDate = g.Key.RecordDate,
                     TotalConfirmed = g.Sum(s => s.TotalConfirmed),
                     TotalRecovered = g.Sum(s => s.TotalRecovered),
@@ -305,8 +305,8 @@ namespace DataClasses
                 .Select(g => new DailyReport
                 {
                     Region = g.Key.Region,
-                    State = "(All)",
-                    District = "(All)",
+                    //State = "(All)",
+                    //District = "(All)",
                     RecordDate = g.Key.RecordDate,
                     TotalConfirmed = g.Sum(s => s.TotalConfirmed),
                     TotalRecovered = g.Sum(s => s.TotalRecovered),
@@ -324,9 +324,9 @@ namespace DataClasses
                 .GroupBy(i => i.RecordDate)
                 .Select(g => new DailyReport
                 {
-                    Region = "(All)",
-                    State = "(All)",
-                    District = "(All)",
+                    Region = "(GLOBAL)",
+                    //State = "(All)",
+                    //District = "(All)",
                     RecordDate = g.Key,
                     TotalConfirmed = g.Sum(s => s.TotalConfirmed),
                     TotalRecovered = g.Sum(s => s.TotalRecovered),
@@ -350,10 +350,10 @@ namespace DataClasses
                     GetDailyFromFile(filePath);
                 }
                 //var stateSums = CalculateStateSums();
-                var regionSums = CalculateRegionSums();
+                //var regionSums = CalculateRegionSums();
                 var globalSums = CalculateGlobalSums();
                 AddGlobalSums(globalSums);
-                AddRegionSums(regionSums);
+                //AddRegionSums(regionSums);
                 //AddStateSums(stateSums);
             }
             else

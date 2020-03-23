@@ -366,15 +366,6 @@ namespace WpfViewer.ViewModels
             var deathsValues = list.Select(r => r.TotalDeaths);
             var dateValues = list.Select(r => r.RecordDate.ToString("MMM-dd"));
 
-            var deathsCnt = ((double)deathsValues.Sum());
-            var recoveredCnt = ((double)recoveredValues.Sum());
-            var confirmedCnt = ((double)confirmedValues.Sum());
-            var activeCnt = confirmedCnt - deathsCnt - recoveredCnt;
-
-            DeathsPct = Math.Round(deathsCnt / confirmedCnt * 100, 2);
-            RecoveredPct = Math.Round(recoveredCnt / confirmedCnt * 100, 2);
-            ActivePct = Math.Round(activeCnt / confirmedCnt * 100, 2);
-
             LineSeriesCollection = new SeriesCollection
             {
                 new LineSeries
@@ -402,6 +393,8 @@ namespace WpfViewer.ViewModels
 
             LineLabels = dateValues.ToArray();
             LineFormatter = value => value.ToString();
+
+            CalculatePercentages(confirmedValues, recoveredValues, deathsValues);
         }
 
         private void ShowBarChart(TotalReport report)
@@ -412,15 +405,6 @@ namespace WpfViewer.ViewModels
             var recoveredValues = list.Select(r => r.NewRecovered);
             var deathsValues = list.Select(r => r.NewDeaths);
             var dateValues = list.Select(r => r.RecordDate.ToString("MMM-dd"));
-
-            //var deathsCnt = ((double)deathsValues.Sum());
-            //var recoveredCnt = ((double)recoveredValues.Sum());
-            //var confirmedCnt = ((double)confirmedValues.Sum());
-            //var activeCnt = confirmedCnt - deathsCnt - recoveredCnt;
-
-            //DeathsPct = Math.Round(deathsCnt / confirmedCnt * 100, 2);
-            //RecoveredPct = Math.Round(recoveredCnt / confirmedCnt * 100, 2);
-            //ActivePct = Math.Round(activeCnt / confirmedCnt * 100, 2);
 
             BarSeriesCollection = new SeriesCollection
             {
@@ -449,6 +433,8 @@ namespace WpfViewer.ViewModels
 
             BarLabels = dateValues.ToArray();
             BarFormatter = value => value.ToString("N");
+
+            CalculatePercentages(confirmedValues, recoveredValues, deathsValues);
         }
 
         private void ShowDataGrid(TotalReport report)
@@ -476,6 +462,18 @@ namespace WpfViewer.ViewModels
             }
 
             return list;
+        }
+
+        private void CalculatePercentages(IEnumerable<int> confirmedValues, IEnumerable<int> recoveredValues, IEnumerable<int> deathsValues)
+        {
+            var deathsCnt = ((double)deathsValues.Sum());
+            var recoveredCnt = ((double)recoveredValues.Sum());
+            var confirmedCnt = ((double)confirmedValues.Sum());
+            var activeCnt = confirmedCnt - deathsCnt - recoveredCnt;
+
+            DeathsPct = Math.Round(deathsCnt / confirmedCnt * 100, 2);
+            RecoveredPct = Math.Round(recoveredCnt / confirmedCnt * 100, 2);
+            ActivePct = Math.Round(activeCnt / confirmedCnt * 100, 2);
         }
 
         #endregion
