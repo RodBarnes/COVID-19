@@ -79,7 +79,7 @@ namespace WpfViewer.ViewModels
                             break;
                         case 1:
                             SetDisplayView(ViewType.BarChart);
-                            ShowBarChar(SelectedTotalReport);
+                            ShowBarChart(SelectedTotalReport);
                             break;
                         case 2:
                             SetDisplayView(ViewType.DataGrid);
@@ -357,7 +357,7 @@ namespace WpfViewer.ViewModels
             //YFormatter = value => value.ToString();
         }
 
-        private void ShowBarChar(TotalReport report)
+        private void ShowBarChart(TotalReport report)
         {
             SeriesCollection = new SeriesCollection
             {
