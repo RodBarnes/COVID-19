@@ -250,13 +250,13 @@ namespace WpfViewer.ViewModels
             }
         }
 
-        private Func<double, string> yFormatter;
-        public Func<double, string> YFormatter
+        private Func<double, string> formatter;
+        public Func<double, string> Formatter
         {
-            get => yFormatter;
+            get => formatter;
             set
             {
-                yFormatter = value;
+                formatter = value;
                 NotifyPropertyChanged();
             }
         }
@@ -354,7 +354,7 @@ namespace WpfViewer.ViewModels
             };
 
             Labels = dateValues.ToArray();
-            //YFormatter = value => value.ToString();
+            Formatter = value => value.ToString();
         }
 
         private void ShowBarChart(TotalReport report)
@@ -379,7 +379,7 @@ namespace WpfViewer.ViewModels
             SeriesCollection[1].Values.Add(48d);
 
             Labels = new[] { "Maria", "Susan", "Charles", "Frida" };
-            //Formatter = value => value.ToString("N");
+            Formatter = value => value.ToString("N");
 
         }
 
