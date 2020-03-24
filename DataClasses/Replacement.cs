@@ -19,7 +19,7 @@
                     ToRegion = fields[4];
                     break;
                 case 3:
-                    FromDistrict = fields[1];
+                    FromCounty = fields[1];
                     FromState = fields[2];
                     FromRegion = fields[3];
                     ToState = fields[4];
@@ -35,7 +35,7 @@
         public string ToRegion { get; set; } = null;
         public string FromState { get; set; } = null;
         public string ToState { get; set; } = null;
-        public string FromDistrict { get; set; } = null;
-        public string ToDistrict { get; set; } = null;
+        public string FromCounty { get; set; } = null;
+        public string ToCounty { get; set; } = null;
     }
 }

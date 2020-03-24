@@ -105,7 +105,7 @@ namespace WpfViewer.ViewModels
         }
 
         private ObservableCollection<DailyReport> regionDailyReports;
-        public ObservableCollection<DailyReport> RegionDailyReports
+        public ObservableCollection<DailyReport> CountryDailyReports
         {
             get => regionDailyReports;
             set
@@ -348,6 +348,11 @@ namespace WpfViewer.ViewModels
                     .Select(g => g.Key.ToString("MMM-dd"));
             }
 
+            //foreach (var item in report.TotalConfirmed)
+            //{
+            //    System.Diagnostics.Debug.WriteLine($"{item}");
+            //}
+
             LineSeriesCollection = new SeriesCollection
             {
                 new LineSeries
@@ -439,16 +444,16 @@ namespace WpfViewer.ViewModels
         {
             var list = GetFilteredList(report);
 
-            RegionDailyReports = new ObservableCollection<DailyReport>(list);
+            CountryDailyReports = new ObservableCollection<DailyReport>(list);
         }
 
         private List<DailyReport> GetFilteredList(TotalReport report)
         {
             List<DailyReport> list;
 
-            if (!string.IsNullOrEmpty(report.Region))
+            if (!string.IsNullOrEmpty(report.Country))
             {
-                list = DailyReports.Where(r => r.Region == report.Region).ToList();
+                list = DailyReports.Where(r => r.Country == report.Country).ToList();
                 if (!string.IsNullOrEmpty(report.State))
                 {
                     list = list.Where(r => r.State == report.State).ToList();
@@ -458,6 +463,11 @@ namespace WpfViewer.ViewModels
             {
                 list = DailyReports.ToList();
             }
+
+            //foreach (var item in list)
+            //{
+            //    System.Diagnostics.Debug.WriteLine($"{item.RecordDate},{item.Country},{item.State},{item.County},{item.TotalConfirmed}");
+            //}
 
             return list;
         }
@@ -479,19 +489,19 @@ namespace WpfViewer.ViewModels
             DailyReports = new DailyReports(DataPath);
 
             // Get the list of reports for the combo box
-            // by Region, State without regard to date
+            // by Country, State without regard to date
             var displayNames = DailyReports
                 .GroupBy(r => new
                 {
-                    r.Region,
+                    r.Country,
                     r.State
                 })
                 .Select(g => new TotalReport()
                 {
-                    Region = g.Key.Region,
+                    Country = g.Key.Country,
                     State = g.Key.State
                 })
-                .OrderBy(a => a.RegionState);
+                .OrderBy(a => a.DisplayName);
 
             TotalReports = new ObservableCollection<TotalReport>(displayNames);
         }
@@ -515,7 +525,7 @@ namespace WpfViewer.ViewModels
             }
             else
             {
-                SelectedTotalReport = TotalReports.Where(a => a.Region == "(GLOBAL)").FirstOrDefault();
+                SelectedTotalReport = TotalReports.Where(a => a.Country == "(GLOBAL)").FirstOrDefault();
                 HideBusyPanel();
             }
         }

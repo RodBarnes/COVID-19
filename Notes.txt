@@ -2,3 +2,6 @@ Somethings wrong with the data for France -- displays as series of peaks
 Add program settings for the repository path
 Autmate determining whether there is a git -- do I have to include git in the packge?  Its 44MB.
 What to do with percentages in the title?  Data grid and bar chart, they don't apply.
+
+Need to use values from prevous date when there isn't a record for the date
+Do I need to use a database and populate it from each data file?

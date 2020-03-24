@@ -9,10 +9,10 @@ namespace DataClasses
 
         public TotalReport(string region, string state)
         {
-            Region = region;
+            Country = region;
             State = state;
         }
-        public string Region { get; set; }
+        public string Country { get; set; }
         public string State { get; set; }
         public IEnumerable<int> TotalConfirmed { get; set; }
         public IEnumerable<int> NewConfirmed { get; set; }
@@ -22,11 +22,11 @@ namespace DataClasses
         public IEnumerable<int> NewRecovered { get; set; }
         public IEnumerable<string> RecordDates { get; set; }
 
-        public string RegionState
+        public string DisplayName
         {
             get
             {
-                var result = Region;
+                var result = Country;
                 if (!string.IsNullOrEmpty(State))
                 {
                     result += $",{State}";

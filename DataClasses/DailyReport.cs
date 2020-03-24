@@ -9,9 +9,9 @@ namespace DataClasses
         public DailyReport(string region, string state, string district, DateTime recordDate, int totalConfirmed, int newConfirmed, int totalDeaths,
             int newDeaths, int totalRecoverd, int newRecovered, int totalActive = 0, double latitude = 0, double longitude = 0)
         {
-            Region = region;
+            Country = region;
             State = state;
-            District = district;
+            County = district;
             RecordDate = recordDate;
             TotalConfirmed = totalConfirmed;
             NewConfirmed = newConfirmed;
@@ -26,9 +26,9 @@ namespace DataClasses
 
         #region Properties
 
-        public string Region { get; set; }
+        public string Country { get; set; }
         public string State { get; set; }
-        public string District { get; set; }
+        public string County { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public int TotalConfirmed { get; set; }
@@ -52,7 +52,7 @@ namespace DataClasses
 
         public override string ToString()
         {
-            return $"\"{Region}\",\"{State}\",{RecordDate},{TotalConfirmed},{TotalDeaths},{TotalRecovered}";
+            return $"\"{Country}\",\"{State}\",{RecordDate},{TotalConfirmed},{TotalDeaths},{TotalRecovered}";
         }
 
         #endregion

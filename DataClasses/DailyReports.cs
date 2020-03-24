@@ -77,7 +77,7 @@ namespace DataClasses
                     double latitude = 0;
                     double longitude = 0;
                     int fips = 0;
-                    string district = "";
+                    string county = "";
                     int totalActive = 0;
                     string combinedKey = "";
 
@@ -85,7 +85,7 @@ namespace DataClasses
                     {
                         isValid = int.TryParse(fields[0], out int nbr);
                         fips = isValid ? nbr : 0;
-                        district = fields[1].Trim();
+                        county = fields[1].Trim();
                         state = fields[2].Trim();
                         region = fields[3].Trim();
                         isValid = DateTime.TryParse(fields[4], out DateTime dateTime);
@@ -109,13 +109,13 @@ namespace DataClasses
                         if (fields[0].Contains(','))
                         {
                             var split = fields[0].Split(',');
-                            district = split[0].Trim();
+                            county = split[0].Trim();
                             state = split[1].Trim();
                             region = fields[1].Trim();
                         }
                         else
                         {
-                            district = "";
+                            county = "";
                             state = fields[0].Trim();
                             region = fields[1].Trim();
                         }
@@ -160,11 +160,11 @@ namespace DataClasses
                                 }
                                 break;
                             case 3:
-                                if (region == rep.FromRegion && state == rep.FromState && district == rep.FromDistrict)
+                                if (region == rep.FromRegion && state == rep.FromState && county == rep.FromCounty)
                                 {
                                     region = rep.ToRegion;
                                     state = rep.ToState;
-                                    district = rep.ToDistrict;
+                                    county = rep.ToCounty;
                                 }
                                 break;
                             default:
@@ -177,8 +177,8 @@ namespace DataClasses
                     var newDeaths = 0;
                     var newRecovered = 0;
                     var prevDateObj = from rep in reports
-                                        group rep by new { rep.Region, rep.State, rep.District } into g
-                                        where g.Key.Region == region && g.Key.State == state && g.Key.District == district
+                                        group rep by new { rep.Country, rep.State, rep.County } into g
+                                        where g.Key.Country == region && g.Key.State == state && g.Key.County == county
                                         select g.OrderByDescending(t => t.RecordDate).FirstOrDefault();
                     if (prevDateObj.Count() > 0)
                     {
@@ -194,7 +194,7 @@ namespace DataClasses
                     //    System.Diagnostics.Debugger.Break();
                     //}
 
-                    var report = reports.Where(i => i.Region == region && i.State == state && i.RecordDate == recordDate).FirstOrDefault();
+                    var report = reports.Where(i => i.Country == region && i.State == state && i.RecordDate == recordDate).FirstOrDefault();
                     if (report != null)
                     {
                         // Update the existing report
@@ -203,11 +203,11 @@ namespace DataClasses
                     else
                     {
                         // Add the report to the collection
-                        report = new DailyReport(region, state, district, recordDate, totalConfirmed, newConfirmed, totalDeaths, newDeaths, totalRecovered, newRecovered, totalActive, latitude, longitude);
+                        report = new DailyReport(region, state, county, recordDate, totalConfirmed, newConfirmed, totalDeaths, newDeaths, totalRecovered, newRecovered, totalActive, latitude, longitude);
                         reports.Add(report);
                     }
 
-                    //System.Diagnostics.Debug.WriteLine($"DAILY: {report.RecordDate.ToString(DateFormat)},{report.Region},{report.State},{report.District},{report.TotalConfirmed},{report.TotalRecovered},{report.TotalDeaths}");
+                    //System.Diagnostics.Debug.WriteLine($"DAILY: {report.RecordDate.ToString(DateFormat)},{report.Region},{report.State},{report.County},{report.TotalConfirmed},{report.TotalRecovered},{report.TotalDeaths}");
                 }
                 else
                 {
@@ -269,12 +269,12 @@ namespace DataClasses
         {
             foreach (DailyReport sum in sums)
             {
-                //System.Diagnostics.Debug.WriteLine($"GLOBAL:{sum.RecordDate.ToString(DateFormat)},{sum.Region},{sum.State},{sum.District},{sum.TotalConfirmed},{sum.TotalRecovered},{sum.TotalDeaths}");
+                //System.Diagnostics.Debug.WriteLine($"GLOBAL:{sum.RecordDate.ToString(DateFormat)},{sum.Region},{sum.State},{sum.County},{sum.TotalConfirmed},{sum.TotalRecovered},{sum.TotalDeaths}");
 
                 //var tests = sums.Where(r => r.Region == "Taiwan").ToList();
                 //foreach (var test in tests)
                 //{
-                //    System.Diagnostics.Debug.WriteLine($"GLOBAL:{test.Region},{test.State},{test.District}");
+                //    System.Diagnostics.Debug.WriteLine($"GLOBAL:{test.Region},{test.State},{test.County}");
 
                 reports.Add(sum);
             }
@@ -287,9 +287,9 @@ namespace DataClasses
                 .GroupBy(i => i.RecordDate)
                 .Select(g => new DailyReport
                 {
-                    Region = "(GLOBAL)",
+                    Country = "(GLOBAL)",
                     //State = "(All)",
-                    //District = "(All)",
+                    //County = "(All)",
                     RecordDate = g.Key,
                     TotalConfirmed = g.Sum(s => s.TotalConfirmed),
                     TotalRecovered = g.Sum(s => s.TotalRecovered),
