@@ -6,7 +6,8 @@ namespace DataClasses
     {
         public DailyReport() { }
 
-        public DailyReport(string region, string state, string district, DateTime recordDate, int totalConfirmed, int newConfirmed, int totalDeaths, int newDeaths, int totalRecoverd, int newRecovered)
+        public DailyReport(string region, string state, string district, DateTime recordDate, int totalConfirmed, int newConfirmed, int totalDeaths,
+            int newDeaths, int totalRecoverd, int newRecovered, double latitude = 0, double longitude = 0)
         {
             Region = region;
             State = state;
@@ -18,6 +19,8 @@ namespace DataClasses
             NewDeaths = newDeaths;
             TotalRecovered = totalRecoverd;
             NewRecovered = newRecovered;
+            Latitude = latitude;
+            Longitude = longitude;
         }
 
         #region Properties
@@ -25,6 +28,8 @@ namespace DataClasses
         public string Region { get; set; }
         public string State { get; set; }
         public string District { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
         public int TotalConfirmed { get; set; }
         public int NewConfirmed { get; set; }
         public int TotalDeaths { get; set; }
