@@ -41,6 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DailyFileData.cs" />
+    <Compile Include="DailyFileDataFips.cs" />
     <Compile Include="DailyReport.cs" />
     <Compile Include="DailyReports.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

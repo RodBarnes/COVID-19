@@ -35,7 +35,7 @@ namespace DataClasses
 
         #region Methods
 
-        private void GetDailyFromFile(string filePath)
+        private void ReadDailyFiles(string filePath)
         {
             var firstLine = true;
             var fileDate = Path.GetFileNameWithoutExtension(filePath);
@@ -223,7 +223,7 @@ namespace DataClasses
             {
                 foreach (var filePath in filePaths)
                 {
-                    GetDailyFromFile(filePath);
+                    ReadDailyFiles(filePath);
                 }
                 var globalSums = CalculateGlobalSums();
                 AddGlobalSums(globalSums);
