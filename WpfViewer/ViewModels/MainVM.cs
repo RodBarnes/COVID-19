@@ -57,7 +57,6 @@ namespace WpfViewer.ViewModels
 
         #region Properties
 
-        // This is the location where the data files are located
         public string GitCommand { get; set; }
         public string RepositoryPath { get; set; }
         public string DataPath { get; set; }
@@ -359,13 +358,34 @@ namespace WpfViewer.ViewModels
             List<DailyReport> list = GetFilteredList(report);
 
             if (report.TotalConfirmed == null)
-                report.TotalConfirmed = list.Select(r => r.TotalConfirmed);
+            {
+                report.TotalConfirmed = list
+                    .GroupBy(r => r.RecordDate)
+                    .Select(g => g.Sum(i => i.TotalConfirmed));
+            }
             if (report.TotalRecovered == null)
-                report.TotalRecovered = list.Select(r => r.TotalRecovered);
+            {
+                report.TotalRecovered = list
+                    .GroupBy(r => r.RecordDate)
+                    .Select(g => g.Sum(i => i.TotalRecovered));
+            }
             if (report.TotalDeaths == null)
-                report.TotalDeaths = list.Select(r => r.TotalDeaths);
+            {
+                report.TotalDeaths = list
+                    .GroupBy(r => r.RecordDate)
+                    .Select(g => g.Sum(i => i.TotalDeaths));
+            }
             if (report.RecordDates == null)
-                report.RecordDates = list.Select(r => r.RecordDate.ToString("MMM-dd"));
+            {
+                report.RecordDates = list
+                    .GroupBy(r => r.RecordDate)
+                    .Select(g => g.Key.ToString("MMM-dd"));
+            }
+
+            //foreach (var item in report.TotalConfirmed)
+            //{
+            //    System.Diagnostics.Debug.WriteLine($"{item}");
+            //}
 
             LineSeriesCollection = new SeriesCollection
             {
@@ -395,7 +415,7 @@ namespace WpfViewer.ViewModels
             LineLabels = report.RecordDates.ToArray();
             LineFormatter = value => value.ToString();
 
-            CalculatePercentages(report.TotalConfirmed, report.TotalRecovered, report.TotalRecovered);
+            CalculatePercentages(report.TotalConfirmed, report.TotalRecovered, report.TotalDeaths);
         }
 
         private void ShowBarChart(TotalReport report)
@@ -403,13 +423,29 @@ namespace WpfViewer.ViewModels
             List<DailyReport> list = GetFilteredList(report);
 
             if (report.NewConfirmed == null)
-                report.NewConfirmed = list.Select(r => r.NewConfirmed);
+            {
+                report.NewConfirmed = list
+                    .GroupBy(r => r.RecordDate)
+                    .Select(g => g.Sum(i => i.NewConfirmed));
+            }
             if (report.NewRecovered == null)
-                report.NewRecovered = list.Select(r => r.NewRecovered);
+            {
+                report.NewRecovered = list
+                    .GroupBy(r => r.RecordDate)
+                    .Select(g => g.Sum(i => i.NewRecovered));
+            }
             if (report.NewDeaths == null)
-                report.NewDeaths = list.Select(r => r.NewDeaths);
+            {
+                report.NewDeaths = list
+                    .GroupBy(r => r.RecordDate)
+                    .Select(g => g.Sum(i => i.NewDeaths));
+            }
             if (report.RecordDates == null)
-                report.RecordDates = list.Select(r => r.RecordDate.ToString("MMM-dd"));
+            {
+                report.RecordDates = list
+                    .GroupBy(r => r.RecordDate)
+                    .Select(g => g.Key.ToString("MMM-dd"));
+            }
 
             BarSeriesCollection = new SeriesCollection
             {
@@ -466,6 +502,10 @@ namespace WpfViewer.ViewModels
                 list = DailyReports.ToList();
             }
 
+            //foreach (var item in list)
+            //{
+            //    System.Diagnostics.Debug.WriteLine($"{item.RecordDate:yyyy-MM-dd},{item.Region},{item.State},{item.TotalConfirmed},{item.TotalRecovered},{item.TotalDeaths}");
+            //}
             return list;
         }
 
