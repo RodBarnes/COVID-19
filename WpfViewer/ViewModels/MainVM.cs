@@ -358,10 +358,14 @@ namespace WpfViewer.ViewModels
         {
             List<DailyReport> list = GetFilteredList(report);
 
-            var confirmedValues = list.Select(r => r.TotalConfirmed);
-            var recoveredValues = list.Select(r => r.TotalRecovered);
-            var deathsValues = list.Select(r => r.TotalDeaths);
-            var dateValues = list.Select(r => r.RecordDate.ToString("MMM-dd"));
+            if (report.TotalConfirmed == null)
+                report.TotalConfirmed = list.Select(r => r.TotalConfirmed);
+            if (report.TotalRecovered == null)
+                report.TotalRecovered = list.Select(r => r.TotalRecovered);
+            if (report.TotalDeaths == null)
+                report.TotalDeaths = list.Select(r => r.TotalDeaths);
+            if (report.RecordDates == null)
+                report.RecordDates = list.Select(r => r.RecordDate.ToString("MMM-dd"));
 
             LineSeriesCollection = new SeriesCollection
             {
@@ -370,38 +374,42 @@ namespace WpfViewer.ViewModels
                     Title = "Confirmed",
                     Stroke = Brushes.Yellow,
                     Fill = Brushes.LightYellow,
-                    Values = new ChartValues<int>(confirmedValues)
+                    Values = new ChartValues<int>(report.TotalConfirmed)
                 },
                 new LineSeries
                 {
                     Title = "Recovered",
                     Stroke = Brushes.Green,
                     Fill = Brushes.LightGreen,
-                    Values = new ChartValues<int>(recoveredValues)
+                    Values = new ChartValues<int>(report.TotalRecovered)
                 },
                 new LineSeries
                 {
                     Title = "Deaths",
                     Stroke = Brushes.Red,
                     Fill = Brushes.LightCoral,
-                    Values = new ChartValues<int>(deathsValues)
+                    Values = new ChartValues<int>(report.TotalDeaths)
                 }
             };
 
-            LineLabels = dateValues.ToArray();
+            LineLabels = report.RecordDates.ToArray();
             LineFormatter = value => value.ToString();
 
-            CalculatePercentages(confirmedValues, recoveredValues, deathsValues);
+            CalculatePercentages(report.TotalConfirmed, report.TotalRecovered, report.TotalRecovered);
         }
 
         private void ShowBarChart(TotalReport report)
         {
             List<DailyReport> list = GetFilteredList(report);
 
-            var confirmedValues = list.Select(r => r.NewConfirmed);
-            var recoveredValues = list.Select(r => r.NewRecovered);
-            var deathsValues = list.Select(r => r.NewDeaths);
-            var dateValues = list.Select(r => r.RecordDate.ToString("MMM-dd"));
+            if (report.NewConfirmed == null)
+                report.NewConfirmed = list.Select(r => r.NewConfirmed);
+            if (report.NewRecovered == null)
+                report.NewRecovered = list.Select(r => r.NewRecovered);
+            if (report.NewDeaths == null)
+                report.NewDeaths = list.Select(r => r.NewDeaths);
+            if (report.RecordDates == null)
+                report.RecordDates = list.Select(r => r.RecordDate.ToString("MMM-dd"));
 
             BarSeriesCollection = new SeriesCollection
             {
@@ -410,28 +418,28 @@ namespace WpfViewer.ViewModels
                     Title = "Confirmed",
                     Stroke = Brushes.Yellow,
                     Fill = Brushes.Yellow,
-                    Values = new ChartValues<int>(confirmedValues)
+                    Values = new ChartValues<int>(report.NewConfirmed)
                 },
                 new StackedColumnSeries
                 {
                     Title = "Recovered",
                     Stroke = Brushes.Green,
                     Fill = Brushes.Green,
-                    Values = new ChartValues<int>(recoveredValues)
+                    Values = new ChartValues<int>(report.NewRecovered)
                 },
                 new StackedColumnSeries
                 {
                     Title = "Deaths",
                     Stroke = Brushes.Red,
                     Fill = Brushes.Red,
-                    Values = new ChartValues<int>(deathsValues)
+                    Values = new ChartValues<int>(report.NewDeaths)
                 }
             };
 
-            BarLabels = dateValues.ToArray();
-            BarFormatter = value => value.ToString("N");
+            BarLabels = report.RecordDates.ToArray();
+            BarFormatter = value => value.ToString();
 
-            CalculatePercentages(confirmedValues, recoveredValues, deathsValues);
+            CalculatePercentages(report.NewConfirmed, report.NewRecovered, report.NewDeaths);
         }
 
         private void ShowDataGrid(TotalReport report)
