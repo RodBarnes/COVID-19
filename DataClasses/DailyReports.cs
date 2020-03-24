@@ -59,125 +59,119 @@ namespace DataClasses
                 var fields = parser.ReadFields();
                 if (!firstLine)
                 {
-                    if (fields.Length > 8)
+                    // New data structure
+
+                    //var sb = new StringBuilder();
+                    //for (int i = 0; i<fields.Length; i++)
+                    //{
+                    //    if (i == 0)
+                    //        sb.Append(fields[i]);
+                    //    else
+                    //        sb.Append($",{fields[i]}");
+                    //}
+                    //System.Diagnostics.Debug.WriteLine($"LoadData  FIELDS:{sb}");
+
+                    if (fields[0].Contains(','))
                     {
+                        var split = fields[0].Split(',');
+                        district = split[0].Trim();
+                        state = split[1].Trim();
+                        region = fields[1].Trim();
                     }
                     else
                     {
-                        // New data structure
-
-                        //var sb = new StringBuilder();
-                        //for (int i = 0; i<fields.Length; i++)
-                        //{
-                        //    if (i == 0)
-                        //        sb.Append(fields[i]);
-                        //    else
-                        //        sb.Append($",{fields[i]}");
-                        //}
-                        //System.Diagnostics.Debug.WriteLine($"LoadData  FIELDS:{sb}");
-
-                        if (fields[0].Contains(','))
-                        {
-                            var split = fields[0].Split(',');
-                            district = split[0].Trim();
-                            state = split[1].Trim();
-                            region = fields[1].Trim();
-                        }
-                        else
-                        {
-                            district = "";
-                            state = fields[0].Trim();
-                            region = fields[1].Trim();
-                        }
-
-                        var dateTime = DateTime.Parse(fields[2]);
-                        var recordDate = new DateTime(dateTime.Year, dateTime.Month, dateTime.Day);
-                        int.TryParse(fields[3], out int totalConfirmed);
-                        int.TryParse(fields[4], out int totalDeaths);
-                        int.TryParse(fields[5], out int totalRecovered);
-                        double latitude = 0;
-                        double longitude = 0;
-                        if (fields.Length > 6)
-                        {
-                            double.TryParse(fields[6], out double lat);
-                            double.TryParse(fields[7], out double lng);
-                            latitude = lat;
-                            longitude = lng;
-                        }
-
-                        //System.Diagnostics.Debug.WriteLine($"LoadData BEFORE:{region},{state},{district},{recordDate},{totalConfirmed},{totalRecovered},{totalDeaths}");
-                        //if (region == "France" && recordDate > new DateTime(2020, 3, 10))
-                        //{
-                        //    System.Diagnostics.Debugger.Break();
-                        //}
-
-                        foreach (var rep in replacements)
-                        {
-                            switch (rep.ReplacementType)
-                            {
-                                case 1:
-                                    if (region == rep.FromRegion)
-                                    {
-                                        region = rep.ToRegion;
-                                    }
-                                    break;
-                                case 2:
-                                    if (region == rep.FromRegion && state == rep.FromState)
-                                    {
-                                        region = rep.ToRegion;
-                                        state = rep.ToState;
-                                    }
-                                    break;
-                                case 3:
-                                    if (region == rep.FromRegion && state == rep.FromState && district == rep.FromDistrict)
-                                    {
-                                        region = rep.ToRegion;
-                                        state = rep.ToState;
-                                        district = rep.ToDistrict;
-                                    }
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-
-                        // Calculate the daily change
-                        var newConfirmed = 0;
-                        var newDeaths = 0;
-                        var newRecovered = 0;
-                        var prevDateObj = from rep in reports
-                                            group rep by new { rep.Region, rep.State, rep.District } into g
-                                            where g.Key.Region == region && g.Key.State == state && g.Key.District == district
-                                            select g.OrderByDescending(t => t.RecordDate).FirstOrDefault();
-                        if (prevDateObj.Count() > 0)
-                        {
-                            var prevReport = prevDateObj.First();
-                            newConfirmed = totalConfirmed - prevReport.TotalConfirmed;
-                            newDeaths = totalDeaths - prevReport.TotalDeaths;
-                            newRecovered = totalRecovered - prevReport.TotalRecovered;
-                        }
-
-                        //System.Diagnostics.Debug.WriteLine($"DAILY: {region},{state},{district},{recordDate},{totalConfirmed},{totalRecovered},{totalDeaths},{newConfirmed},{newRecovered},{newDeaths}");
-                        //if (region == "France" && recordDate > new DateTime(2020, 3, 10))
-                        //{
-                        //    System.Diagnostics.Debugger.Break();
-                        //}
-
-                        var report = reports.Where(i => i.Region == region && i.State == state && i.RecordDate == recordDate).FirstOrDefault();
-                        if (report != null)
-                        {
-                            // Update the existing report
-                            UpdateReport(report, totalConfirmed, totalDeaths, totalRecovered, newConfirmed, newDeaths, newRecovered);
-                        }
-                        else
-                        {
-                            // Add the report to the collection
-                            report = new DailyReport(region, state, district, recordDate, totalConfirmed, newConfirmed, totalDeaths, newDeaths, totalRecovered, newRecovered, latitude, longitude);
-                            reports.Add(report);
-                        }
-
-                        //System.Diagnostics.Debug.WriteLine($"DAILY: {report.RecordDate.ToString(DateFormat)},{report.Region},{report.State},{report.District},{report.TotalConfirmed},{report.TotalRecovered},{report.TotalDeaths}");
+                        district = "";
+                        state = fields[0].Trim();
+                        region = fields[1].Trim();
                     }
+
+                    var dateTime = DateTime.Parse(fields[2]);
+                    var recordDate = new DateTime(dateTime.Year, dateTime.Month, dateTime.Day);
+                    int.TryParse(fields[3], out int totalConfirmed);
+                    int.TryParse(fields[4], out int totalDeaths);
+                    int.TryParse(fields[5], out int totalRecovered);
+                    double latitude = 0;
+                    double longitude = 0;
+                    if (fields.Length > 6)
+                    {
+                        double.TryParse(fields[6], out double lat);
+                        double.TryParse(fields[7], out double lng);
+                        latitude = lat;
+                        longitude = lng;
+                    }
+
+                    //System.Diagnostics.Debug.WriteLine($"LoadData BEFORE:{region},{state},{district},{recordDate},{totalConfirmed},{totalRecovered},{totalDeaths}");
+                    //if (region == "France" && recordDate > new DateTime(2020, 3, 10))
+                    //{
+                    //    System.Diagnostics.Debugger.Break();
+                    //}
+
+                    foreach (var rep in replacements)
+                    {
+                        switch (rep.ReplacementType)
+                        {
+                            case 1:
+                                if (region == rep.FromRegion)
+                                {
+                                    region = rep.ToRegion;
+                                }
+                                break;
+                            case 2:
+                                if (region == rep.FromRegion && state == rep.FromState)
+                                {
+                                    region = rep.ToRegion;
+                                    state = rep.ToState;
+                                }
+                                break;
+                            case 3:
+                                if (region == rep.FromRegion && state == rep.FromState && district == rep.FromDistrict)
+                                {
+                                    region = rep.ToRegion;
+                                    state = rep.ToState;
+                                    district = rep.ToDistrict;
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                    // Calculate the daily change
+                    var newConfirmed = 0;
+                    var newDeaths = 0;
+                    var newRecovered = 0;
+                    var prevDateObj = from rep in reports
+                                        group rep by new { rep.Region, rep.State, rep.District } into g
+                                        where g.Key.Region == region && g.Key.State == state && g.Key.District == district
+                                        select g.OrderByDescending(t => t.RecordDate).FirstOrDefault();
+                    if (prevDateObj.Count() > 0)
+                    {
+                        var prevReport = prevDateObj.First();
+                        newConfirmed = totalConfirmed - prevReport.TotalConfirmed;
+                        newDeaths = totalDeaths - prevReport.TotalDeaths;
+                        newRecovered = totalRecovered - prevReport.TotalRecovered;
+                    }
+
+                    //System.Diagnostics.Debug.WriteLine($"DAILY: {region},{state},{district},{recordDate},{totalConfirmed},{totalRecovered},{totalDeaths},{newConfirmed},{newRecovered},{newDeaths}");
+                    //if (region == "France" && recordDate > new DateTime(2020, 3, 10))
+                    //{
+                    //    System.Diagnostics.Debugger.Break();
+                    //}
+
+                    var report = reports.Where(i => i.Region == region && i.State == state && i.RecordDate == recordDate).FirstOrDefault();
+                    if (report != null)
+                    {
+                        // Update the existing report
+                        UpdateReport(report, totalConfirmed, totalDeaths, totalRecovered, newConfirmed, newDeaths, newRecovered);
+                    }
+                    else
+                    {
+                        // Add the report to the collection
+                        report = new DailyReport(region, state, district, recordDate, totalConfirmed, newConfirmed, totalDeaths, newDeaths, totalRecovered, newRecovered, latitude, longitude);
+                        reports.Add(report);
+                    }
+
+                    //System.Diagnostics.Debug.WriteLine($"DAILY: {report.RecordDate.ToString(DateFormat)},{report.Region},{report.State},{report.District},{report.TotalConfirmed},{report.TotalRecovered},{report.TotalDeaths}");
                 }
                 else
                 {
