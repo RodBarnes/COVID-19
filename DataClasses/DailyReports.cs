@@ -52,10 +52,6 @@ namespace DataClasses
             parser.HasFieldsEnclosedInQuotes = true;
             do
             {
-                string state;
-                string region;
-                string district;
-
                 var fields = parser.ReadFields();
                 if (!firstLine)
                 {
@@ -71,35 +67,75 @@ namespace DataClasses
                     //}
                     //System.Diagnostics.Debug.WriteLine($"LoadData  FIELDS:{sb}");
 
-                    if (fields[0].Contains(','))
+                    bool isValid = false;
+                    string region;
+                    string state;
+                    DateTime recordDate;
+                    int totalConfirmed;
+                    int totalRecovered;
+                    int totalDeaths;
+                    double latitude = 0;
+                    double longitude = 0;
+                    int fips = 0;
+                    string district = "";
+                    int totalActive = 0;
+                    string combinedKey = "";
+
+                    if (fields.Length > 8)
                     {
-                        var split = fields[0].Split(',');
-                        district = split[0].Trim();
-                        state = split[1].Trim();
-                        region = fields[1].Trim();
+                        isValid = int.TryParse(fields[0], out int nbr);
+                        fips = isValid ? nbr : 0;
+                        district = fields[1].Trim();
+                        state = fields[2].Trim();
+                        region = fields[3].Trim();
+                        isValid = DateTime.TryParse(fields[4], out DateTime dateTime);
+                        recordDate = isValid ? new DateTime(dateTime.Year, dateTime.Month, dateTime.Day) : new DateTime();
+                        isValid = double.TryParse(fields[5], out double lat);
+                        latitude = isValid ? lat : 0;
+                        isValid = double.TryParse(fields[6], out double lng);
+                        longitude = isValid ? lng : 0;
+                        isValid = int.TryParse(fields[7], out int confirmed);
+                        totalConfirmed = isValid ? confirmed : 0;
+                        isValid = int.TryParse(fields[8], out int deaths);
+                        totalDeaths = isValid ? deaths : 0;
+                        isValid = int.TryParse(fields[9], out int recovered);
+                        totalRecovered = isValid ? recovered : 0;
+                        isValid = int.TryParse(fields[10], out int active);
+                        totalActive = isValid ? active : 0;
+                        combinedKey = fields[11].Trim();
                     }
                     else
                     {
-                        district = "";
-                        state = fields[0].Trim();
-                        region = fields[1].Trim();
-                    }
+                        if (fields[0].Contains(','))
+                        {
+                            var split = fields[0].Split(',');
+                            district = split[0].Trim();
+                            state = split[1].Trim();
+                            region = fields[1].Trim();
+                        }
+                        else
+                        {
+                            district = "";
+                            state = fields[0].Trim();
+                            region = fields[1].Trim();
+                        }
 
-                    var dateTime = DateTime.Parse(fields[2]);
-                    var recordDate = new DateTime(dateTime.Year, dateTime.Month, dateTime.Day);
-                    int.TryParse(fields[3], out int totalConfirmed);
-                    int.TryParse(fields[4], out int totalDeaths);
-                    int.TryParse(fields[5], out int totalRecovered);
-                    double latitude = 0;
-                    double longitude = 0;
-                    if (fields.Length > 6)
-                    {
-                        double.TryParse(fields[6], out double lat);
-                        double.TryParse(fields[7], out double lng);
-                        latitude = lat;
-                        longitude = lng;
+                        isValid = DateTime.TryParse(fields[2], out DateTime dateTime);
+                        recordDate = isValid ? dateTime : new DateTime();
+                        isValid = int.TryParse(fields[3], out int confirmed);
+                        totalConfirmed = isValid ? confirmed : 0;
+                        isValid = int.TryParse(fields[4], out int deaths);
+                        totalDeaths = isValid ? deaths : 0;
+                        isValid = int.TryParse(fields[5], out int recovered);
+                        totalRecovered = isValid ? recovered : 0;
+                        if (fields.Length > 6)
+                        {
+                            isValid = double.TryParse(fields[6], out double lat);
+                            latitude = isValid ? lat : 0;
+                            isValid = double.TryParse(fields[7], out double lng);
+                            longitude = isValid ? lng : 0;
+                        }
                     }
-
                     //System.Diagnostics.Debug.WriteLine($"LoadData BEFORE:{region},{state},{district},{recordDate},{totalConfirmed},{totalRecovered},{totalDeaths}");
                     //if (region == "France" && recordDate > new DateTime(2020, 3, 10))
                     //{
@@ -167,7 +203,7 @@ namespace DataClasses
                     else
                     {
                         // Add the report to the collection
-                        report = new DailyReport(region, state, district, recordDate, totalConfirmed, newConfirmed, totalDeaths, newDeaths, totalRecovered, newRecovered, latitude, longitude);
+                        report = new DailyReport(region, state, district, recordDate, totalConfirmed, newConfirmed, totalDeaths, newDeaths, totalRecovered, newRecovered, totalActive, latitude, longitude);
                         reports.Add(report);
                     }
 
