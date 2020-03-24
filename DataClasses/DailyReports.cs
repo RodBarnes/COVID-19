@@ -178,90 +178,6 @@ namespace DataClasses
             while (!parser.EndOfData);
         }
 
-        private void AddStateSums(List<DailyReport> sums)
-        {
-            // Get a list of Region, State, District where District is blank or missing
-            var allSums = reports
-                .GroupBy(i => new { i.Region, i.State, i.District })
-                .Select(i => new { i.Key.Region, i.Key.State, i.Key.District })
-                .Where(i => !string.IsNullOrEmpty(i.Region) && !string.IsNullOrEmpty(i.State) && string.IsNullOrEmpty(i.District)).ToList();
-
-            //foreach (var all in allSums)
-            //{
-            //    System.Diagnostics.Debug.WriteLine($"REGION:{all.Region},{all.State},{all.District}");
-            //}
-
-            foreach (DailyReport sum in sums)
-            {
-                //System.Diagnostics.Debug.WriteLine($"STATE: {sum.RecordDate.ToString(DateFormat)},{sum.Region},{sum.State},{sum.District},{sum.TotalConfirmed},{sum.TotalRecovered},{sum.TotalDeaths}");
-
-                //var tests = sums.Where(r => r.Region == "Taiwan").ToList();
-                //foreach (var test in tests)
-                //{
-                //    System.Diagnostics.Debug.WriteLine($"STATE: {test.Region},{test.State},{test.District}");
-                //}
-
-                // If there is no existing District = (All) record, add one
-                var chk = allSums.Where(a => a.Region == sum.Region && a.State == sum.State).Count();
-                if (chk == 0)
-                {
-                    // Add the (All) for the region
-                    reports.Add(sum);
-                }
-                else
-                {
-                    //Else, update the existing District = (All) record
-                    //var fixes = reports.Where(r => r.Region == sum.Region && r.State == sum.State).ToList();
-                    //foreach (var fix in fixes)
-                    //{
-                    //    fix.District = "(All)";
-                    //}
-                }
-            }
-        }
-
-        private void AddRegionSums(List<DailyReport> sums)
-        {
-            // Get a list of Region, State where State is blank or missing
-            var allSums = reports
-                .GroupBy(r => new { r.Region, r.State })
-                .Select(r => new { r.Key.Region, r.Key.State })
-                .Where(r => !string.IsNullOrEmpty(r.Region) && string.IsNullOrEmpty(r.State)).ToList();
-
-            //foreach (var all in allSums)
-            //{
-            //    System.Diagnostics.Debug.WriteLine($"REGION:{all.Region},{all.State}");
-            //}
-
-            foreach (DailyReport sum in sums)
-            {
-                //System.Diagnostics.Debug.WriteLine($"REGION:{sum.RecordDate.ToString(DateFormat)},{sum.Region},{sum.State},{sum.District},{sum.TotalConfirmed},{sum.TotalRecovered},{sum.TotalDeaths}");
-
-                //var tests = sums.Where(r => r.Region == "Taiwan").ToList();
-                //foreach (var test in tests)
-                //{
-                //    System.Diagnostics.Debug.WriteLine($"REGION:{test.Region},{test.State},{test.District}");
-                //}
-
-                // If there is no existing State = (All) record, add one
-                var chk = allSums.Where(a => a.Region == sum.Region).Count();
-                if (chk == 0)
-                {
-                    // Add the (All) for the region
-                    reports.Add(sum);
-                }
-                else
-                {
-                    //Else, update the existing State = (All) record
-                    //var fixes = reports.Where(r => r.Region == sum.Region).ToList();
-                    //foreach (var fix in fixes)
-                    //{
-                    //    fix.State = "(All)";
-                    //}
-                }
-            }
-        }
-
         private void AddGlobalSums(List<DailyReport> sums)
         {
             foreach (DailyReport sum in sums)
@@ -275,46 +191,6 @@ namespace DataClasses
 
                 reports.Add(sum);
             }
-        }
-
-        private List<DailyReport> CalculateStateSums()
-        {
-            // Get a list of counts by date rolled up to Region, State
-            return reports
-                .GroupBy(r => new { r.Region, r.State, r.RecordDate })
-                .Select(g => new DailyReport
-                {
-                    Region = g.Key.Region,
-                    State = g.Key.State,
-                    //District = "(All)",
-                    RecordDate = g.Key.RecordDate,
-                    TotalConfirmed = g.Sum(s => s.TotalConfirmed),
-                    TotalRecovered = g.Sum(s => s.TotalRecovered),
-                    TotalDeaths = g.Sum(s => s.TotalDeaths),
-                    NewConfirmed = g.Sum(s => s.NewConfirmed),
-                    NewRecovered = g.Sum(s => s.NewRecovered),
-                    NewDeaths = g.Sum(s => s.NewDeaths)
-                }).ToList();
-        }
-
-        private List<DailyReport> CalculateRegionSums()
-        {
-            // Get a list of counts by date rolled up to region
-            return reports
-                .GroupBy(r => new { r.Region, r.RecordDate })
-                .Select(g => new DailyReport
-                {
-                    Region = g.Key.Region,
-                    //State = "(All)",
-                    //District = "(All)",
-                    RecordDate = g.Key.RecordDate,
-                    TotalConfirmed = g.Sum(s => s.TotalConfirmed),
-                    TotalRecovered = g.Sum(s => s.TotalRecovered),
-                    TotalDeaths = g.Sum(s => s.TotalDeaths),
-                    NewConfirmed = g.Sum(s => s.NewConfirmed),
-                    NewRecovered = g.Sum(s => s.NewRecovered),
-                    NewDeaths = g.Sum(s => s.NewDeaths)
-                }).ToList();
         }
 
         private List<DailyReport> CalculateGlobalSums()
@@ -349,12 +225,8 @@ namespace DataClasses
                 {
                     GetDailyFromFile(filePath);
                 }
-                //var stateSums = CalculateStateSums();
-                //var regionSums = CalculateRegionSums();
                 var globalSums = CalculateGlobalSums();
                 AddGlobalSums(globalSums);
-                //AddRegionSums(regionSums);
-                //AddStateSums(stateSums);
             }
             else
             {
