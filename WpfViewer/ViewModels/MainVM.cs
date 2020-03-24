@@ -116,7 +116,6 @@ namespace WpfViewer.ViewModels
         }
 
         private DailyReport selectedDailyReport;
-
         public DailyReport SelectedDailyReport
         {
             get => selectedDailyReport;
@@ -160,17 +159,6 @@ namespace WpfViewer.ViewModels
             }
         }
 
-        private ObservableCollection<TotalReport> totalReports;
-        public ObservableCollection<TotalReport> TotalReports
-        {
-            get => totalReports;
-            set
-            {
-                totalReports = value;
-                NotifyPropertyChanged();
-            }
-        }
-
         private DailyReports dailyReports;
         public DailyReports DailyReports
         {
@@ -178,6 +166,17 @@ namespace WpfViewer.ViewModels
             set
             {
                 dailyReports = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private ObservableCollection<TotalReport> totalReports;
+        public ObservableCollection<TotalReport> TotalReports
+        {
+            get => totalReports;
+            set
+            {
+                totalReports = value;
                 NotifyPropertyChanged();
             }
         }
@@ -205,39 +204,6 @@ namespace WpfViewer.ViewModels
                             break;
                     }
                 }
-            }
-        }
-
-        private double deathsPct = 0;
-        public double DeathsPct
-        {
-            get => deathsPct;
-            set
-            {
-                deathsPct = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        private double recoveredPct = 0;
-        public double RecoveredPct
-        {
-            get => recoveredPct;
-            set
-            {
-                recoveredPct = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        private double activePct = 0;
-        public double ActivePct
-        {
-            get => activePct;
-            set
-            {
-                activePct = value;
-                NotifyPropertyChanged();
             }
         }
 
@@ -382,11 +348,6 @@ namespace WpfViewer.ViewModels
                     .Select(g => g.Key.ToString("MMM-dd"));
             }
 
-            //foreach (var item in report.TotalConfirmed)
-            //{
-            //    System.Diagnostics.Debug.WriteLine($"{item}");
-            //}
-
             LineSeriesCollection = new SeriesCollection
             {
                 new LineSeries
@@ -414,8 +375,6 @@ namespace WpfViewer.ViewModels
 
             LineLabels = report.RecordDates.ToArray();
             LineFormatter = value => value.ToString();
-
-            CalculatePercentages(report.TotalConfirmed, report.TotalRecovered, report.TotalDeaths);
         }
 
         private void ShowBarChart(TotalReport report)
@@ -474,8 +433,6 @@ namespace WpfViewer.ViewModels
 
             BarLabels = report.RecordDates.ToArray();
             BarFormatter = value => value.ToString();
-
-            CalculatePercentages(report.NewConfirmed, report.NewRecovered, report.NewDeaths);
         }
 
         private void ShowDataGrid(TotalReport report)
@@ -502,23 +459,7 @@ namespace WpfViewer.ViewModels
                 list = DailyReports.ToList();
             }
 
-            //foreach (var item in list)
-            //{
-            //    System.Diagnostics.Debug.WriteLine($"{item.RecordDate:yyyy-MM-dd},{item.Region},{item.State},{item.TotalConfirmed},{item.TotalRecovered},{item.TotalDeaths}");
-            //}
             return list;
-        }
-
-        private void CalculatePercentages(IEnumerable<int> confirmedValues, IEnumerable<int> recoveredValues, IEnumerable<int> deathsValues)
-        {
-            var deathsCnt = ((double)deathsValues.Sum());
-            var recoveredCnt = ((double)recoveredValues.Sum());
-            var confirmedCnt = ((double)confirmedValues.Sum());
-            var activeCnt = confirmedCnt - deathsCnt - recoveredCnt;
-
-            DeathsPct = Math.Round(deathsCnt / confirmedCnt * 100, 2);
-            RecoveredPct = Math.Round(recoveredCnt / confirmedCnt * 100, 2);
-            ActivePct = Math.Round(activeCnt / confirmedCnt * 100, 2);
         }
 
         #endregion

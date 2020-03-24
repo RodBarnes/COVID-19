@@ -25,19 +25,6 @@
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center" >
                 <TextBlock Text="{Binding SelectedTotalReport.RegionState}" FontSize="18" VerticalAlignment="Center" />
-                <TextBlock Text=" -- " FontSize="18" VerticalAlignment="Center" />
-                <StackPanel Orientation="Horizontal" Margin="5,5" >
-                    <TextBlock Text="Act% " FontSize="18" VerticalAlignment="Center" />
-                    <TextBlock Text="{Binding ActivePct}" FontSize="18" VerticalAlignment="Center" />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="5,5">
-                    <TextBlock Text="Rcv% "  FontSize="18" VerticalAlignment="Center" />
-                    <TextBlock Text="{Binding RecoveredPct}" FontSize="18" VerticalAlignment="Center" />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="5,5">
-                    <TextBlock Text="Dth% " FontSize="18" VerticalAlignment="Center" />
-                    <TextBlock Text="{Binding DeathsPct}" FontSize="18" VerticalAlignment="Center" />
-                </StackPanel>
             </StackPanel>
             <ComboBox Grid.Row="1" Grid.Column="1" Margin="5,5" ItemsSource="{Binding ViewSelections}" SelectedIndex="{Binding ViewIndex}" />
             <ListBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding TotalReports}" SelectedItem="{Binding SelectedTotalReport}" DisplayMemberPath="RegionState" />
