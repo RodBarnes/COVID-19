@@ -4,7 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace DataClasses
 {
@@ -17,11 +16,13 @@ namespace DataClasses
 
         private readonly List<Replacement> replacements = new List<Replacement>();
 
-        public DailyReports(string path = "")
-        {
-            ReadReplacements();
-            MergeData(path);
-        }
+        public DailyReports() { }
+
+        //public DailyReports(string path)
+        //{
+        //    ReadReplacements();
+        //    MergeData(path);
+        //}
 
         #region Properties
 
@@ -42,7 +43,7 @@ namespace DataClasses
 
         #region Methods
 
-        private void ReadDailyFiles(string filePath)
+        public void ReadDailyFiles(string filePath)
         {
             var firstLine = true;
             var fileDate = Path.GetFileNameWithoutExtension(filePath);
@@ -88,7 +89,7 @@ namespace DataClasses
                         county = fields[1].Trim();
                         state = fields[2].Trim();
                         region = fields[3].Trim();
-                        isValid = DateTime.TryParse(fields[4], out DateTime dateTime);
+                        isValid = DateTime.TryParse(Path.GetFileNameWithoutExtension(filePath).ToString(), out DateTime dateTime);
                         recordDate = isValid ? new DateTime(dateTime.Year, dateTime.Month, dateTime.Day) : new DateTime();
                         isValid = double.TryParse(fields[5], out double lat);
                         latitude = isValid ? lat : 0;
@@ -120,7 +121,7 @@ namespace DataClasses
                             region = fields[1].Trim();
                         }
 
-                        isValid = DateTime.TryParse(fields[2], out DateTime dateTime);
+                        isValid = DateTime.TryParse(Path.GetFileNameWithoutExtension(filePath).ToString(), out DateTime dateTime);
                         recordDate = isValid ? dateTime : new DateTime();
                         isValid = int.TryParse(fields[3], out int confirmed);
                         totalConfirmed = isValid ? confirmed : 0;
@@ -265,31 +266,110 @@ namespace DataClasses
             }
         }
 
-        private void AddGlobalSums(List<DailyReport> sums)
-        {
-            foreach (DailyReport sum in sums)
-            {
-                //System.Diagnostics.Debug.WriteLine($"GLOBAL:{sum.RecordDate.ToString(DateFormat)},{sum.Region},{sum.State},{sum.County},{sum.TotalConfirmed},{sum.TotalRecovered},{sum.TotalDeaths}");
+        //public void MergeData(string path)
+        //{
+        //    readHeaders = true;
 
-                //var tests = sums.Where(r => r.Region == "Taiwan").ToList();
-                //foreach (var test in tests)
-                //{
-                //    System.Diagnostics.Debug.WriteLine($"GLOBAL:{test.Region},{test.State},{test.County}");
+        //    var filePaths = Directory.GetFiles(path, "*.csv");
 
-                reports.Add(sum);
-            }
-        }
+        //    if (filePaths.Length > 0)
+        //    {
+        //        foreach (var filePath in filePaths)
+        //        {
+        //            ReadDailyFiles(filePath);
+        //        }
+        //        //AddMissingRecords();
+        //        //AddGlobalSums();
+        //    }
+        //    else
+        //    {
+        //        throw new FileNotFoundException($"No files found at path '{path}'.");
+        //    }
+        //}
 
-        private List<DailyReport> CalculateGlobalSums()
+        //public void AddMissingRecords()
+        //{
+        //    var minDate = reports.Min(r => r.RecordDate);
+        //    var maxDate = reports.Max(r => r.RecordDate);
+        //    var days = maxDate.Subtract(minDate).Days;
+        //    var list = reports
+        //        .Select(r => new { r.Country, r.State, r.County, r.RecordDate })
+        //        .Distinct()
+        //        .OrderBy(r => r.Country)
+        //        .ThenBy(r => r.State)
+        //        .ThenBy(r => r.County)
+        //        .ThenBy(r => r.RecordDate);
+
+        //    foreach (var item in list)
+        //    {
+        //        System.Diagnostics.Debug.WriteLine($"{item.RecordDate},{item.Country},{item.State},{item.County}");
+        //    }
+
+        //    // Examine each dimension...
+        //    foreach (var item in list)
+        //    {
+        //        System.Diagnostics.Debug.WriteLine($"{item.RecordDate},{item.Country},{item.State},{item.County}");
+
+        //        var curDate = minDate;
+        //        // Checking for each date in the full range
+        //        do
+        //        {
+        //            var report = reports
+        //                .Where(r => r.RecordDate <= curDate && r.Country == item.Country && r.State == item.State && r.County == item.County)
+        //                .OrderByDescending(r => r.RecordDate)
+        //                .FirstOrDefault();
+        //            if (report == null)
+        //            {
+        //                // We found no report older or the same age as the date being checked
+        //                // so we need to fill in the older dates
+        //                report = reports
+        //                .Where(r => r.Country == item.Country && r.State == item.State && r.County == item.County)
+        //                .OrderBy(r => r.RecordDate)
+        //                .FirstOrDefault();
+
+        //                var chkDate = minDate;
+        //                do
+        //                {
+        //                    // Make a copy of the existing report, give it the new RecordDate, then add it to the reports
+        //                    var newReport = report.Clone();
+        //                    newReport.RecordDate = chkDate;
+        //                    newReport.TotalConfirmed = newReport.TotalRecovered = newReport.TotalRecovered = newReport.TotalActive = 0;
+        //                    reports.Add(newReport);
+
+        //                    chkDate = chkDate.AddDays(1);
+        //                }
+        //                while (chkDate < report.RecordDate);
+        //            }
+        //            else if (report.RecordDate < curDate)
+        //            {
+        //                // We found a report for the same dimension but with a date older then the current date being checked
+        //                // so we need to fill in the missing dates
+        //                var chkDate = report.RecordDate.AddDays(1);
+        //                do
+        //                {
+        //                    // Make a copy of the existing report, give it the new RecordDate, then add it to the reports
+        //                    var newReport = report.Clone();
+        //                    newReport.RecordDate = chkDate;
+        //                    reports.Add(newReport);
+
+        //                    chkDate = chkDate.AddDays(1);
+        //                }
+        //                while (chkDate <= curDate);
+        //            }
+        //            curDate = curDate.AddDays(1);
+        //        }
+        //        while (curDate <= maxDate);
+        //    }
+        //}
+
+        public void AddGlobalSums()
         {
             // Get a list by date rolled up across all regions
-            return reports
+            var sums = reports
                 .GroupBy(i => i.RecordDate)
                 .Select(g => new DailyReport
                 {
                     Country = "(GLOBAL)",
-                    //State = "(All)",
-                    //County = "(All)",
                     RecordDate = g.Key,
                     TotalConfirmed = g.Sum(s => s.TotalConfirmed),
                     TotalRecovered = g.Sum(s => s.TotalRecovered),
@@ -298,30 +378,14 @@ namespace DataClasses
                     NewRecovered = g.Sum(s => s.NewRecovered),
                     NewDeaths = g.Sum(s => s.NewDeaths)
                 }).ToList();
-        }
 
-        public void MergeData(string path)
-        {
-            readHeaders = true;
-
-            var filePaths = Directory.GetFiles(path, "*.csv");
-
-            if (filePaths.Length > 0)
+            foreach (DailyReport sum in sums)
             {
-                foreach (var filePath in filePaths)
-                {
-                    ReadDailyFiles(filePath);
-                }
-                var globalSums = CalculateGlobalSums();
-                AddGlobalSums(globalSums);
-            }
-            else
-            {
-                throw new FileNotFoundException($"No files found at path '{path}'.");
+                reports.Add(sum);
             }
         }
 
-        private void ReadReplacements()
+        public void ReadReplacements()
         {
             var dir = Directory.GetCurrentDirectory();
             var filePath = $@"{dir}\Replacements.csv";

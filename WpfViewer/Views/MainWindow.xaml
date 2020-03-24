@@ -80,7 +80,7 @@
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center">
                 <StackPanel>
-                    <StackPanel Width="280" Margin="5,5,5,5">
+                    <StackPanel Width="280" Margin="5,5,5,5" >
                         <TextBox Text="{Binding BusyPanelTitle}" TextWrapping="Wrap" MinHeight="16" Background="LightGreen" HorizontalAlignment="Center" />
                         <ProgressBar Visibility="Collapsed" Value="{Binding BusyProgressValue}" Minimum="{Binding BusyProgressMinimum}" Maximum="{Binding BusyProgressMaximum}" Height="20" />
                         <TextBox Visibility="Collapsed" Text="{Binding BusyProgressText}" HorizontalAlignment="Center" TextAlignment="Center" Width="32" Background="LightGreen" />

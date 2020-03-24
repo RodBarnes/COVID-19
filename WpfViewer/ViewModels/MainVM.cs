@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
@@ -484,9 +485,31 @@ namespace WpfViewer.ViewModels
                 PullLastestData();
             }
 
-            ShowBusyPanel("Importing data...");
+            var filePaths = Directory.GetFiles(DataPath, "*.csv");
 
-            DailyReports = new DailyReports(DataPath);
+            if (filePaths.Length > 0)
+            {
+                DailyReports = new DailyReports();
+
+                ShowBusyPanel("Reading replacements...");
+                DailyReports.ReadReplacements();
+
+                ShowBusyPanel("Importing data...");
+                foreach (var filePath in filePaths)
+                {
+                    DailyReports.ReadDailyFiles(filePath);
+                }
+
+                //ShowBusyPanel("Filling in missing dates...");
+                //DailyReports.AddMissingRecords();
+
+                ShowBusyPanel("Calculating global values...");
+                DailyReports.AddGlobalSums();
+            }
+            else
+            {
+                throw new FileNotFoundException($"No files found at path '{DataPath}'.");
+            }
 
             // Get the list of reports for the combo box
             // by Country, State without regard to date

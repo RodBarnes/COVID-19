@@ -6,12 +6,12 @@ namespace DataClasses
     {
         public DailyReport() { }
 
-        public DailyReport(string region, string state, string district, DateTime recordDate, int totalConfirmed, int newConfirmed, int totalDeaths,
+        public DailyReport(string country, string state, string county, DateTime recordDate, int totalConfirmed, int newConfirmed, int totalDeaths,
             int newDeaths, int totalRecoverd, int newRecovered, int totalActive = 0, double latitude = 0, double longitude = 0)
         {
-            Country = region;
+            Country = country;
             State = state;
-            County = district;
+            County = county;
             RecordDate = recordDate;
             TotalConfirmed = totalConfirmed;
             NewConfirmed = newConfirmed;
@@ -22,6 +22,27 @@ namespace DataClasses
             TotalActive = totalActive;
             Latitude = latitude;
             Longitude = longitude;
+        }
+
+        public DailyReport Clone()
+        {
+            var report = new DailyReport(
+                Country = Country,
+                State = State,
+                County = County,
+                RecordDate = RecordDate,
+                TotalConfirmed = TotalConfirmed,
+                NewConfirmed = NewConfirmed,
+                TotalDeaths = TotalDeaths,
+                NewDeaths = NewDeaths,
+                TotalRecovered = TotalRecovered,
+                NewRecovered = NewRecovered,
+                TotalActive = TotalActive,
+                Latitude = Latitude,
+                Longitude = Longitude
+            );
+
+            return report;
         }
 
         #region Properties
