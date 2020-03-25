@@ -323,37 +323,7 @@ namespace WpfViewer.ViewModels
 
         private void ShowLineChart(TotalReport report)
         {
-            List<DailyReport> list = GetFilteredList(report);
-
-            if (report.TotalConfirmed == null)
-            {
-                report.TotalConfirmed = list
-                    .GroupBy(r => r.RecordDate)
-                    .Select(g => g.Sum(i => i.TotalConfirmed));
-            }
-            if (report.TotalRecovered == null)
-            {
-                report.TotalRecovered = list
-                    .GroupBy(r => r.RecordDate)
-                    .Select(g => g.Sum(i => i.TotalRecovered));
-            }
-            if (report.TotalDeaths == null)
-            {
-                report.TotalDeaths = list
-                    .GroupBy(r => r.RecordDate)
-                    .Select(g => g.Sum(i => i.TotalDeaths));
-            }
-            if (report.RecordDates == null)
-            {
-                report.RecordDates = list
-                    .GroupBy(r => r.RecordDate)
-                    .Select(g => g.Key.ToString("MMM-dd"));
-            }
-
-            //foreach (var item in report.TotalConfirmed)
-            //{
-            //    System.Diagnostics.Debug.WriteLine($"{item}");
-            //}
+            PopulateNewCounts(report);
 
             LineSeriesCollection = new SeriesCollection
             {
@@ -386,32 +356,7 @@ namespace WpfViewer.ViewModels
 
         private void ShowBarChart(TotalReport report)
         {
-            List<DailyReport> list = GetFilteredList(report);
-
-            if (report.NewConfirmed == null)
-            {
-                report.NewConfirmed = list
-                    .GroupBy(r => r.RecordDate)
-                    .Select(g => g.Sum(i => i.NewConfirmed));
-            }
-            if (report.NewRecovered == null)
-            {
-                report.NewRecovered = list
-                    .GroupBy(r => r.RecordDate)
-                    .Select(g => g.Sum(i => i.NewRecovered));
-            }
-            if (report.NewDeaths == null)
-            {
-                report.NewDeaths = list
-                    .GroupBy(r => r.RecordDate)
-                    .Select(g => g.Sum(i => i.NewDeaths));
-            }
-            if (report.RecordDates == null)
-            {
-                report.RecordDates = list
-                    .GroupBy(r => r.RecordDate)
-                    .Select(g => g.Key.ToString("MMM-dd"));
-            }
+            PopulateTotalCounts(report);
 
             BarSeriesCollection = new SeriesCollection
             {
@@ -447,6 +392,66 @@ namespace WpfViewer.ViewModels
             var list = GetFilteredList(report);
 
             CountryDailyReports = new ObservableCollection<DailyReport>(list);
+        }
+
+        private void PopulateNewCounts(TotalReport report)
+        {
+            var list = GetFilteredList(report);
+
+            if (report.TotalConfirmed == null)
+            {
+                report.TotalConfirmed = list
+                    .GroupBy(r => r.RecordDate)
+                    .Select(g => g.Sum(i => i.TotalConfirmed));
+            }
+            if (report.TotalRecovered == null)
+            {
+                report.TotalRecovered = list
+                    .GroupBy(r => r.RecordDate)
+                    .Select(g => g.Sum(i => i.TotalRecovered));
+            }
+            if (report.TotalDeaths == null)
+            {
+                report.TotalDeaths = list
+                    .GroupBy(r => r.RecordDate)
+                    .Select(g => g.Sum(i => i.TotalDeaths));
+            }
+            if (report.RecordDates == null)
+            {
+                report.RecordDates = list
+                    .GroupBy(r => r.RecordDate)
+                    .Select(g => g.Key.ToString("MMM-dd"));
+            }
+        }
+
+        private void PopulateTotalCounts(TotalReport report)
+        {
+            var list = GetFilteredList(report);
+
+            if (report.NewConfirmed == null)
+            {
+                report.NewConfirmed = list
+                    .GroupBy(r => r.RecordDate)
+                    .Select(g => g.Sum(i => i.NewConfirmed));
+            }
+            if (report.NewRecovered == null)
+            {
+                report.NewRecovered = list
+                    .GroupBy(r => r.RecordDate)
+                    .Select(g => g.Sum(i => i.NewRecovered));
+            }
+            if (report.NewDeaths == null)
+            {
+                report.NewDeaths = list
+                    .GroupBy(r => r.RecordDate)
+                    .Select(g => g.Sum(i => i.NewDeaths));
+            }
+            if (report.RecordDates == null)
+            {
+                report.RecordDates = list
+                    .GroupBy(r => r.RecordDate)
+                    .Select(g => g.Key.ToString("MMM-dd"));
+            }
         }
 
         private List<DailyReport> GetFilteredList(TotalReport report)
