@@ -317,7 +317,7 @@ namespace WpfViewer.ViewModels
             var result = Utility.RunCommand(GitCommand, RepositoryPath);
             if (!result.Contains("Already up to date."))
             {
-                ShowMessagePanel("Error!", result);
+                ShowMessagePanel("Result", result);
             }
         }
 
