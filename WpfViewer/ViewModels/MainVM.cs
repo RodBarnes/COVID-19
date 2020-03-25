@@ -62,6 +62,7 @@ namespace WpfViewer.ViewModels
         public string RepositoryPath { get; set; }
         public string DataPath { get; set; }
         public string PullData { get; set; }
+        public string ReplacementsPath { get; set; }
 
         private ObservableCollection<string> viewSelections;
         public ObservableCollection<string> ViewSelections
@@ -473,44 +474,8 @@ namespace WpfViewer.ViewModels
             return list;
         }
 
-        #endregion
-
-        #region Background Workers
-
-        private void bw_LoadDataDoWork(object sender, DoWorkEventArgs e)
+        private void BuildTotalReports()
         {
-            if (PullData == "True")
-            {
-                ShowBusyPanel("Pulling latest data...");
-                PullLastestData();
-            }
-
-            var filePaths = Directory.GetFiles(DataPath, "*.csv");
-
-            if (filePaths.Length > 0)
-            {
-                DailyReports = new DailyReports();
-
-                ShowBusyPanel("Reading replacements...");
-                DailyReports.ReadReplacements();
-
-                ShowBusyPanel("Importing data...");
-                foreach (var filePath in filePaths)
-                {
-                    DailyReports.ReadDailyFiles(filePath);
-                }
-
-                //ShowBusyPanel("Filling in missing dates...");
-                //DailyReports.AddMissingRecords();
-
-                ShowBusyPanel("Calculating global values...");
-                DailyReports.AddGlobalSums();
-            }
-            else
-            {
-                throw new FileNotFoundException($"No files found at path '{DataPath}'.");
-            }
-
             // Get the list of reports for the combo box
             // by Country, State without regard to date
             var displayNames = DailyReports
@@ -527,6 +492,43 @@ namespace WpfViewer.ViewModels
                 .OrderBy(a => a.DisplayName);
 
             TotalReports = new ObservableCollection<TotalReport>(displayNames);
+        }
+
+        #endregion
+
+        #region Background Workers
+
+        private void bw_LoadDataDoWork(object sender, DoWorkEventArgs e)
+        {
+            if (PullData == "True")
+            {
+                ShowBusyPanel("Pulling latest data...");
+                PullLastestData();
+            }
+
+            DailyReports = new DailyReports();
+
+            ShowBusyPanel("Reading replacements...");
+            DailyReports.ReadReplacements(ReplacementsPath);
+
+            ShowBusyPanel("Importing data...");
+            var filePaths = Directory.GetFiles(DataPath, "*.csv");
+            if (filePaths.Length > 0)
+            {
+                foreach (var filePath in filePaths)
+                {
+                    DailyReports.ReadDailyFiles(filePath);
+                }
+            }
+            else
+            {
+                throw new FileNotFoundException($"No files found at path '{DataPath}'.");
+            }
+
+            ShowBusyPanel("Calculating global values...");
+            DailyReports.AddGlobalSums();
+
+            BuildTotalReports();
         }
 
         private void bw_LoadDataProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -559,19 +561,22 @@ namespace WpfViewer.ViewModels
 
         private void LoadSettings()
         {
+            var dir = Directory.GetCurrentDirectory();
             var path = @"D:\Source\BitBucket\3rd Party\COVID-19";
             var list = new Settings
             {
                 new Setting(nameof(GitCommand), @"""D:\Program Files\Git\cmd\git.exe"" pull"),
                 new Setting(nameof(RepositoryPath), path),
                 new Setting(nameof(PullData),"True"),
-                new Setting(nameof(DataPath), $@"{path}\csse_covid_19_data\csse_covid_19_daily_reports")
+                new Setting(nameof(DataPath), $@"{path}\csse_covid_19_data\csse_covid_19_daily_reports"),
+                new Setting(nameof(ReplacementsPath), $@"{dir}\Replacements.csv")
             };
             Utility.LoadSettings(list);
             GitCommand = list[nameof(GitCommand)].Value;
             RepositoryPath = list[nameof(RepositoryPath)].Value;
             PullData = list[nameof(PullData)].Value;
             DataPath = list[nameof(DataPath)].Value;
+            ReplacementsPath = list[nameof(ReplacementsPath)].Value;
         }
 
         private void SaveSettings()
@@ -581,7 +586,8 @@ namespace WpfViewer.ViewModels
                 new Setting(nameof(GitCommand), GitCommand),
                 new Setting(nameof(RepositoryPath), RepositoryPath),
                 new Setting(nameof(PullData), PullData),
-                new Setting(nameof(DataPath), DataPath)
+                new Setting(nameof(DataPath), DataPath),
+                new Setting(nameof(ReplacementsPath), ReplacementsPath)
             };
             Utility.SaveSettings(list);
         }

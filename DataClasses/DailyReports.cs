@@ -385,11 +385,9 @@ namespace DataClasses
             }
         }
 
-        public void ReadReplacements()
+        public void ReadReplacements(string path)
         {
-            var dir = Directory.GetCurrentDirectory();
-            var filePath = $@"{dir}\Replacements.csv";
-            using (parser = new TextFieldParser(filePath))
+            using (parser = new TextFieldParser(path))
             {
                 parser.SetDelimiters(",");
                 parser.HasFieldsEnclosedInQuotes = true;
