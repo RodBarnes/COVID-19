@@ -81,9 +81,11 @@
                         VerticalAlignment="Center">
                 <StackPanel Width="280" Margin="5,5,5,5" VerticalAlignment="Center" Background="LightGreen" >
                     <TextBox Text="{Binding BusyPanelTitle}" TextWrapping="Wrap" MinHeight="16" HorizontalAlignment="Center" Background="Transparent" BorderBrush="Transparent" />
-                    <!--<ProgressBar Visibility="Collapsed" Value="{Binding BusyProgressValue}" Minimum="{Binding BusyProgressMinimum}" Maximum="{Binding BusyProgressMaximum}" Height="20" />-->
-                    <!--<TextBox Visibility="Collapsed" Text="{Binding BusyProgressText}" HorizontalAlignment="Center" TextAlignment="Center" Width="32" />-->
-                    <!--<Button Visibility="Collapsed" Content="Cancel" Command="{Binding BusyCancelCommand}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="38"/>-->
+                    <Grid>
+                        <ProgressBar Visibility="Visible" Value="{Binding BusyProgressValue}" Minimum="{Binding BusyProgressMinimum}" Maximum="{Binding BusyProgressMaximum}" Height="20" Margin="5,5"/>
+                        <TextBox Visibility="Visible" Text="{Binding BusyProgressText}" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center" BorderBrush="Transparent" Background="Transparent"/>
+                    </Grid>
+                    <Button Visibility="Visible" Content="Cancel" Command="{Binding BusyCancelCommand}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="38"/>
                 </StackPanel>
             </Border>
         </Grid>

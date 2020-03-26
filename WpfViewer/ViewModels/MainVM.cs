@@ -41,6 +41,8 @@ namespace WpfViewer.ViewModels
             bw.DoWork += bw_LoadDataDoWork;
             bw.ProgressChanged += bw_LoadDataProgressChanged;
             bw.RunWorkerCompleted += bw_LoadDataRunWorkerCompleted;
+            bw.WorkerReportsProgress = true;
+            bw.WorkerSupportsCancellation = true;
             if (!bw.IsBusy)
             {
                 bw.RunWorkerAsync();
@@ -520,9 +522,19 @@ namespace WpfViewer.ViewModels
             var filePaths = Directory.GetFiles(DataPath, "*.csv");
             if (filePaths.Length > 0)
             {
-                foreach (var filePath in filePaths)
+                for (int i = 0; i < filePaths.Length; i++)
                 {
-                    DailyReports.ReadDailyFiles(filePath);
+                    if (bw.CancellationPending)
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
+
+                    DailyReports.ReadDailyFiles(filePaths[i]);
+
+                    // Update progress
+                    int val = (int)(i * BusyProgressMaximum / filePaths.Length);
+                    bw.ReportProgress(val);
                 }
             }
             else
@@ -538,6 +550,7 @@ namespace WpfViewer.ViewModels
 
         private void bw_LoadDataProgressChanged(object sender, ProgressChangedEventArgs e)
         {
+            BusyProgressValue = e.ProgressPercentage;
             BusyProgressText = e.ProgressPercentage.ToString();
         }
 
