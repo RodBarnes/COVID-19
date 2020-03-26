@@ -351,11 +351,6 @@ namespace WpfViewer.ViewModels
         {
             PopulateTotalCounts(report);
 
-            foreach (int count in report.TotalRecovered)
-            {
-                System.Diagnostics.Debug.WriteLine(count);
-            }
-
             LineSeriesCollection = new SeriesCollection
             {
                 new LineSeries
