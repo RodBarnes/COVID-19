@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -33,20 +32,10 @@ namespace WpfViewer.ViewModels
             InitMessagePanel();
             InitMainPanel();
 
-            bw = new BackgroundWorker
-            {
-                WorkerReportsProgress = true,
-                WorkerSupportsCancellation = true
-            };
-            bw.DoWork += bw_LoadDataDoWork;
-            bw.ProgressChanged += bw_LoadDataProgressChanged;
-            bw.RunWorkerCompleted += bw_LoadDataRunWorkerCompleted;
-            bw.WorkerReportsProgress = true;
-            bw.WorkerSupportsCancellation = true;
-            if (!bw.IsBusy)
-            {
-                bw.RunWorkerAsync();
-            }
+            DailyReports = new DailyReports();
+
+            //ImportData();
+            ReadData();
         }
 
         ~MainVM()
@@ -314,6 +303,23 @@ namespace WpfViewer.ViewModels
             }
         }
 
+        private void ReadData()
+        {
+            DailyReports.ReadData();
+            DailyReports.AddGlobalSums();
+            BuildTotalReports();
+
+            //var dReports = DailyReports
+            //    .Where(r => r.Country == "China" && r.State == "Hubei")
+            //    .Select(r => new DailyReport(r.Country, r.State, r.County, r.RecordDate, r.TotalConfirmed, r.TotalRecovered, r.TotalDeaths, r.TotalActive, r.NewConfirmed, r.NewRecovered, r.NewDeaths, r.Latitude, r.Longitude));
+            //foreach (DailyReport report in dReports)
+            //{
+            //    System.Diagnostics.Debug.WriteLine($"{report.Country},{report.State},{report.TotalRecovered}");
+            //}
+
+            SelectedTotalReport = TotalReports.Where(a => a.Country == "(GLOBAL)").FirstOrDefault();
+        }
+
         private void PullLastestData()
         {
             var result = Utility.RunCommand(GitCommand, RepositoryPath);
@@ -323,9 +329,32 @@ namespace WpfViewer.ViewModels
             }
         }
 
+        private void ImportData()
+        {
+            bw = new BackgroundWorker
+            {
+                WorkerReportsProgress = true,
+                WorkerSupportsCancellation = true
+            };
+            bw.DoWork += bw_LoadDataDoWork;
+            bw.ProgressChanged += bw_LoadDataProgressChanged;
+            bw.RunWorkerCompleted += bw_LoadDataRunWorkerCompleted;
+            bw.WorkerReportsProgress = true;
+            bw.WorkerSupportsCancellation = true;
+            if (!bw.IsBusy)
+            {
+                bw.RunWorkerAsync();
+            }
+        }
+
         private void ShowLineChart(TotalReport report)
         {
-            PopulateNewCounts(report);
+            PopulateTotalCounts(report);
+
+            foreach (int count in report.TotalRecovered)
+            {
+                System.Diagnostics.Debug.WriteLine(count);
+            }
 
             LineSeriesCollection = new SeriesCollection
             {
@@ -358,7 +387,7 @@ namespace WpfViewer.ViewModels
 
         private void ShowBarChart(TotalReport report)
         {
-            PopulateTotalCounts(report);
+            PopulateNewCounts(report);
 
             BarSeriesCollection = new SeriesCollection
             {
@@ -396,7 +425,7 @@ namespace WpfViewer.ViewModels
             CountryDailyReports = new ObservableCollection<DailyReport>(list);
         }
 
-        private void PopulateNewCounts(TotalReport report)
+        private void PopulateTotalCounts(TotalReport report)
         {
             var list = GetFilteredList(report);
 
@@ -426,7 +455,7 @@ namespace WpfViewer.ViewModels
             }
         }
 
-        private void PopulateTotalCounts(TotalReport report)
+        private void PopulateNewCounts(TotalReport report)
         {
             var list = GetFilteredList(report);
 
@@ -456,9 +485,21 @@ namespace WpfViewer.ViewModels
             }
         }
 
+        //private void PrepareDisplay()
+        //{
+        //    DailyReports.AddGlobalSums();
+        //    BuildTotalReports();
+        //    SelectedTotalReport = TotalReports.Where(a => a.Country == "(GLOBAL)").FirstOrDefault();
+        //}
+
         private List<DailyReport> GetFilteredList(TotalReport report)
         {
             List<DailyReport> list;
+
+            //foreach (var item in DailyReports)
+            //{
+            //    System.Diagnostics.Debug.WriteLine($"{item.RecordDate},{item.Country},{item.State},{item.County},{item.TotalRecovered}");
+            //}
 
             if (!string.IsNullOrEmpty(report.Country))
             {
@@ -472,11 +513,6 @@ namespace WpfViewer.ViewModels
             {
                 list = DailyReports.ToList();
             }
-
-            //foreach (var item in list)
-            //{
-            //    System.Diagnostics.Debug.WriteLine($"{item.RecordDate},{item.Country},{item.State},{item.County},{item.TotalConfirmed}");
-            //}
 
             return list;
         }
@@ -513,10 +549,10 @@ namespace WpfViewer.ViewModels
                 PullLastestData();
             }
 
-            DailyReports = new DailyReports();
+            DailyReports.Clear();
 
             ShowBusyPanel("Reading replacements...");
-            DailyReports.ReadReplacements(ReplacementsPath);
+            DailyReports.Replacements.ReadReplacements(ReplacementsPath);
 
             ShowBusyPanel("Importing data...");
             var filePaths = Directory.GetFiles(DataPath, "*.csv");
@@ -530,7 +566,7 @@ namespace WpfViewer.ViewModels
                         return;
                     }
 
-                    DailyReports.ReadDailyFiles(filePaths[i]);
+                    DailyReports.ImportDailyRecords(filePaths[i]);
 
                     // Update progress
                     int val = (int)(i * BusyProgressMaximum / filePaths.Length);
@@ -541,11 +577,6 @@ namespace WpfViewer.ViewModels
             {
                 throw new FileNotFoundException($"No files found at path '{DataPath}'.");
             }
-
-            ShowBusyPanel("Calculating global values...");
-            DailyReports.AddGlobalSums();
-
-            BuildTotalReports();
         }
 
         private void bw_LoadDataProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -568,7 +599,7 @@ namespace WpfViewer.ViewModels
             }
             else
             {
-                SelectedTotalReport = TotalReports.Where(a => a.Country == "(GLOBAL)").FirstOrDefault();
+                ReadData();
                 HideBusyPanel();
             }
         }

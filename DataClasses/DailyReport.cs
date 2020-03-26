@@ -6,8 +6,10 @@ namespace DataClasses
     {
         public DailyReport() { }
 
-        public DailyReport(string country, string state, string county, DateTime recordDate, int totalConfirmed, int newConfirmed, int totalDeaths,
-            int newDeaths, int totalRecoverd, int newRecovered, int totalActive = 0, double latitude = 0, double longitude = 0)
+        public DailyReport(string country, string state, string county, DateTime recordDate,
+            int totalConfirmed, int totalRecoverd, int totalDeaths,
+            int newConfirmed, int newRecovered, int newDeaths,
+            int totalActive = 0, double latitude = 0, double longitude = 0)
         {
             Country = country;
             State = state;
@@ -32,11 +34,11 @@ namespace DataClasses
                 County = County,
                 RecordDate = RecordDate,
                 TotalConfirmed = TotalConfirmed,
-                NewConfirmed = NewConfirmed,
-                TotalDeaths = TotalDeaths,
-                NewDeaths = NewDeaths,
                 TotalRecovered = TotalRecovered,
+                TotalDeaths = TotalDeaths,
+                NewConfirmed = NewConfirmed,
                 NewRecovered = NewRecovered,
+                NewDeaths = NewDeaths,
                 TotalActive = TotalActive,
                 Latitude = Latitude,
                 Longitude = Longitude

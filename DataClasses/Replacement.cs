@@ -1,6 +1,6 @@
 ﻿namespace DataClasses
 {
-    class Replacement
+    public class Replacement
     {
         public Replacement(string[] fields)
         {
@@ -30,12 +30,16 @@
             }
         }
 
+        #region Properties
+
         public int ReplacementType { get; set; } = 0;
-        public string FromRegion { get; set; } = null;
-        public string ToRegion { get; set; } = null;
-        public string FromState { get; set; } = null;
-        public string ToState { get; set; } = null;
-        public string FromCounty { get; set; } = null;
-        public string ToCounty { get; set; } = null;
+        public string FromRegion { get; set; } = "";
+        public string ToRegion { get; set; } = "";
+        public string FromState { get; set; } = "";
+        public string ToState { get; set; } = "";
+        public string FromCounty { get; set; } = "";
+        public string ToCounty { get; set; } = "";
+
+        #endregion
     }
 }

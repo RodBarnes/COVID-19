@@ -1,2 +1,4 @@
 Data/
 packages/
+*.mdf
+*.ldf

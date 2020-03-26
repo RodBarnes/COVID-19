@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="1d238399-cf15-499c-a40e-a9664cead125" ChangeDateTime="03/26/2020 17:46:54">
+    <Property Name="ElementName" Value="[dbo].[DailyReport].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DailyReport]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CountryRegion" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="2fd0d50e-ca09-45b0-b9c1-da38bcfda010" ChangeDateTime="03/26/2020 17:47:10">
+    <Property Name="ElementName" Value="[dbo].[DailyReport].[ProvinceState]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DailyReport]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="StateProvince" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="a95e117d-2e10-490d-9e3a-5256918c8e57" ChangeDateTime="03/26/2020 17:52:38">
+    <Property Name="ElementName" Value="[dbo].[CountyDistrict].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[CountyDistrict]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CountryDistrictId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="935e89c7-c4f7-4f19-81dc-d7891aabde62" ChangeDateTime="03/26/2020 17:52:46">
+    <Property Name="ElementName" Value="[dbo].[CountyDistrict].[CountryDistrictId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[CountyDistrict]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CountryRegionId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c7bcf919-6ea6-43c5-8d0d-0ecaa67dda06" ChangeDateTime="03/26/2020 17:52:52">
+    <Property Name="ElementName" Value="[dbo].[StateProvince].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[StateProvince]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="StateProvinceId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="5e6d3425-7216-4a0b-b269-24ae9d9e0fa0" ChangeDateTime="03/26/2020 17:53:11">
+    <Property Name="ElementName" Value="[dbo].[CountyDistrict].[CountryRegionId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[CountyDistrict]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CountyDistrictId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="6161b7e9-e62d-461c-b530-f850d34d380c" ChangeDateTime="03/26/2020 17:53:17">
+    <Property Name="ElementName" Value="[dbo].[CountryRegion].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[CountryRegion]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CountryRegionId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="3b73d888-1234-4d75-a7dc-8cef4667eebe" ChangeDateTime="03/26/2020 17:53:34">
+    <Property Name="ElementName" Value="[dbo].[DailyReport].[CountryRegion]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DailyReport]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CountryRegionId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="26caeeaa-a8bb-416f-8e4f-8a390f83ddd0" ChangeDateTime="03/26/2020 17:53:39">
+    <Property Name="ElementName" Value="[dbo].[DailyReport].[StateProvince]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DailyReport]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="StateProvinceId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d65cba1f-ad46-4021-85a9-14a27909c578" ChangeDateTime="03/26/2020 17:53:44">
+    <Property Name="ElementName" Value="[dbo].[DailyReport].[CountyDistrict]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DailyReport]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CountyDistrictId" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="638ac722-e6a9-4945-9d78-58353d9f6a15" ChangeDateTime="03/26/2020 18:49:04">
+    <Property Name="ElementName" Value="[dbo].[DailyReport].[Confirmed]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DailyReport]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="TotalConfirmed" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="8de5ed22-9aeb-45c2-b44c-e8c985a845fd" ChangeDateTime="03/26/2020 18:49:08">
+    <Property Name="ElementName" Value="[dbo].[DailyReport].[Recovered]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DailyReport]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="TotalRecovered" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="a635ae09-53e7-46d4-ab74-c1ce30127717" ChangeDateTime="03/26/2020 18:49:11">
+    <Property Name="ElementName" Value="[dbo].[DailyReport].[Deaths]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DailyReport]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="TotalDeaths" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="450d9f83-a21f-4813-9083-171c1788bb3e" ChangeDateTime="03/26/2020 18:49:14">
+    <Property Name="ElementName" Value="[dbo].[DailyReport].[Active]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DailyReport]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="TotalActive" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="3dab93a2-e234-476e-a6d9-216f5060706d" ChangeDateTime="03/26/2020 19:32:43">
+    <Property Name="ElementName" Value="[dbo].[DailyReport].[LastUpdated]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DailyReport]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="RecordDate" />
+  </Operation>
+</Operations>

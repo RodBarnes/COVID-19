@@ -45,8 +45,10 @@
     <Compile Include="DailyFileDataFips.cs" />
     <Compile Include="DailyReport.cs" />
     <Compile Include="DailyReports.cs" />
+    <Compile Include="DatabaseConnection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Replacement.cs" />
+    <Compile Include="Replacements.cs" />
     <Compile Include="TotalReport.cs" />
   </ItemGroup>
   <ItemGroup>
