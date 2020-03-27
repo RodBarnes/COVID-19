@@ -60,7 +60,9 @@
                       ItemsSource="{Binding CountryDailyReports}"
                       SelectedItem="{Binding SelectedDailyReport}"
                       AutoGenerateColumns="False"
-                      IsReadOnly="True">
+                      IsReadOnly="True"
+                      ClipboardCopyMode="IncludeHeader"
+                      >
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Country" Binding="{Binding Country}" />
                     <DataGridTextColumn Header="State" Binding="{Binding State}" />
