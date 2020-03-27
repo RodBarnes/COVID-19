@@ -91,11 +91,11 @@ namespace DataClasses
                 // Insert DailyReport
                 int rows;
                 var sql = "INSERT INTO DailyReport(CountryRegionId, StateProvinceId, CountyDistrictId, " +
-                    "FileDate, lastUpdate, TotalConfirmed, TotalRecovered, TotalDeaths, TotalActive, Latitude, Longitude, " +
-                    "NewConfirmed, NewRecovered, NewDeaths) " +
+                    "FileDate, lastUpdate, TotalConfirmed, TotalRecovered, TotalDeaths, TotalActive, " +
+                    "NewConfirmed, NewRecovered, NewDeaths, NewActive, Latitude, Longitude, FIPS) " +
                     "VALUES (@countryRegionId, @stateProvinceId, @countyDistrictId, @fileDate, @lastUpdate, " +
-                    "@totalConfirmed, @totalRecovered, @totalDeaths, @totalActive, @latitude, @longitude, @newConfirmed, " +
-                    "@newRecovered, @newDeaths)";
+                    "@totalConfirmed, @totalRecovered, @totalDeaths, @totalActive, " +
+                    "@newConfirmed, @newRecovered, @newDeaths, @newActive, @latitude, @longitude, @fips)";
                 var cmd = new SqlCommand(sql, sqlConn);
                 cmd.Parameters.AddWithValue("@countryRegionId", countryRegionId);
                 cmd.Parameters.AddWithValue("@stateProvinceId", stateProvinceId);
@@ -106,11 +106,13 @@ namespace DataClasses
                 cmd.Parameters.AddWithValue("@totalRecovered", report.TotalRecovered);
                 cmd.Parameters.AddWithValue("@totalDeaths", report.TotalDeaths);
                 cmd.Parameters.AddWithValue("@totalActive", report.TotalActive);
-                cmd.Parameters.AddWithValue("@latitude", report.Latitude);
-                cmd.Parameters.AddWithValue("@longitude", report.Longitude);
                 cmd.Parameters.AddWithValue("@newConfirmed", report.NewConfirmed);
                 cmd.Parameters.AddWithValue("@newRecovered", report.NewRecovered);
                 cmd.Parameters.AddWithValue("@newDeaths", report.NewDeaths);
+                cmd.Parameters.AddWithValue("@newActive", report.NewActive);
+                cmd.Parameters.AddWithValue("@latitude", report.Latitude);
+                cmd.Parameters.AddWithValue("@longitude", report.Longitude);
+                cmd.Parameters.AddWithValue("@fips", report.FIPS);
                 //foreach (SqlParameter param in cmd.Parameters)
                 //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
                 rows = cmd.ExecuteNonQuery();
@@ -130,8 +132,8 @@ namespace DataClasses
                 // Update DailyReport
                 object obj;
                 var sql = $"UPDATE DailyReport SET TotalConfirmed=@totalConfirmed, TotalRecovered=@totalRecovered, TotalDeaths=@totalDeaths, " +
-                    $"TotalActive=@totalActive, NewConfirmed=@newConfirmed, NewRecovered=@newRecovered, NewDeaths=@newDeaths " +
-                    "Latitude=@latitude, Longitude=@longitude " +
+                    $"TotalActive=@totalActive, NewConfirmed=@newConfirmed, NewRecovered=@newRecovered, NewDeaths=@newDeaths, NewActive=@newActive, " +
+                    "Latitude=@latitude, Longitude=@longitude, FIPS=@fips " +
                     "FROM DailyReport dr " +
                     $"JOIN CountryRegion cr ON cr.[Name] = @countryRegion " +
                     $"JOIN StateProvince sp ON sp.[Name] = @stateProvince " +
@@ -145,11 +147,13 @@ namespace DataClasses
                 cmd.Parameters.AddWithValue("@recovered", report.TotalRecovered);
                 cmd.Parameters.AddWithValue("@totalDeaths", report.TotalDeaths);
                 cmd.Parameters.AddWithValue("@totalActive", report.TotalActive);
-                cmd.Parameters.AddWithValue("@latitude", report.Latitude);
-                cmd.Parameters.AddWithValue("@longitude", report.Longitude);
                 cmd.Parameters.AddWithValue("@newConfirmed", report.NewConfirmed);
                 cmd.Parameters.AddWithValue("@newRecovered", report.NewRecovered);
                 cmd.Parameters.AddWithValue("@newDeaths", report.NewDeaths);
+                cmd.Parameters.AddWithValue("@newActive", report.NewActive);
+                cmd.Parameters.AddWithValue("@latitude", report.Latitude);
+                cmd.Parameters.AddWithValue("@longitude", report.Longitude);
+                cmd.Parameters.AddWithValue("@fips", report.FIPS);
                 //foreach (SqlParameter param in cmd.Parameters)
                 //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
                 obj = cmd.ExecuteScalar();
@@ -205,8 +209,8 @@ namespace DataClasses
                 // Find DailyReport
                 var sql = $"SELECT cr.[Name] as CountryRegion, sp.[Name] as StateProvince, cd.[Name] as CountyDistrict, " +
                     "dr.FileDate, dr.LastUpdate, dr.TotalConfirmed, dr.TotalRecovered, dr.TotalDeaths, " +
-                    "dr.NewConfirmed, dr.NewRecovered, dr.NewDeaths, dr.TotalActive, " +
-                    "dr.Latitude, dr.Longitude " +
+                    "dr.TotalActive, dr.NewConfirmed, dr.NewRecovered, dr.NewDeaths, dr.NewActive, " +
+                    "dr.Latitude, dr.Longitude, dr.FIPS " +
                     $"FROM DailyReport dr " +
                     "JOIN CountryRegion cr ON cr.CountryRegionId=dr.CountryRegionId " +
                     "JOIN StateProvince sp ON sp.StateProvinceId=dr.StateProvinceId " +
@@ -233,15 +237,17 @@ namespace DataClasses
                         var totalConfirmed = (int)reader["TotalConfirmed"];
                         var totalRecovered = (int)reader["TotalRecovered"];
                         var totalDeaths = (int)reader["TotalDeaths"];
+                        var totalActive = (int)reader["TotalActive"];
                         var newConfirmed = (int)reader["NewConfirmed"];
                         var newRecovered = (int)reader["NewRecovered"];
                         var newDeaths = (int)reader["NewDeaths"];
-                        var totalActive = (int)reader["TotalActive"];
+                        var newActive = (int)reader["NewActive"];
                         var latitude = (double)reader["Latitude"];
                         var longitude = (double)reader["Longitude"];
+                        var fips = (int)reader["FIPS"];
                         report = new DailyReport(fileDate, countryRegion, stateProvince, countyDistrict, lastUpdate, 
-                            totalConfirmed, totalRecovered, totalDeaths, newConfirmed, newRecovered, newDeaths,
-                            totalActive, latitude, longitude);
+                            totalConfirmed, totalRecovered, totalDeaths, totalActive, 
+                            newConfirmed, newRecovered, newDeaths, newActive, latitude, longitude, fips);
                     }
                 }
                 reader.Close();
@@ -263,8 +269,8 @@ namespace DataClasses
                 // Find previous DailyReport
                 var sql = $"SELECT cr.[Name] as CountryRegion, sp.[Name] as StateProvince, cd.[Name] as CountyDistrict, " +
                     "dr.FileDate, dr.LastUpdate, dr.TotalConfirmed, dr.TotalRecovered, dr.TotalDeaths, " +
-                    "dr.NewConfirmed, dr.NewRecovered, dr.NewDeaths, dr.TotalActive, " +
-                    "dr.Latitude, dr.Longitude " +
+                    "dr.TotalActive, dr.NewConfirmed, dr.NewRecovered, dr.NewDeaths, dr.NewActive, " +
+                    "dr.Latitude, dr.Longitude, dr.FIPS " +
                     $"FROM DailyReport dr " +
                     "JOIN CountryRegion cr ON cr.CountryRegionId=dr.CountryRegionId " +
                     "JOIN StateProvince sp ON sp.StateProvinceId=dr.StateProvinceId " +
@@ -292,15 +298,17 @@ namespace DataClasses
                         var totalConfirmed = (int)reader["TotalConfirmed"];
                         var totalRecovered = (int)reader["TotalRecovered"];
                         var totalDeaths = (int)reader["TotalDeaths"];
+                        var totalActive = (int)reader["TotalActive"];
                         var newConfirmed = (int)reader["NewConfirmed"];
                         var newRecovered = (int)reader["NewRecovered"];
                         var newDeaths = (int)reader["NewDeaths"];
-                        var totalActive = (int)reader["TotalActive"];
+                        var newActive = (int)reader["NewActive"];
                         var latitude = (double)reader["Latitude"];
                         var longitude = (double)reader["Longitude"];
+                        var fips = (int)reader["FIPS"];
                         report = new DailyReport(fileDate, countryRegion, stateProvince, countyDistrict, lastUpdate,
-                            totalConfirmed, totalRecovered, totalDeaths, newConfirmed, newRecovered, newDeaths,
-                            totalActive, latitude, longitude);
+                            totalConfirmed, totalRecovered, totalDeaths, totalActive, 
+                            newConfirmed, newRecovered, newDeaths, newActive, latitude, longitude, fips);
                         break;  // We only care about the first one
                     }
                 }
@@ -320,8 +328,8 @@ namespace DataClasses
             {
                 // Add DailyReport
                 var sql = $"SELECT cr.[Name] as CountryRegion, sp.[Name] as StateProvince, cd.[Name] as CountyDistrict, " +
-                    "dr.FileDate, dr.LastUpdate, dr.TotalConfirmed, dr.TotalRecovered, dr.TotalDeaths, dr.TotalActive, dr.Latitude, dr.Longitude, " +
-                    "dr.NewConfirmed, dr.NewRecovered, dr.NewDeaths " +
+                    "dr.FileDate, dr.LastUpdate, dr.TotalConfirmed, dr.TotalRecovered, dr.TotalDeaths, dr.TotalActive, " +
+                    "dr.NewConfirmed, dr.NewRecovered, dr.NewDeaths, dr.NewActive, dr.Latitude, dr.Longitude, dr.fips " +
                     $"FROM DailyReport dr " +
                     "JOIN CountryRegion cr ON cr.CountryRegionId=dr.CountryRegionId " +
                     "JOIN StateProvince sp ON sp.StateProvinceId=dr.StateProvinceId " +
@@ -346,15 +354,17 @@ namespace DataClasses
                         var totalConfirmed = (int)reader["TotalConfirmed"];
                         var totalRecovered = (int)reader["TotalRecovered"];
                         var totalDeaths = (int)reader["TotalDeaths"];
+                        var totalActive = (int)reader["TotalActive"];
                         var newConfirmed = (int)reader["NewConfirmed"];
                         var newRecovered = (int)reader["NewRecovered"];
                         var newDeaths = (int)reader["NewDeaths"];
-                        var totalActive = (int)reader["TotalActive"];
+                        var newActive = (int)reader["NewActive"];
                         var latitude = (double)reader["Latitude"];
                         var longitude = (double)reader["Longitude"];
+                        var fips = (int)reader["FIPS"];
                         var item = new DailyReport(fileDate, countryRegion, stateProvince, countyDistrict, lastUpdate,
-                            totalConfirmed, totalRecovered, totalDeaths, newConfirmed, newRecovered, newDeaths,
-                            totalActive, latitude, longitude);
+                            totalConfirmed, totalRecovered, totalDeaths, totalActive, 
+                            newConfirmed, newRecovered, newDeaths, newActive, latitude, longitude, fips);
                         reports.Add(item);
 
                         //System.Diagnostics.Debug.WriteLine($"{item.FileDate},{item.Country},{item.State},{item.County},{item.TotalRecovered}");

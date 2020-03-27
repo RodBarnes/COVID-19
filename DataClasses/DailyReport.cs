@@ -7,9 +7,9 @@ namespace DataClasses
         public DailyReport() { }
 
         public DailyReport(DateTime fileDate, string country, string state, string county, DateTime lastUpdate,
-            int totalConfirmed, int totalRecoverd, int totalDeaths,
-            int newConfirmed, int newRecovered, int newDeaths,
-            int totalActive = 0, double latitude = 0, double longitude = 0)
+            int totalConfirmed, int totalRecoverd, int totalDeaths, int totalActive,
+            int newConfirmed, int newRecovered, int newDeaths, int newActive,
+            double latitude = 0, double longitude = 0, int fips = 0)
         {
             FileDate = fileDate;
             Country = country;
@@ -19,12 +19,14 @@ namespace DataClasses
             TotalConfirmed = totalConfirmed;
             TotalRecovered = totalRecoverd;
             TotalDeaths = totalDeaths;
+            TotalActive = totalActive;
             NewConfirmed = newConfirmed;
             NewRecovered = newRecovered;
             NewDeaths = newDeaths;
-            TotalActive = totalActive;
+            NewActive = newActive;
             Latitude = latitude;
             Longitude = longitude;
+            FIPS = fips;
         }
 
         #region Properties
@@ -43,12 +45,14 @@ namespace DataClasses
         public int TotalConfirmed { get; set; }
         public int TotalRecovered { get; set; }
         public int TotalDeaths { get; set; }
+        public int TotalActive { get; set; }
         public int NewConfirmed { get; set; }
         public int NewRecovered { get; set; }
         public int NewDeaths { get; set; }
-        public int TotalActive { get; set; }
+        public int NewActive { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
+        public int FIPS { get; set; }
 
         #endregion
 
@@ -65,10 +69,11 @@ namespace DataClasses
                 TotalConfirmed = TotalConfirmed,
                 TotalRecovered = TotalRecovered,
                 TotalDeaths = TotalDeaths,
+                TotalActive = TotalActive,
                 NewConfirmed = NewConfirmed,
                 NewRecovered = NewRecovered,
                 NewDeaths = NewDeaths,
-                TotalActive = TotalActive,
+                NewActive = NewActive,
                 Latitude = Latitude,
                 Longitude = Longitude
             );

@@ -67,12 +67,15 @@
                     <DataGridTextColumn Header="Country" Binding="{Binding Country}" />
                     <DataGridTextColumn Header="State" Binding="{Binding State}" />
                     <DataGridTextColumn Header="County" Binding="{Binding County}" />
+                    <DataGridTextColumn Header="FIPS" Binding="{Binding FIPS}" />
                     <DataGridTextColumn Header="Confirmed" Binding="{Binding TotalConfirmed}" />
                     <DataGridTextColumn Header="New" Binding="{Binding NewConfirmed}" />
                     <DataGridTextColumn Header="Recovered" Binding="{Binding TotalRecovered}" />
                     <DataGridTextColumn Header="New" Binding="{Binding NewRecovered}" />
                     <DataGridTextColumn Header="Deaths" Binding="{Binding TotalDeaths}" />
                     <DataGridTextColumn Header="New" Binding="{Binding NewDeaths}" />
+                    <DataGridTextColumn Header="Active" Binding="{Binding TotalActive}" />
+                    <DataGridTextColumn Header="New" Binding="{Binding NewActive}" />
                     <DataGridTextColumn Header="Date" Binding="{Binding FileDate, StringFormat=\{0:MM/dd/yyyy\}}" />
                 </DataGrid.Columns>
             </DataGrid>
@@ -83,7 +86,7 @@
             <Grid Background="Black" Opacity="0.5"/>
             <Border
                         MinWidth="50" MinHeight="50"
-                        Background="LightSeaGreen" 
+                        Background="LightGreen" 
                         BorderBrush="Black" 
                         BorderThickness="1" 
                         HorizontalAlignment="Center"
@@ -94,7 +97,7 @@
                         <ProgressBar Visibility="Visible" Value="{Binding BusyProgressValue}" Minimum="{Binding BusyProgressMinimum}" Maximum="{Binding BusyProgressMaximum}" Height="20" Margin="5,5"/>
                         <TextBox Visibility="Visible" Text="{Binding BusyProgressText}" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center" BorderBrush="Transparent" Background="Transparent"/>
                     </Grid>
-                    <Button Visibility="Visible" Content="Cancel" Command="{Binding BusyCancelCommand}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="38"/>
+                    <Button Visibility="Visible" Content="Cancel" Command="{Binding BusyCancelCommand}" HorizontalAlignment="Center" Width="50"/>
                 </StackPanel>
             </Border>
         </Grid>

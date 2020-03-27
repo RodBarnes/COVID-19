@@ -59,12 +59,12 @@ namespace DataClasses
             }
         }
 
-        public void ReplacementsRefresh(string path)
+        public void ImportSwaps(string path)
         {
             Replacements.Refresh(path);
         }
 
-        public void DataRefresh(string filePath)
+        public void ImportData(string filePath)
         {
             using (var db = new DatabaseConnection())
             {
@@ -81,18 +81,22 @@ namespace DataClasses
                     if (!firstLine)
                     {
                         DateTime lastUpdate;
-                        string country;
-                        string state;
+                        string country = "";
+                        string state = "";
+                        string county = "";
+                        string combinedKey = "";
                         bool isValid = false;
                         int totalConfirmed;
                         int totalRecovered;
                         int totalDeaths;
+                        int totalActive = 0;
+                        int newConfirmed = 0;
+                        int newDeaths = 0;
+                        int newRecovered = 0;
+                        int newActive = 0;
                         double latitude = 0;
                         double longitude = 0;
                         int fips = 0;
-                        string county = "";
-                        int totalActive = 0;
-                        string combinedKey = "";
 
                         isValid = DateTime.TryParse(Path.GetFileNameWithoutExtension(filePath).ToString(), out DateTime dateTimeChk);
                         fileDate = isValid ? dateTimeChk : new DateTime();
@@ -157,16 +161,26 @@ namespace DataClasses
 
                         Replacements.Apply(ref country, ref state, ref county);
 
+                        // Calculate the total active
+                        if (totalActive == 0)
+                        {
+                            totalActive = totalConfirmed - totalRecovered - totalDeaths;
+                        }
+
                         // Calculate the daily change
-                        var newConfirmed = 0;
-                        var newDeaths = 0;
-                        var newRecovered = 0;
                         var prevReport = db.ReportReadPrevious(country, state, county, fileDate);
                         if (prevReport != null)
                         {
                             newConfirmed = totalConfirmed - prevReport.TotalConfirmed;
                             newDeaths = totalDeaths - prevReport.TotalDeaths;
                             newRecovered = totalRecovered - prevReport.TotalRecovered;
+                            newActive = totalActive - prevReport.TotalActive;
+}
+                        else
+                        {
+                            newConfirmed = totalConfirmed;
+                            newDeaths = totalDeaths;
+                            newRecovered = totalRecovered;
                         }
 
                         var report = db.ReportRead(country, state, county, fileDate);
@@ -182,7 +196,7 @@ namespace DataClasses
                         {
                             // Add the report to the collection
                             report = new DailyReport(fileDate, country, state, county, lastUpdate, totalConfirmed, totalRecovered, totalDeaths,
-                                newConfirmed, newRecovered, newDeaths, totalActive, latitude, longitude);
+                                totalActive, newConfirmed, newRecovered, newDeaths, newActive, latitude, longitude, fips);
                             db.ReportInsert(report);
 
                             // Add the country to list used to check for country-only entries

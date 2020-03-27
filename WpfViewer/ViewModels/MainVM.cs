@@ -547,7 +547,7 @@ namespace WpfViewer.ViewModels
 
             ShowBusyPanel("Refreshing data...");
             DailyReports.Clear(LastImportDateTime);
-            DailyReports.ReplacementsRefresh(ReplacementsPath);
+            DailyReports.ImportSwaps(ReplacementsPath);
 
             // Create a list of files to import
             List<string> fileList = GetFileList(DataPath, LastImportDateTime);
@@ -566,11 +566,11 @@ namespace WpfViewer.ViewModels
                     var fileName = Path.GetFileNameWithoutExtension(filePath);
 
                     // Update progress
-                    BusyPanelTitle = $"Reading {fileName}...";
+                    BusyPanelTitle = $"Reading {fileName}";
                     int val = (int)(i * BusyProgressMaximum / fileList.Count);
                     bw.ReportProgress(val);
 
-                    DailyReports.DataRefresh(filePath);
+                    DailyReports.ImportData(filePath);
                 }
             }
             else

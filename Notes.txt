@@ -1,4 +1,1 @@
 Automate determining whether there is a git -- do I have to include git in the packge?  Its 44MB.
-
-Confirmed that US, Washington totals are correct for data
-Confirmed that US totals are correct for data
