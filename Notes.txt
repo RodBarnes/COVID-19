@@ -1,3 +1,5 @@
 New chart isn't showing anything; new are all zero
 
+Enhance refresh to only look for data that has changed since the last time a refresh was done.
+
 Autmate determining whether there is a git -- do I have to include git in the packge?  Its 44MB.

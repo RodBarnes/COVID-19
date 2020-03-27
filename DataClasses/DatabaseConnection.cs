@@ -86,11 +86,6 @@ namespace DataClasses
         {
             try
             {
-                // Check name tables
-                //var countryRegionId = CountryRegionManage(report.Country);
-                //var stateProvinceId = StateProvinceManage(report.State);
-                //var countyDistrictId = CountyDistrictManage(report.County);
-
                 // Update DailyReport
                 object obj;
                 var sql = $"UPDATE DailyReport SET TotalConfirmed=@totalConfirmed, TotalRecovered=@totalRecovered, TotalDeaths=@totalDeaths, " +
@@ -217,6 +212,66 @@ namespace DataClasses
 
             return report;
         }
+
+        public DailyReport ReportReadPrevious(string countryRegion, string stateProvince, string countyDistrict, DateTime recordDate)
+        {
+            DailyReport report = null;
+
+            try
+            {
+                // Find previous DailyReport
+                var sql = $"SELECT cr.[Name] as CountryRegion, sp.[Name] as StateProvince, cd.[Name] as CountyDistrict, " +
+                    "dr.RecordDate, dr.TotalConfirmed, dr.TotalRecovered, dr.TotalDeaths, " +
+                    "dr.NewConfirmed, dr.NewRecovered, dr.NewDeaths, dr.TotalActive, " +
+                    "dr.Latitude, dr.Longitude " +
+                    $"FROM DailyReport dr " +
+                    "JOIN CountryRegion cr ON cr.CountryRegionId=dr.CountryRegionId " +
+                    "JOIN StateProvince sp ON sp.StateProvinceId=dr.StateProvinceId " +
+                    "JOIN CountyDistrict cd ON cd.CountyDistrictId=dr.CountyDistrictId " +
+                    "WHERE cr.[Name]=@countryRegion AND sp.[Name]=@stateProvince " +
+                    "AND cd.[Name]=@countyDistrict AND dr.RecordDate<=@recordDate " +
+                    "ORDER BY dr.RecordDate DESC";
+                var cmd = new SqlCommand(sql, sqlConn);
+                cmd.Parameters.AddWithValue("@countryRegion", countryRegion);
+                cmd.Parameters.AddWithValue("@stateProvince", stateProvince);
+                cmd.Parameters.AddWithValue("@countyDistrict", countyDistrict);
+                cmd.Parameters.AddWithValue("@recordDate", recordDate);
+                //foreach (SqlParameter param in cmd.Parameters)
+                //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (reader == null)
+                {
+                    throw new Exception($"ReportReadPrevious failed: reader={reader}\nsql={cmd.CommandText}.");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        var totalConfirmed = (int)reader["TotalConfirmed"];
+                        var totalRecovered = (int)reader["TotalRecovered"];
+                        var totalDeaths = (int)reader["TotalDeaths"];
+                        var newConfirmed = (int)reader["NewConfirmed"];
+                        var newRecovered = (int)reader["NewRecovered"];
+                        var newDeaths = (int)reader["NewDeaths"];
+                        var totalActive = (int)reader["TotalActive"];
+                        var latitude = (double)reader["Latitude"];
+                        var longitude = (double)reader["Longitude"];
+                        report = new DailyReport(countryRegion, stateProvince, countyDistrict, recordDate,
+                            totalConfirmed, totalRecovered, totalDeaths, newConfirmed, newRecovered, newDeaths,
+                            totalActive, latitude, longitude);
+                        break;  // We only care about the first one
+                    }
+                }
+                reader.Close();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"ReportReadPrevious failed.", ex);
+            }
+
+            return report;
+        }
+
 
         public void ReportsRead(DailyReports reports)
         {

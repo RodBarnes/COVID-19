@@ -71,18 +71,6 @@ namespace DataClasses
                     var fields = parser.ReadFields();
                     if (!firstLine)
                     {
-                        // New data structure
-
-                        //var sb = new StringBuilder();
-                        //for (int i = 0; i<fields.Length; i++)
-                        //{
-                        //    if (i == 0)
-                        //        sb.Append(fields[i]);
-                        //    else
-                        //        sb.Append($",{fields[i]}");
-                        //}
-                        //System.Diagnostics.Debug.WriteLine($"LoadData  FIELDS:{sb}");
-
                         bool isValid = false;
                         string country;
                         string state;
@@ -152,11 +140,6 @@ namespace DataClasses
                                 longitude = isValid ? lng : 0;
                             }
                         }
-                        //System.Diagnostics.Debug.WriteLine($"LoadData BEFORE:{region},{state},{district},{recordDate},{totalConfirmed},{totalRecovered},{totalDeaths}");
-                        //if (region == "France" && recordDate > new DateTime(2020, 3, 10))
-                        //{
-                        //    System.Diagnostics.Debugger.Break();
-                        //}
 
                         Replacements.Apply(ref country, ref state, ref county);
 
@@ -164,25 +147,14 @@ namespace DataClasses
                         var newConfirmed = 0;
                         var newDeaths = 0;
                         var newRecovered = 0;
-                        var prevDateObj = from rep in reports
-                                          group rep by new { rep.Country, rep.State, rep.County } into g
-                                          where g.Key.Country == country && g.Key.State == state && g.Key.County == county
-                                          select g.OrderByDescending(t => t.RecordDate).FirstOrDefault();
-                        if (prevDateObj.Count() > 0)
+                        var prevReport = db.ReportReadPrevious(country, state, county, recordDate);
+                        if (prevReport != null)
                         {
-                            var prevReport = prevDateObj.First();
                             newConfirmed = totalConfirmed - prevReport.TotalConfirmed;
                             newDeaths = totalDeaths - prevReport.TotalDeaths;
                             newRecovered = totalRecovered - prevReport.TotalRecovered;
                         }
 
-                        //System.Diagnostics.Debug.WriteLine($"DAILY: {region},{state},{district},{recordDate},{totalConfirmed},{totalRecovered},{totalDeaths},{newConfirmed},{newRecovered},{newDeaths}");
-                        //if (region == "France" && recordDate > new DateTime(2020, 3, 10))
-                        //{
-                        //    System.Diagnostics.Debugger.Break();
-                        //}
-
-                        //var report = reports.Where(i => i.Country == region && i.State == state && i.RecordDate == recordDate).FirstOrDefault();
                         var report = db.ReportRead(country, state, county, recordDate);
                         if (report != null)
                         {
@@ -197,11 +169,8 @@ namespace DataClasses
                             // Add the report to the collection
                             report = new DailyReport(country, state, county, recordDate, totalConfirmed, totalRecovered, totalDeaths,
                                 newConfirmed, newRecovered, newDeaths, totalActive, latitude, longitude);
-                            //reports.Add(report);
                             db.ReportInsert(report);
                         }
-
-                        //System.Diagnostics.Debug.WriteLine($"DAILY: {report.RecordDate.ToString(DateFormat)},{report.Region},{report.State},{report.County},{report.TotalConfirmed},{report.TotalRecovered},{report.TotalDeaths}");
                     }
                     else
                     {
@@ -215,18 +184,6 @@ namespace DataClasses
                 }
                 while (!parser.EndOfData);
             }
-        }
-
-        private static DailyReport UpdateReport(DailyReport report, int totalConfirmed, int totalDeaths, int totalRecovered, int newConfirmed, int newDeaths, int newRecovered)
-        {
-            report.TotalConfirmed = totalConfirmed;
-            report.TotalRecovered = totalRecovered;
-            report.TotalDeaths = totalDeaths;
-            report.NewConfirmed = newConfirmed;
-            report.NewRecovered = newRecovered;
-            report.NewDeaths = newDeaths;
-
-            return report;
         }
 
         private void ExtractHeadersFromFields(string[] fields)
@@ -261,102 +218,6 @@ namespace DataClasses
                 }
             }
         }
-
-        //public void MergeData(string path)
-        //{
-        //    readHeaders = true;
-
-        //    var filePaths = Directory.GetFiles(path, "*.csv");
-
-        //    if (filePaths.Length > 0)
-        //    {
-        //        foreach (var filePath in filePaths)
-        //        {
-        //            ReadDailyFiles(filePath);
-        //        }
-        //        //AddMissingRecords();
-        //        //AddGlobalSums();
-        //    }
-        //    else
-        //    {
-        //        throw new FileNotFoundException($"No files found at path '{path}'.");
-        //    }
-        //}
-
-        //public void AddMissingRecords()
-        //{
-        //    var minDate = reports.Min(r => r.RecordDate);
-        //    var maxDate = reports.Max(r => r.RecordDate);
-        //    var days = maxDate.Subtract(minDate).Days;
-        //    var list = reports
-        //        .Select(r => new { r.Country, r.State, r.County, r.RecordDate })
-        //        .Distinct()
-        //        .OrderBy(r => r.Country)
-        //        .ThenBy(r => r.State)
-        //        .ThenBy(r => r.County)
-        //        .ThenBy(r => r.RecordDate);
-
-        //    foreach (var item in list)
-        //    {
-        //        System.Diagnostics.Debug.WriteLine($"{item.RecordDate},{item.Country},{item.State},{item.County}");
-        //    }
-
-        //    // Examine each dimension...
-        //    foreach (var item in list)
-        //    {
-        //        System.Diagnostics.Debug.WriteLine($"{item.RecordDate},{item.Country},{item.State},{item.County}");
-
-        //        var curDate = minDate;
-        //        // Checking for each date in the full range
-        //        do
-        //        {
-        //            var report = reports
-        //                .Where(r => r.RecordDate <= curDate && r.Country == item.Country && r.State == item.State && r.County == item.County)
-        //                .OrderByDescending(r => r.RecordDate)
-        //                .FirstOrDefault();
-        //            if (report == null)
-        //            {
-        //                // We found no report older or the same age as the date being checked
-        //                // so we need to fill in the older dates
-        //                report = reports
-        //                .Where(r => r.Country == item.Country && r.State == item.State && r.County == item.County)
-        //                .OrderBy(r => r.RecordDate)
-        //                .FirstOrDefault();
-
-        //                var chkDate = minDate;
-        //                do
-        //                {
-        //                    // Make a copy of the existing report, give it the new RecordDate, then add it to the reports
-        //                    var newReport = report.Clone();
-        //                    newReport.RecordDate = chkDate;
-        //                    newReport.TotalConfirmed = newReport.TotalRecovered = newReport.TotalRecovered = newReport.TotalActive = 0;
-        //                    reports.Add(newReport);
-
-        //                    chkDate = chkDate.AddDays(1);
-        //                }
-        //                while (chkDate < report.RecordDate);
-        //            }
-        //            else if (report.RecordDate < curDate)
-        //            {
-        //                // We found a report for the same dimension but with a date older then the current date being checked
-        //                // so we need to fill in the missing dates
-        //                var chkDate = report.RecordDate.AddDays(1);
-        //                do
-        //                {
-        //                    // Make a copy of the existing report, give it the new RecordDate, then add it to the reports
-        //                    var newReport = report.Clone();
-        //                    newReport.RecordDate = chkDate;
-        //                    reports.Add(newReport);
-
-        //                    chkDate = chkDate.AddDays(1);
-        //                }
-        //                while (chkDate <= curDate);
-        //            }
-        //            curDate = curDate.AddDays(1);
-        //        }
-        //        while (curDate <= maxDate);
-        //    }
-        //}
 
         public void AddGlobalSums()
         {

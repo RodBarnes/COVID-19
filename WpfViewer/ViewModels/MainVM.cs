@@ -536,12 +536,10 @@ namespace WpfViewer.ViewModels
                 PullLastestData();
             }
 
+            ShowBusyPanel("Refreshing data...");
             DailyReports.Clear();
-
-            ShowBusyPanel("Reading replacements...");
             DailyReports.Replacements.Refresh(ReplacementsPath);
 
-            ShowBusyPanel("Importing data...");
             var filePaths = Directory.GetFiles(DataPath, "*.csv");
             if (filePaths.Length > 0)
             {
@@ -553,11 +551,14 @@ namespace WpfViewer.ViewModels
                         return;
                     }
 
-                    DailyReports.ImportDailyRecords(filePaths[i]);
+                    var filePath = filePaths[i];
 
                     // Update progress
+                    BusyPanelTitle = $"Reading {Path.GetFileNameWithoutExtension(filePath)}...";
                     int val = (int)(i * BusyProgressMaximum / filePaths.Length);
                     bw.ReportProgress(val);
+
+                    DailyReports.ImportDailyRecords(filePath);
                 }
             }
             else
