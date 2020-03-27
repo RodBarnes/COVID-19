@@ -539,7 +539,7 @@ namespace WpfViewer.ViewModels
             DailyReports.Clear();
 
             ShowBusyPanel("Reading replacements...");
-            DailyReports.Replacements.ReadReplacements(ReplacementsPath);
+            DailyReports.Replacements.Refresh(ReplacementsPath);
 
             ShowBusyPanel("Importing data...");
             var filePaths = Directory.GetFiles(DataPath, "*.csv");

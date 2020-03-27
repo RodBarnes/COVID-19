@@ -12,7 +12,7 @@ namespace DataClasses
 
         #region Methods
 
-        public void ReadReplacements(string path)
+        public void Refresh(string path)
         {
             using (var parser = new TextFieldParser(path))
             {
