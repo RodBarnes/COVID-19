@@ -169,7 +169,7 @@ namespace DataClasses
             {
                 // Find DailyReport
                 var sql = $"SELECT cr.[Name] as CountryRegion, sp.[Name] as StateProvince, cd.[Name] as CountyDistrict, " +
-                    "dr.RecordDate, dr.TotalConfirmed, dr.TotalRecovered, dr.TotalDeaths" +
+                    "dr.RecordDate, dr.TotalConfirmed, dr.TotalRecovered, dr.TotalDeaths, " +
                     "dr.NewConfirmed, dr.NewRecovered, dr.NewDeaths, dr.TotalActive, " +
                     "dr.Latitude, dr.Longitude " +
                     $"FROM DailyReport dr " +
@@ -201,8 +201,8 @@ namespace DataClasses
                         var newRecovered = (int)reader["NewRecovered"];
                         var newDeaths = (int)reader["NewDeaths"];
                         var totalActive = (int)reader["TotalActive"];
-                        var latitude = (float)reader["Latitude"];
-                        var longitude = (float)reader["Longitude"];
+                        var latitude = (double)reader["Latitude"];
+                        var longitude = (double)reader["Longitude"];
                         report = new DailyReport(countryRegion, stateProvince, countyDistrict, recordDate, 
                             totalConfirmed, totalRecovered, totalDeaths, newConfirmed, newRecovered, newDeaths,
                             totalActive, latitude, longitude);

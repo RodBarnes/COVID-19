@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
 using System.Windows.Media;
 using Common;
 using DataClasses;
@@ -34,7 +35,6 @@ namespace WpfViewer.ViewModels
 
             DailyReports = new DailyReports();
 
-            //ImportData();
             ReadData();
         }
 
@@ -46,6 +46,18 @@ namespace WpfViewer.ViewModels
         public event PropertyChangedEventHandler PropertyChanged;
         private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        #region Commands
+
+        public ICommand RefreshDataCommand { get; set; }
+
+        #endregion
+
+        #region Actions
+
+        private void RefreshDataAction(object obj) => ImportData();
+
+        #endregion
 
         #region Properties
 
@@ -272,6 +284,8 @@ namespace WpfViewer.ViewModels
 
         private void InitMainPanel()
         {
+            RefreshDataCommand = new Command(RefreshDataAction);
+
             var col = new ObservableCollection<string>();
             col.Add("Daily Total");
             col.Add("Daily New");
@@ -308,14 +322,6 @@ namespace WpfViewer.ViewModels
             DailyReports.ReadData();
             DailyReports.AddGlobalSums();
             BuildTotalReports();
-
-            //var dReports = DailyReports
-            //    .Where(r => r.Country == "China" && r.State == "Hubei")
-            //    .Select(r => new DailyReport(r.Country, r.State, r.County, r.RecordDate, r.TotalConfirmed, r.TotalRecovered, r.TotalDeaths, r.TotalActive, r.NewConfirmed, r.NewRecovered, r.NewDeaths, r.Latitude, r.Longitude));
-            //foreach (DailyReport report in dReports)
-            //{
-            //    System.Diagnostics.Debug.WriteLine($"{report.Country},{report.State},{report.TotalRecovered}");
-            //}
 
             SelectedTotalReport = TotalReports.Where(a => a.Country == "(GLOBAL)").FirstOrDefault();
         }
