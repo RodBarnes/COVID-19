@@ -288,8 +288,6 @@ namespace DataClasses
                 {
                     while (reader.Read())
                     {
-                        System.Diagnostics.Debug.WriteLine($"{reader[0]},{reader[1]},{reader[2]},{reader[3]},{reader[4]},{reader[5]},{reader[6]},{reader[7]},{reader[8]},{reader[9]}");
-
                         var lastUpdate = DateTime.Parse(reader["LastUpdate"].ToString());
                         var totalConfirmed = (int)reader["TotalConfirmed"];
                         var totalRecovered = (int)reader["TotalRecovered"];

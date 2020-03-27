@@ -220,31 +220,31 @@ namespace DataClasses
         {
             if (fields.Length > 8)
             {
-                ColumnHeader01 = fields[1].Trim();
-                ColumnHeader02 = fields[0].Trim();
-                ColumnHeader03 = fields[2].Trim();
-                ColumnHeader04 = fields[3].Trim();
-                ColumnHeader05 = fields[4].Trim();
-                ColumnHeader06 = fields[5].Trim();
-                ColumnHeader07 = fields[6].Trim();
-                ColumnHeader08 = fields[7].Trim();
-                ColumnHeader09 = fields[8].Trim();
-                ColumnHeader10 = fields[9].Trim();
-                ColumnHeader11 = fields[10].Trim();
-                ColumnHeader12 = fields[12].Trim();
+                ColumnHeader04 = fields[0].Trim();  // FIPS
+                ColumnHeader03 = fields[1].Trim();  // Admin2
+                ColumnHeader02 = fields[2].Trim();  // ProvinceState
+                ColumnHeader01 = fields[3].Trim();  // CountryRegion
+                ColumnHeader05 = fields[4].Trim();  // LastUpdate
+                ColumnHeader06 = fields[5].Trim();  // Latitude
+                ColumnHeader07 = fields[6].Trim();  // Longitude
+                ColumnHeader08 = fields[7].Trim();  // Confirmed
+                ColumnHeader09 = fields[8].Trim();  // Deaths
+                ColumnHeader10 = fields[9].Trim();  // Recovered
+                ColumnHeader11 = fields[10].Trim(); // Active
+                ColumnHeader12 = fields[11].Trim(); // CombinedKey
             }
             else
             {
-                ColumnHeader01 = fields[1].Trim();
-                ColumnHeader02 = fields[0].Trim();
-                ColumnHeader03 = fields[2].Trim();
-                ColumnHeader04 = fields[3].Trim();
-                ColumnHeader05 = fields[4].Trim();
-                ColumnHeader06 = fields[5].Trim();
+                ColumnHeader02 = fields[0].Trim();  // ProvinceState
+                ColumnHeader01 = fields[1].Trim();  // CountryRegion
+                ColumnHeader03 = fields[2].Trim();  // LastUpdate
+                ColumnHeader04 = fields[3].Trim();  // Confirmed
+                ColumnHeader05 = fields[4].Trim();  // Deaths
+                ColumnHeader06 = fields[5].Trim();  // Recovered
                 if (fields.Length > 6)
                 {
-                    ColumnHeader07 = fields[6].Trim();
-                    ColumnHeader08 = fields[7].Trim();
+                    ColumnHeader07 = fields[6].Trim();  // Latitude
+                    ColumnHeader08 = fields[7].Trim();  // Longitude
                 }
             }
         }
