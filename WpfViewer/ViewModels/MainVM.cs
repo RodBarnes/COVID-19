@@ -538,7 +538,7 @@ namespace WpfViewer.ViewModels
 
             ShowBusyPanel("Refreshing data...");
             DailyReports.Clear();
-            DailyReports.Replacements.Refresh(ReplacementsPath);
+            DailyReports.ReplacementsRefresh(ReplacementsPath);
 
             var filePaths = Directory.GetFiles(DataPath, "*.csv");
             if (filePaths.Length > 0)
@@ -558,7 +558,7 @@ namespace WpfViewer.ViewModels
                     int val = (int)(i * BusyProgressMaximum / filePaths.Length);
                     bw.ReportProgress(val);
 
-                    DailyReports.ImportDailyRecords(filePath);
+                    DailyReports.DataRefresh(filePath);
                 }
             }
             else

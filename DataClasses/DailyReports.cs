@@ -11,10 +11,8 @@ namespace DataClasses
     {
         //private const string DateFormat = "yyyy-MM-dd";
         private List<DailyReport> reports = new List<DailyReport>();
-        private TextFieldParser parser;
         private bool readHeaders = true;
-
-        public readonly Replacements Replacements = new Replacements();
+        private readonly Replacements Replacements = new Replacements();
 
         public DailyReports() { }
 
@@ -56,14 +54,19 @@ namespace DataClasses
             }
         }
 
-        public void ImportDailyRecords(string filePath)
+        public void ReplacementsRefresh(string path)
+        {
+            Replacements.Refresh(path);
+        }
+
+        public void DataRefresh(string filePath)
         {
             var firstLine = true;
             var fileDate = Path.GetFileNameWithoutExtension(filePath);
 
             using (var db = new DatabaseConnection())
             {
-                parser = new TextFieldParser(filePath);
+                var parser = new TextFieldParser(filePath);
                 parser.SetDelimiters(",");
                 parser.HasFieldsEnclosedInQuotes = true;
                 do
