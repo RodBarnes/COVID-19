@@ -2,10 +2,11 @@
 	AS
 
 SELECT
+ dr.FileDate,
  cr.[Name] AS CountryRegion, dr.CountryRegionId,
  sp.[Name] AS StateProvince, dr.StateProvinceId,
  cd.[Name] AS CountyDistrict, dr.CountyDistrictId,
- dr.RecordDate,
+ dr.LastUpdate,
  dr.TotalConfirmed,
  dr.TotalRecovered,
  dr.TotalDeaths,

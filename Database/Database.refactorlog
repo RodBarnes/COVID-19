@@ -105,4 +105,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="RecordDate" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="ea1308d7-5e03-4820-8766-1342f4b2cbbf" ChangeDateTime="03/27/2020 20:22:44">
+    <Property Name="ElementName" Value="[dbo].[DailyReport].[RecordDate]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DailyReport]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FileDate" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="2d706819-30ff-4297-bf58-9219b7e36168" ChangeDateTime="03/27/2020 20:49:54">
+    <Property Name="ElementName" Value="[dbo].[DailyReport].[RecordDate]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DailyReport]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="LastUpdate" />
+  </Operation>
 </Operations>

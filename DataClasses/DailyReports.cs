@@ -66,11 +66,12 @@ namespace DataClasses
 
         public void DataRefresh(string filePath)
         {
-            var firstLine = true;
-            var fileDate = Path.GetFileNameWithoutExtension(filePath);
-
             using (var db = new DatabaseConnection())
             {
+                var firstLine = true;
+                var countries = new List<string>();
+                DateTime fileDate = DateTime.Now;
+
                 var parser = new TextFieldParser(filePath);
                 parser.SetDelimiters(",");
                 parser.HasFieldsEnclosedInQuotes = true;
@@ -79,10 +80,10 @@ namespace DataClasses
                     var fields = parser.ReadFields();
                     if (!firstLine)
                     {
-                        bool isValid = false;
+                        DateTime lastUpdate;
                         string country;
                         string state;
-                        DateTime recordDate;
+                        bool isValid = false;
                         int totalConfirmed;
                         int totalRecovered;
                         int totalDeaths;
@@ -93,15 +94,19 @@ namespace DataClasses
                         int totalActive = 0;
                         string combinedKey = "";
 
+                        isValid = DateTime.TryParse(Path.GetFileNameWithoutExtension(filePath).ToString(), out DateTime dateTimeChk);
+                        fileDate = isValid ? dateTimeChk : new DateTime();
+
                         if (fields.Length > 8)
                         {
+                            // New structure effective 3/22/2020
                             isValid = int.TryParse(fields[0], out int nbr);
                             fips = isValid ? nbr : 0;
                             county = fields[1].Trim();
                             state = fields[2].Trim();
                             country = fields[3].Trim();
-                            isValid = DateTime.TryParse(Path.GetFileNameWithoutExtension(filePath).ToString(), out DateTime dateTime);
-                            recordDate = isValid ? new DateTime(dateTime.Year, dateTime.Month, dateTime.Day) : new DateTime();
+                            isValid = DateTime.TryParse(fields[4], out DateTime dateTime);
+                            lastUpdate = isValid ? dateTime : fileDate;
                             isValid = double.TryParse(fields[5], out double lat);
                             latitude = isValid ? lat : 0;
                             isValid = double.TryParse(fields[6], out double lng);
@@ -118,6 +123,7 @@ namespace DataClasses
                         }
                         else
                         {
+                            // Old structure
                             if (fields[0].Contains(','))
                             {
                                 var split = fields[0].Split(',');
@@ -132,8 +138,8 @@ namespace DataClasses
                                 country = fields[1].Trim();
                             }
 
-                            isValid = DateTime.TryParse(Path.GetFileNameWithoutExtension(filePath).ToString(), out DateTime dateTime);
-                            recordDate = isValid ? dateTime : new DateTime();
+                            isValid = DateTime.TryParse(fields[2], out DateTime dateTime);
+                            lastUpdate = isValid ? dateTime : fileDate;
                             isValid = int.TryParse(fields[3], out int confirmed);
                             totalConfirmed = isValid ? confirmed : 0;
                             isValid = int.TryParse(fields[4], out int deaths);
@@ -155,7 +161,7 @@ namespace DataClasses
                         var newConfirmed = 0;
                         var newDeaths = 0;
                         var newRecovered = 0;
-                        var prevReport = db.ReportReadPrevious(country, state, county, recordDate);
+                        var prevReport = db.ReportReadPrevious(country, state, county, fileDate);
                         if (prevReport != null)
                         {
                             newConfirmed = totalConfirmed - prevReport.TotalConfirmed;
@@ -163,21 +169,27 @@ namespace DataClasses
                             newRecovered = totalRecovered - prevReport.TotalRecovered;
                         }
 
-                        var report = db.ReportRead(country, state, county, recordDate);
+                        var report = db.ReportRead(country, state, county, fileDate);
                         if (report != null)
                         {
-                            if (report.Country != country || report.State != state || report.County != county || report.RecordDate != recordDate)
+                            if (report.Country != country || report.State != state || report.County != county || report.FileDate != fileDate)
                             {
                                 // Should never get here
-                                throw new Exception($"Read a report matching {country},{state},{county},{recordDate:MM-dd-yyyy} but failed to match!");
+                                throw new Exception($"Read a report matching {country},{state},{county},{fileDate:MM-dd-yyyy} but failed to match!");
                             }
                         }
                         else
                         {
                             // Add the report to the collection
-                            report = new DailyReport(country, state, county, recordDate, totalConfirmed, totalRecovered, totalDeaths,
+                            report = new DailyReport(fileDate, country, state, county, lastUpdate, totalConfirmed, totalRecovered, totalDeaths,
                                 newConfirmed, newRecovered, newDeaths, totalActive, latitude, longitude);
                             db.ReportInsert(report);
+
+                            // Add the country to list used to check for country-only entries
+                            if (!countries.Exists(i => i == country))
+                            {
+                                countries.Add(country);
+                            }
                         }
                     }
                     else
@@ -191,6 +203,16 @@ namespace DataClasses
                     }
                 }
                 while (!parser.EndOfData);
+
+                // Add missing country-only entries
+                foreach (var country in countries)
+                {
+                    var found = db.ReportExists(country, "", "", fileDate);
+                    if (!found)
+                    {
+                        db.CountryInsert(country, fileDate);
+                    }
+                }
             }
         }
 
@@ -231,11 +253,11 @@ namespace DataClasses
         {
             // Get a list by date rolled up across all regions
             var sums = reports
-                .GroupBy(i => i.RecordDate)
+                .GroupBy(i => i.FileDate)
                 .Select(g => new DailyReport
                 {
                     Country = "(GLOBAL)",
-                    RecordDate = g.Key,
+                    FileDate = g.Key,
                     TotalConfirmed = g.Sum(s => s.TotalConfirmed),
                     TotalRecovered = g.Sum(s => s.TotalRecovered),
                     TotalDeaths = g.Sum(s => s.TotalDeaths),

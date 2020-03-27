@@ -6,21 +6,22 @@ namespace DataClasses
     {
         public DailyReport() { }
 
-        public DailyReport(string country, string state, string county, DateTime recordDate,
+        public DailyReport(DateTime fileDate, string country, string state, string county, DateTime lastUpdate,
             int totalConfirmed, int totalRecoverd, int totalDeaths,
             int newConfirmed, int newRecovered, int newDeaths,
             int totalActive = 0, double latitude = 0, double longitude = 0)
         {
+            FileDate = fileDate;
             Country = country;
             State = state;
             County = county;
-            RecordDate = recordDate;
+            LastUpdate = lastUpdate;
             TotalConfirmed = totalConfirmed;
-            NewConfirmed = newConfirmed;
-            TotalDeaths = totalDeaths;
-            NewDeaths = newDeaths;
             TotalRecovered = totalRecoverd;
+            TotalDeaths = totalDeaths;
+            NewConfirmed = newConfirmed;
             NewRecovered = newRecovered;
+            NewDeaths = newDeaths;
             TotalActive = totalActive;
             Latitude = latitude;
             Longitude = longitude;
@@ -28,25 +29,26 @@ namespace DataClasses
 
         #region Properties
 
+        private DateTime fileDate;
+        public DateTime FileDate
+        {
+            get => fileDate;
+            set => fileDate = new DateTime(value.Year, value.Month, value.Day);
+        }
+
         public string Country { get; set; }
         public string State { get; set; }
         public string County { get; set; }
+        public DateTime LastUpdate { get; set; }
+        public int TotalConfirmed { get; set; }
+        public int TotalRecovered { get; set; }
+        public int TotalDeaths { get; set; }
+        public int NewConfirmed { get; set; }
+        public int NewRecovered { get; set; }
+        public int NewDeaths { get; set; }
+        public int TotalActive { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
-        public int TotalConfirmed { get; set; }
-        public int NewConfirmed { get; set; }
-        public int TotalDeaths { get; set; }
-        public int NewDeaths { get; set; }
-        public int TotalRecovered { get; set; }
-        public int NewRecovered { get; set; }
-        public int TotalActive { get; set; }
-
-        private DateTime recordDate;
-        public DateTime RecordDate
-        {
-            get => recordDate;
-            set => recordDate = new DateTime(value.Year, value.Month, value.Day);
-        }
 
         #endregion
 
@@ -55,10 +57,11 @@ namespace DataClasses
         public DailyReport Clone()
         {
             var report = new DailyReport(
+                FileDate = FileDate,
                 Country = Country,
                 State = State,
                 County = County,
-                RecordDate = RecordDate,
+                LastUpdate = LastUpdate,
                 TotalConfirmed = TotalConfirmed,
                 TotalRecovered = TotalRecovered,
                 TotalDeaths = TotalDeaths,
@@ -75,7 +78,7 @@ namespace DataClasses
 
         public override string ToString()
         {
-            return $"\"{Country}\",\"{State}\",{RecordDate},{TotalConfirmed},{TotalDeaths},{TotalRecovered}";
+            return $"\"{Country}\",\"{State}\",{FileDate},{TotalConfirmed},{TotalDeaths},{TotalRecovered}";
         }
 
         #endregion

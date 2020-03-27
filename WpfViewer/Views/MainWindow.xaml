@@ -73,7 +73,7 @@
                     <DataGridTextColumn Header="New" Binding="{Binding NewRecovered}" />
                     <DataGridTextColumn Header="Deaths" Binding="{Binding TotalDeaths}" />
                     <DataGridTextColumn Header="New" Binding="{Binding NewDeaths}" />
-                    <DataGridTextColumn Header="Date" Binding="{Binding RecordDate, StringFormat=\{0:MM/dd/yyyy\}}" />
+                    <DataGridTextColumn Header="Date" Binding="{Binding FileDate, StringFormat=\{0:MM/dd/yyyy\}}" />
                 </DataGrid.Columns>
             </DataGrid>
 

@@ -383,7 +383,7 @@ namespace WpfViewer.ViewModels
                 }
             };
 
-            LineLabels = report.RecordDates.ToArray();
+            LineLabels = report.FileDates.ToArray();
             LineFormatter = value => value.ToString();
         }
 
@@ -414,7 +414,7 @@ namespace WpfViewer.ViewModels
                 }
             };
 
-            BarLabels = report.RecordDates.ToArray();
+            BarLabels = report.FileDates.ToArray();
             BarFormatter = value => value.ToString();
         }
 
@@ -432,28 +432,28 @@ namespace WpfViewer.ViewModels
             if (report.TotalConfirmed == null)
             {
                 report.TotalConfirmed = list
-                    .GroupBy(r => r.RecordDate)
+                    .GroupBy(r => r.FileDate)
                     .OrderBy(g => g.Key)
                     .Select(g => g.Sum(i => i.TotalConfirmed));
             }
             if (report.TotalRecovered == null)
             {
                 report.TotalRecovered = list
-                    .GroupBy(r => r.RecordDate)
+                    .GroupBy(r => r.FileDate)
                     .OrderBy(g => g.Key)
                     .Select(g => g.Sum(i => i.TotalRecovered));
             }
             if (report.TotalDeaths == null)
             {
                 report.TotalDeaths = list
-                    .GroupBy(r => r.RecordDate)
+                    .GroupBy(r => r.FileDate)
                     .OrderBy(g => g.Key)
                     .Select(g => g.Sum(i => i.TotalDeaths));
             }
-            if (report.RecordDates == null)
+            if (report.FileDates == null)
             {
-                report.RecordDates = list
-                    .GroupBy(r => r.RecordDate)
+                report.FileDates = list
+                    .GroupBy(r => r.FileDate)
                     .OrderBy(g => g.Key)
                     .Select(g => g.Key.ToString("MMM-dd"));
             }
@@ -466,28 +466,28 @@ namespace WpfViewer.ViewModels
             if (report.NewConfirmed == null)
             {
                 report.NewConfirmed = list
-                    .GroupBy(r => r.RecordDate)
+                    .GroupBy(r => r.FileDate)
                     .OrderBy(g => g.Key)
                     .Select(g => g.Sum(i => i.NewConfirmed));
             }
             if (report.NewRecovered == null)
             {
                 report.NewRecovered = list
-                    .GroupBy(r => r.RecordDate)
+                    .GroupBy(r => r.FileDate)
                     .OrderBy(g => g.Key)
                     .Select(g => g.Sum(i => i.NewRecovered));
             }
             if (report.NewDeaths == null)
             {
                 report.NewDeaths = list
-                    .GroupBy(r => r.RecordDate)
+                    .GroupBy(r => r.FileDate)
                     .OrderBy(g => g.Key)
                     .Select(g => g.Sum(i => i.NewDeaths));
             }
-            if (report.RecordDates == null)
+            if (report.FileDates == null)
             {
-                report.RecordDates = list
-                    .GroupBy(r => r.RecordDate)
+                report.FileDates = list
+                    .GroupBy(r => r.FileDate)
                     .OrderBy(g => g.Key)
                     .Select(g => g.Key.ToString("MMM-dd"));
             }
@@ -510,7 +510,7 @@ namespace WpfViewer.ViewModels
                 list = DailyReports.ToList();
             }
 
-            return list.OrderBy(r => r.RecordDate).ThenBy(r => r.Country).ThenBy(r => r.State).ThenBy(r => r.County).ToList();
+            return list.OrderBy(r => r.FileDate).ThenBy(r => r.Country).ThenBy(r => r.State).ThenBy(r => r.County).ToList();
         }
 
         private void BuildTotalReports()

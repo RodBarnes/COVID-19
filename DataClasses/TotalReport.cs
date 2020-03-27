@@ -22,7 +22,7 @@ namespace DataClasses
         public IEnumerable<int> NewDeaths { get; set; }
         public IEnumerable<int> TotalRecovered { get; set; }
         public IEnumerable<int> NewRecovered { get; set; }
-        public IEnumerable<string> RecordDates { get; set; }
+        public IEnumerable<string> FileDates { get; set; }
 
         public string DisplayName
         {
