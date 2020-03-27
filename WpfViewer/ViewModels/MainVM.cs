@@ -66,6 +66,7 @@ namespace WpfViewer.ViewModels
         public string DataPath { get; set; }
         public string PullData { get; set; }
         public string ReplacementsPath { get; set; }
+        public DateTime LastImportDateTime { get; set; }
 
         private ObservableCollection<string> viewSelections;
         public ObservableCollection<string> ViewSelections
@@ -339,6 +340,8 @@ namespace WpfViewer.ViewModels
 
         private void ImportData()
         {
+            LastImportDateTime = DateTime.Now;
+
             bw = new BackgroundWorker
             {
                 WorkerReportsProgress = true,
@@ -606,7 +609,8 @@ namespace WpfViewer.ViewModels
                 new Setting(nameof(RepositoryPath), path),
                 new Setting(nameof(PullData),"True"),
                 new Setting(nameof(DataPath), $@"{path}\csse_covid_19_data\csse_covid_19_daily_reports"),
-                new Setting(nameof(ReplacementsPath), $@"{dir}\Replacements.csv")
+                new Setting(nameof(ReplacementsPath), $@"{dir}\Replacements.csv"),
+                new Setting(nameof(LastImportDateTime), DateTime.Now.ToString())
             };
             Utility.LoadSettings(list);
             GitCommand = list[nameof(GitCommand)].Value;
@@ -614,6 +618,7 @@ namespace WpfViewer.ViewModels
             PullData = list[nameof(PullData)].Value;
             DataPath = list[nameof(DataPath)].Value;
             ReplacementsPath = list[nameof(ReplacementsPath)].Value;
+            LastImportDateTime = DateTime.Parse(list[nameof(LastImportDateTime)].Value);
         }
 
         private void SaveSettings()
@@ -624,7 +629,8 @@ namespace WpfViewer.ViewModels
                 new Setting(nameof(RepositoryPath), RepositoryPath),
                 new Setting(nameof(PullData), PullData),
                 new Setting(nameof(DataPath), DataPath),
-                new Setting(nameof(ReplacementsPath), ReplacementsPath)
+                new Setting(nameof(ReplacementsPath), ReplacementsPath),
+                new Setting(nameof(LastImportDateTime), LastImportDateTime.ToString())
             };
             Utility.SaveSettings(list);
         }
