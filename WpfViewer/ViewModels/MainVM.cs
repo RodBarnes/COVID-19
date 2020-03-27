@@ -196,6 +196,8 @@ namespace WpfViewer.ViewModels
                 NotifyPropertyChanged();
                 if (selectedTotalReport != null)
                 {
+                    PopulateTotalCounts(selectedTotalReport);
+                    PopulateNewCounts(selectedTotalReport);
                     switch(ViewIndex)
                     {
                         case 0:
@@ -355,8 +357,6 @@ namespace WpfViewer.ViewModels
 
         private void ShowLineChart(TotalReport report)
         {
-            PopulateTotalCounts(report);
-
             LineSeriesCollection = new SeriesCollection
             {
                 new LineSeries
@@ -388,8 +388,6 @@ namespace WpfViewer.ViewModels
 
         private void ShowBarChart(TotalReport report)
         {
-            PopulateNewCounts(report);
-
             BarSeriesCollection = new SeriesCollection
             {
                 new StackedColumnSeries
@@ -486,21 +484,9 @@ namespace WpfViewer.ViewModels
             }
         }
 
-        //private void PrepareDisplay()
-        //{
-        //    DailyReports.AddGlobalSums();
-        //    BuildTotalReports();
-        //    SelectedTotalReport = TotalReports.Where(a => a.Country == "(GLOBAL)").FirstOrDefault();
-        //}
-
         private List<DailyReport> GetFilteredList(TotalReport report)
         {
             List<DailyReport> list;
-
-            //foreach (var item in DailyReports)
-            //{
-            //    System.Diagnostics.Debug.WriteLine($"{item.RecordDate},{item.Country},{item.State},{item.County},{item.TotalRecovered}");
-            //}
 
             if (!string.IsNullOrEmpty(report.Country))
             {
