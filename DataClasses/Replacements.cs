@@ -14,6 +14,8 @@ namespace DataClasses
 
         public void Refresh(string path)
         {
+            list.Clear();
+
             using (var parser = new TextFieldParser(path))
             {
                 parser.SetDelimiters(",");

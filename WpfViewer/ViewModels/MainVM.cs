@@ -340,8 +340,6 @@ namespace WpfViewer.ViewModels
 
         private void ImportData()
         {
-            LastImportDateTime = DateTime.Now;
-
             bw = new BackgroundWorker
             {
                 WorkerReportsProgress = true,
@@ -548,13 +546,15 @@ namespace WpfViewer.ViewModels
             }
 
             ShowBusyPanel("Refreshing data...");
-            DailyReports.Clear();
+            DailyReports.Clear(LastImportDateTime);
             DailyReports.ReplacementsRefresh(ReplacementsPath);
 
-            var filePaths = Directory.GetFiles(DataPath, "*.csv");
-            if (filePaths.Length > 0)
+            // Create a list of files to import
+            List<string> fileList = GetFileList(DataPath, LastImportDateTime);
+
+            if (fileList.Count > 0)
             {
-                for (int i = 0; i < filePaths.Length; i++)
+                for (int i = 0; i < fileList.Count; i++)
                 {
                     if (bw.CancellationPending)
                     {
@@ -562,11 +562,12 @@ namespace WpfViewer.ViewModels
                         return;
                     }
 
-                    var filePath = filePaths[i];
+                    var filePath = fileList[i];
+                    var fileName = Path.GetFileNameWithoutExtension(filePath);
 
                     // Update progress
-                    BusyPanelTitle = $"Reading {Path.GetFileNameWithoutExtension(filePath)}...";
-                    int val = (int)(i * BusyProgressMaximum / filePaths.Length);
+                    BusyPanelTitle = $"Reading {fileName}...";
+                    int val = (int)(i * BusyProgressMaximum / fileList.Count);
                     bw.ReportProgress(val);
 
                     DailyReports.DataRefresh(filePath);
@@ -576,6 +577,27 @@ namespace WpfViewer.ViewModels
             {
                 throw new FileNotFoundException($"No files found at path '{DataPath}'.");
             }
+        }
+
+        private List<string> GetFileList(string path, DateTime? dateTime)
+        {
+            List<string> fileList = new List<string>(); ;
+            if (dateTime == null)
+            {
+                dateTime = DateTime.Parse("10/1/2019");
+            }
+
+            var filePaths = Directory.GetFiles(path, "*.csv");
+            foreach (var filePath in filePaths)
+            {
+                var fileNameDate = DateTime.Parse(Path.GetFileNameWithoutExtension(filePath));
+                if (fileNameDate >= dateTime)
+                {
+                    fileList.Add(filePath);
+                }
+            }
+
+            return fileList;
         }
 
         private void bw_LoadDataProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -589,7 +611,6 @@ namespace WpfViewer.ViewModels
             if ((e.Cancelled == true))
             {
                 HideBusyPanel();
-                ShowMessagePanel("Cancelled", "User cancelled the operation!");
             }
             else if (!(e.Error == null))
             {
@@ -598,6 +619,7 @@ namespace WpfViewer.ViewModels
             }
             else
             {
+                LastImportDateTime = DateTime.Now;
                 ReadData();
                 HideBusyPanel();
             }
@@ -618,7 +640,7 @@ namespace WpfViewer.ViewModels
                 new Setting(nameof(PullData),"True"),
                 new Setting(nameof(DataPath), $@"{path}\csse_covid_19_data\csse_covid_19_daily_reports"),
                 new Setting(nameof(ReplacementsPath), $@"{dir}\Replacements.csv"),
-                new Setting(nameof(LastImportDateTime), DateTime.Now.ToString())
+                new Setting(nameof(LastImportDateTime), "10/1/2019")
             };
             Utility.LoadSettings(list);
             GitCommand = list[nameof(GitCommand)].Value;
@@ -638,7 +660,7 @@ namespace WpfViewer.ViewModels
                 new Setting(nameof(PullData), PullData),
                 new Setting(nameof(DataPath), DataPath),
                 new Setting(nameof(ReplacementsPath), ReplacementsPath),
-                new Setting(nameof(LastImportDateTime), LastImportDateTime.ToString())
+                new Setting(nameof(LastImportDateTime), LastImportDateTime.ToString("MM/dd/yyyy"))
             };
             Utility.SaveSettings(list);
         }

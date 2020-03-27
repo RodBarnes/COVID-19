@@ -35,16 +35,21 @@ namespace DataClasses
 
         #region Methods
 
-        public void Clear()
+        public void Clear(DateTime? lastImportDate)
         {
             using (var db = new DatabaseConnection())
             {
-                db.ClearData();
+                if (lastImportDate is null)
+                {
+                    db.ClearDataAll();
+                }
+                else
+                {
+                    db.ClearDataFromDate(lastImportDate);
+                }
             }
-            reports.Clear();
-            Replacements.Clear();
+            Clear();
         }
-
 
         public void ReadData()
         {
@@ -252,6 +257,8 @@ namespace DataClasses
         public DailyReport this[int index] { get => reports[index]; set => reports[index] = value; }
 
         public int Count => reports.Count;
+
+        public void Clear() => reports.Clear();
 
         public bool IsReadOnly => ((IList<DailyReport>)reports).IsReadOnly;
 

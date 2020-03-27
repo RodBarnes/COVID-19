@@ -23,7 +23,6 @@ namespace DataClasses
             Longitude = longitude;
         }
 
-
         public string ProvinceState { get; set; }
         public string CountryRegion { get; set; }
         public DateTime LastUpdate { get; set; }

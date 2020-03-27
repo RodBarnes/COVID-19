@@ -10,7 +10,7 @@
         Icon="/Images/coronavirus.ico"
         Height="759.019" Width="1144.62">
     <Grid>
-        <Grid Background="AliceBlue">
+        <Grid Background="LightSteelBlue">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="10" />
                 <ColumnDefinition Width="200" />

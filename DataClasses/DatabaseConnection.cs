@@ -18,7 +18,7 @@ namespace DataClasses
 
         void IDisposable.Dispose() => sqlConn.Close();
 
-        public void ClearData()
+        public void ClearDataAll()
         {
             var filePath = @"D:\Source\BitBucket\COVID-19\Clear all data.sql";
             using (var file = new StreamReader(filePath))
@@ -37,6 +37,19 @@ namespace DataClasses
                     }
                 }
             }
+        }
+
+        public void ClearDataFromDate(DateTime? lastImportDate)
+        {
+            int rows;
+
+            var sql = $"DELETE FROM DailyReport WHERE RecordDate >= @lastImportDate";
+            var cmd = new SqlCommand(sql, sqlConn);
+            cmd.Parameters.AddWithValue("@lastImportDate", lastImportDate);
+            rows = cmd.ExecuteNonQuery();
+            if (rows < 0)
+                throw new Exception($"ClearByDate failed: LastImportDate='{lastImportDate}'\nsql={cmd.CommandText}.");
+
         }
 
         public void ReportInsert(DailyReport report)
@@ -271,7 +284,6 @@ namespace DataClasses
 
             return report;
         }
-
 
         public void ReportsRead(DailyReports reports)
         {

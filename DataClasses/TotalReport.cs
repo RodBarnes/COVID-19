@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace DataClasses
 {
@@ -12,6 +11,9 @@ namespace DataClasses
             Country = region;
             State = state;
         }
+
+        #region Properties
+
         public string Country { get; set; }
         public string State { get; set; }
         public IEnumerable<int> TotalConfirmed { get; set; }
@@ -35,5 +37,7 @@ namespace DataClasses
                 return result;
             }
         }
+
+        #endregion
     }
 }

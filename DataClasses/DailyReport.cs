@@ -26,27 +26,6 @@ namespace DataClasses
             Longitude = longitude;
         }
 
-        public DailyReport Clone()
-        {
-            var report = new DailyReport(
-                Country = Country,
-                State = State,
-                County = County,
-                RecordDate = RecordDate,
-                TotalConfirmed = TotalConfirmed,
-                TotalRecovered = TotalRecovered,
-                TotalDeaths = TotalDeaths,
-                NewConfirmed = NewConfirmed,
-                NewRecovered = NewRecovered,
-                NewDeaths = NewDeaths,
-                TotalActive = TotalActive,
-                Latitude = Latitude,
-                Longitude = Longitude
-            );
-
-            return report;
-        }
-
         #region Properties
 
         public string Country { get; set; }
@@ -72,6 +51,27 @@ namespace DataClasses
         #endregion
 
         #region Methods
+
+        public DailyReport Clone()
+        {
+            var report = new DailyReport(
+                Country = Country,
+                State = State,
+                County = County,
+                RecordDate = RecordDate,
+                TotalConfirmed = TotalConfirmed,
+                TotalRecovered = TotalRecovered,
+                TotalDeaths = TotalDeaths,
+                NewConfirmed = NewConfirmed,
+                NewRecovered = NewRecovered,
+                NewDeaths = NewDeaths,
+                TotalActive = TotalActive,
+                Latitude = Latitude,
+                Longitude = Longitude
+            );
+
+            return report;
+        }
 
         public override string ToString()
         {

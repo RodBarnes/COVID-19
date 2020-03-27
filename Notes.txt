@@ -3,3 +3,8 @@ New chart isn't showing anything; new are all zero
 Enhance refresh to only look for data that has changed since the last time a refresh was done.
 
 Autmate determining whether there is a git -- do I have to include git in the packge?  Its 44MB.
+
+There is no roll-up for China.  Probably for others, also, which had no single entry in the data.
+
+Confirmed that US, Washington totals are correct for data
+Confirmed that US totals are correct for data

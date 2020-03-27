@@ -32,6 +32,7 @@ namespace WpfViewer.ViewModels
         {
             if (bw != null && bw.WorkerSupportsCancellation)
             {
+                ShowMessagePanel("Cancel!", "Action will terminate after the current operation.");
                 bw.CancelAsync();
             }
         }
