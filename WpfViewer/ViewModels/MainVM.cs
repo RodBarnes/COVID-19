@@ -51,6 +51,7 @@ namespace WpfViewer.ViewModels
 
             DailyReports = new DailyReports();
 
+            ImportData();
             ReadData();
         }
 
@@ -71,7 +72,11 @@ namespace WpfViewer.ViewModels
 
         #region Actions
 
-        private void RefreshDataAction(object obj) => ImportData();
+        private void RefreshDataAction(object obj)
+        {
+            LastImportDateTime = DateTime.Parse(BASE_DATE);
+            ImportData();
+        }
 
         #endregion
 
@@ -608,11 +613,8 @@ namespace WpfViewer.ViewModels
                     worker.ReportProgress(val);
 
                     DailyReports.ImportData(filePath);
+                    LastImportDateTime = DateTime.Parse(fileName);
                 }
-            }
-            else
-            {
-                throw new FileNotFoundException($"No files found at path '{DataPath}'.");
             }
         }
 
