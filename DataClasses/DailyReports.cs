@@ -75,170 +75,172 @@ namespace DataClasses
                 long byteCount = 0;
                 var sb = new StringBuilder();
 
-                // Used to parse each file
-                var parser = new TextFieldParser(filePath);
-                parser.SetDelimiters(",");
-                parser.HasFieldsEnclosedInQuotes = true;
-
                 // Used when checking for missing country-only entries
                 var countries = new List<string>();
                 DateTime fileDate = DateTime.Now;
 
-                var firstLine = true;
-                do
+                // Used to parse each file
+                using (var parser = new TextFieldParser(filePath))
                 {
-                    var fields = parser.ReadFields();
-                    if (!firstLine)
+                    parser.SetDelimiters(",");
+                    parser.HasFieldsEnclosedInQuotes = true;
+
+                    var firstLine = true;
+                    do
                     {
-                        DateTime lastUpdate;
-                        string country = "";
-                        string state = "";
-                        string county = "";
-                        string combinedKey = "";
-                        bool isValid = false;
-                        int totalConfirmed;
-                        int totalRecovered;
-                        int totalDeaths;
-                        int totalActive = 0;
-                        int newConfirmed = 0;
-                        int newDeaths = 0;
-                        int newRecovered = 0;
-                        int newActive = 0;
-                        double latitude = 0;
-                        double longitude = 0;
-                        int fips = 0;
-
-                        isValid = DateTime.TryParse(Path.GetFileNameWithoutExtension(filePath).ToString(), out DateTime dateTimeChk);
-                        fileDate = isValid ? dateTimeChk : new DateTime();
-
-                        if (fields.Length > 8)
+                        var fields = parser.ReadFields();
+                        if (!firstLine)
                         {
-                            // New structure effective 3/22/2020
-                            isValid = int.TryParse(fields[0], out int nbr);
-                            fips = isValid ? nbr : 0;
-                            county = fields[1].Trim();
-                            state = fields[2].Trim();
-                            country = fields[3].Trim();
-                            isValid = DateTime.TryParse(fields[4], out DateTime dateTime);
-                            lastUpdate = isValid ? dateTime : fileDate;
-                            isValid = double.TryParse(fields[5], out double lat);
-                            latitude = isValid ? lat : 0;
-                            isValid = double.TryParse(fields[6], out double lng);
-                            longitude = isValid ? lng : 0;
-                            isValid = int.TryParse(fields[7], out int confirmed);
-                            totalConfirmed = isValid ? confirmed : 0;
-                            isValid = int.TryParse(fields[8], out int deaths);
-                            totalDeaths = isValid ? deaths : 0;
-                            isValid = int.TryParse(fields[9], out int recovered);
-                            totalRecovered = isValid ? recovered : 0;
-                            isValid = int.TryParse(fields[10], out int active);
-                            totalActive = isValid ? active : 0;
-                            combinedKey = fields[11].Trim();
-                        }
-                        else
-                        {
-                            // Old structure
-                            if (fields[0].Contains(','))
+                            DateTime lastUpdate;
+                            string country = "";
+                            string state = "";
+                            string county = "";
+                            string combinedKey = "";
+                            bool isValid = false;
+                            int totalConfirmed;
+                            int totalRecovered;
+                            int totalDeaths;
+                            int totalActive = 0;
+                            int newConfirmed = 0;
+                            int newDeaths = 0;
+                            int newRecovered = 0;
+                            int newActive = 0;
+                            double latitude = 0;
+                            double longitude = 0;
+                            int fips = 0;
+
+                            isValid = DateTime.TryParse(Path.GetFileNameWithoutExtension(filePath).ToString(), out DateTime dateTimeChk);
+                            fileDate = isValid ? dateTimeChk : new DateTime();
+
+                            if (fields.Length > 8)
                             {
-                                var split = fields[0].Split(',');
-                                county = split[0].Trim();
-                                state = split[1].Trim();
-                                country = fields[1].Trim();
+                                // New structure effective 3/22/2020
+                                isValid = int.TryParse(fields[0], out int nbr);
+                                fips = isValid ? nbr : 0;
+                                county = fields[1].Trim();
+                                state = fields[2].Trim();
+                                country = fields[3].Trim();
+                                isValid = DateTime.TryParse(fields[4], out DateTime dateTime);
+                                lastUpdate = isValid ? dateTime : fileDate;
+                                isValid = double.TryParse(fields[5], out double lat);
+                                latitude = isValid ? lat : 0;
+                                isValid = double.TryParse(fields[6], out double lng);
+                                longitude = isValid ? lng : 0;
+                                isValid = int.TryParse(fields[7], out int confirmed);
+                                totalConfirmed = isValid ? confirmed : 0;
+                                isValid = int.TryParse(fields[8], out int deaths);
+                                totalDeaths = isValid ? deaths : 0;
+                                isValid = int.TryParse(fields[9], out int recovered);
+                                totalRecovered = isValid ? recovered : 0;
+                                isValid = int.TryParse(fields[10], out int active);
+                                totalActive = isValid ? active : 0;
+                                combinedKey = fields[11].Trim();
                             }
                             else
                             {
-                                county = "";
-                                state = fields[0].Trim();
-                                country = fields[1].Trim();
+                                // Old structure
+                                if (fields[0].Contains(','))
+                                {
+                                    var split = fields[0].Split(',');
+                                    county = split[0].Trim();
+                                    state = split[1].Trim();
+                                    country = fields[1].Trim();
+                                }
+                                else
+                                {
+                                    county = "";
+                                    state = fields[0].Trim();
+                                    country = fields[1].Trim();
+                                }
+
+                                isValid = DateTime.TryParse(fields[2], out DateTime dateTime);
+                                lastUpdate = isValid ? dateTime : fileDate;
+                                isValid = int.TryParse(fields[3], out int confirmed);
+                                totalConfirmed = isValid ? confirmed : 0;
+                                isValid = int.TryParse(fields[4], out int deaths);
+                                totalDeaths = isValid ? deaths : 0;
+                                isValid = int.TryParse(fields[5], out int recovered);
+                                totalRecovered = isValid ? recovered : 0;
+                                if (fields.Length > 6)
+                                {
+                                    isValid = double.TryParse(fields[6], out double lat);
+                                    latitude = isValid ? lat : 0;
+                                    isValid = double.TryParse(fields[7], out double lng);
+                                    longitude = isValid ? lng : 0;
+                                }
                             }
 
-                            isValid = DateTime.TryParse(fields[2], out DateTime dateTime);
-                            lastUpdate = isValid ? dateTime : fileDate;
-                            isValid = int.TryParse(fields[3], out int confirmed);
-                            totalConfirmed = isValid ? confirmed : 0;
-                            isValid = int.TryParse(fields[4], out int deaths);
-                            totalDeaths = isValid ? deaths : 0;
-                            isValid = int.TryParse(fields[5], out int recovered);
-                            totalRecovered = isValid ? recovered : 0;
-                            if (fields.Length > 6)
+                            Replacements.Swap(ref country, ref state, ref county);
+
+                            // Calculate the total active
+                            if (totalActive == 0)
                             {
-                                isValid = double.TryParse(fields[6], out double lat);
-                                latitude = isValid ? lat : 0;
-                                isValid = double.TryParse(fields[7], out double lng);
-                                longitude = isValid ? lng : 0;
+                                totalActive = totalConfirmed - totalRecovered - totalDeaths;
+                            }
+
+                            // Calculate the daily change
+                            var prevReport = db.ReportReadPrevious(country, state, county, fileDate);
+                            if (prevReport != null)
+                            {
+                                newConfirmed = totalConfirmed - prevReport.TotalConfirmed;
+                                newDeaths = totalDeaths - prevReport.TotalDeaths;
+                                newRecovered = totalRecovered - prevReport.TotalRecovered;
+                                newActive = totalActive - prevReport.TotalActive;
+                            }
+                            else
+                            {
+                                newConfirmed = totalConfirmed;
+                                newDeaths = totalDeaths;
+                                newRecovered = totalRecovered;
+                            }
+
+                            var report = db.ReportRead(country, state, county, fileDate);
+                            if (report != null)
+                            {
+                                if (report.Country != country || report.State != state || report.County != county || report.FileDate != fileDate)
+                                {
+                                    // Should never get here
+                                    throw new Exception($"Read a report matching {country},{state},{county},{fileDate:MM-dd-yyyy} but failed to match!");
+                                }
+                            }
+                            else
+                            {
+                                // Add the report to the collection
+                                report = new DailyReport(fileDate, country, state, county, lastUpdate, totalConfirmed, totalRecovered, totalDeaths,
+                                    totalActive, newConfirmed, newRecovered, newDeaths, newActive, latitude, longitude, fips);
+                                db.ReportInsert(report);
+
+                                // Add the country to list used to check for country-only entries
+                                if (!countries.Exists(i => i == country))
+                                {
+                                    countries.Add(country);
+                                }
                             }
                         }
-
-                        Replacements.Swap(ref country, ref state, ref county);
-
-                        // Calculate the total active
-                        if (totalActive == 0)
-                        {
-                            totalActive = totalConfirmed - totalRecovered - totalDeaths;
-                        }
-
-                        // Calculate the daily change
-                        var prevReport = db.ReportReadPrevious(country, state, county, fileDate);
-                        if (prevReport != null)
-                        {
-                            newConfirmed = totalConfirmed - prevReport.TotalConfirmed;
-                            newDeaths = totalDeaths - prevReport.TotalDeaths;
-                            newRecovered = totalRecovered - prevReport.TotalRecovered;
-                            newActive = totalActive - prevReport.TotalActive;
-}
                         else
                         {
-                            newConfirmed = totalConfirmed;
-                            newDeaths = totalDeaths;
-                            newRecovered = totalRecovered;
-                        }
-
-                        var report = db.ReportRead(country, state, county, fileDate);
-                        if (report != null)
-                        {
-                            if (report.Country != country || report.State != state || report.County != county || report.FileDate != fileDate)
+                            if (readHeaders)
                             {
-                                // Should never get here
-                                throw new Exception($"Read a report matching {country},{state},{county},{fileDate:MM-dd-yyyy} but failed to match!");
+                                ExtractHeadersFromFields(fields);
+                                readHeaders = false;
                             }
+                            firstLine = false;
                         }
-                        else
-                        {
-                            // Add the report to the collection
-                            report = new DailyReport(fileDate, country, state, county, lastUpdate, totalConfirmed, totalRecovered, totalDeaths,
-                                totalActive, newConfirmed, newRecovered, newDeaths, newActive, latitude, longitude, fips);
-                            db.ReportInsert(report);
 
-                            // Add the country to list used to check for country-only entries
-                            if (!countries.Exists(i => i == country))
+                        if (worker != null)
+                        {
+                            // Calculate bytes to move progress bar
+                            sb.Clear();
+                            foreach (var field in fields)
                             {
-                                countries.Add(country);
+                                sb.Append(field);
                             }
+                            byteCount += (sb.Length + fields.Length + 1);
+                            worker.ReportProgress((int)(byteCount * maxProgressValue / parser.Length));
                         }
                     }
-                    else
-                    {
-                        if (readHeaders)
-                        {
-                            ExtractHeadersFromFields(fields);
-                            readHeaders = false;
-                        }
-                        firstLine = false;
-                    }
-
-                    if (worker != null)
-                    {
-                        // Calculate bytes to move progress bar
-                        sb.Clear();
-                        foreach (var field in fields)
-                        {
-                            sb.Append(field);
-                        }
-                        byteCount += (sb.Length + fields.Length + 1);
-                        worker.ReportProgress((int)(byteCount * maxProgressValue / parser.Length));
-                    }
+                    while (!parser.EndOfData);
                 }
-                while (!parser.EndOfData);
 
                 // Add missing country-only entries
                 foreach (var country in countries)
@@ -248,12 +250,6 @@ namespace DataClasses
                     {
                         db.CountryInsert(country, fileDate);
                     }
-                }
-
-                if (worker != null)
-                {
-                    // Final progress movement
-                    worker.ReportProgress((int)(parser.Length * maxProgressValue / parser.Length));
                 }
             }
         }
