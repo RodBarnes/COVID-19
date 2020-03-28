@@ -2,8 +2,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace DataClasses
 {
@@ -65,17 +67,24 @@ namespace DataClasses
             Replacements.Refresh(path);
         }
 
-        public void ImportData(string filePath)
+        public void ImportData(string filePath, BackgroundWorker worker = null, double maxProgressValue = 0)
         {
             using (var db = new DatabaseConnection())
             {
-                var firstLine = true;
-                var countries = new List<string>();
-                DateTime fileDate = DateTime.Now;
+                // Used to provide progress bar values
+                long byteCount = 0;
+                var sb = new StringBuilder();
 
+                // Used to parse each file
                 var parser = new TextFieldParser(filePath);
                 parser.SetDelimiters(",");
                 parser.HasFieldsEnclosedInQuotes = true;
+
+                // Used when checking for missing country-only entries
+                var countries = new List<string>();
+                DateTime fileDate = DateTime.Now;
+
+                var firstLine = true;
                 do
                 {
                     var fields = parser.ReadFields();
@@ -216,6 +225,18 @@ namespace DataClasses
                         }
                         firstLine = false;
                     }
+
+                    if (worker != null)
+                    {
+                        // Calculate bytes to move progress bar
+                        sb.Clear();
+                        foreach (var field in fields)
+                        {
+                            sb.Append(field);
+                        }
+                        byteCount += (sb.Length + fields.Length + 1);
+                        worker.ReportProgress((int)(byteCount * maxProgressValue / parser.Length));
+                    }
                 }
                 while (!parser.EndOfData);
 
@@ -227,6 +248,12 @@ namespace DataClasses
                     {
                         db.CountryInsert(country, fileDate);
                     }
+                }
+
+                if (worker != null)
+                {
+                    // Final progress movement
+                    worker.ReportProgress((int)(parser.Length * maxProgressValue / parser.Length));
                 }
             }
         }

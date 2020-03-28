@@ -52,7 +52,6 @@ namespace WpfViewer.ViewModels
             DailyReports = new DailyReports();
 
             ImportData();
-            ReadData();
         }
 
         ~MainVM()
@@ -606,13 +605,8 @@ namespace WpfViewer.ViewModels
 
                     var filePath = fileList[i];
                     var fileName = Path.GetFileNameWithoutExtension(filePath);
-
-                    // Update progress
                     BusyPanelTitle = $"Reading {fileName}";
-                    int val = (int)(i * BusyProgressMaximum / fileList.Count);
-                    worker.ReportProgress(val);
-
-                    DailyReports.ImportData(filePath);
+                    DailyReports.ImportData(filePath, worker, BusyProgressMaximum);
                     LastImportDateTime = DateTime.Parse(fileName);
                 }
             }
