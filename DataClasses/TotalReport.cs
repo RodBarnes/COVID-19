@@ -21,7 +21,7 @@ namespace DataClasses
                 var result = Country;
                 if (!string.IsNullOrEmpty(State))
                 {
-                    result += $",{State}";
+                    result += $", {State}";
                 }
 
                 return result;
