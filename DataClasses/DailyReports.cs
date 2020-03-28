@@ -9,8 +9,9 @@ namespace DataClasses
 {
     public class DailyReports : IList<DailyReport>
     {
-        //private const string DateFormat = "yyyy-MM-dd";
-        private List<DailyReport> reports = new List<DailyReport>();
+        private const string GLOBAL_NAME = "(GLOBAL)";
+
+        private readonly List<DailyReport> reports = new List<DailyReport>();
         private bool readHeaders = true;
         private readonly Replacements Replacements = new Replacements();
 
@@ -159,7 +160,7 @@ namespace DataClasses
                             }
                         }
 
-                        Replacements.Apply(ref country, ref state, ref county);
+                        Replacements.Swap(ref country, ref state, ref county);
 
                         // Calculate the total active
                         if (totalActive == 0)
@@ -270,7 +271,7 @@ namespace DataClasses
                 .GroupBy(i => i.FileDate)
                 .Select(g => new DailyReport
                 {
-                    Country = "(GLOBAL)",
+                    Country = GLOBAL_NAME,
                     FileDate = g.Key,
                     TotalConfirmed = g.Sum(s => s.TotalConfirmed),
                     TotalRecovered = g.Sum(s => s.TotalRecovered),

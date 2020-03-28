@@ -6,7 +6,7 @@ namespace DataClasses
 {
     public class Replacements : IList<Replacement>
     {
-        private static List<Replacement> list = new List<Replacement>();
+        private static readonly List<Replacement> list = new List<Replacement>();
 
         public Replacements() { }
 
@@ -29,7 +29,7 @@ namespace DataClasses
             }
         }
 
-        public void Apply(ref string country, ref string state, ref string county)
+        public void Swap(ref string country, ref string state, ref string county)
         {
             foreach (var rep in list)
             {
@@ -66,29 +66,29 @@ namespace DataClasses
 
         #region Standard Methods
 
-        public Replacement this[int index] { get => ((IList<Replacement>)list)[index]; set => ((IList<Replacement>)list)[index] = value; }
+        public Replacement this[int index] { get => list[index]; set => list[index] = value; }
 
-        public int Count => ((IList<Replacement>)list).Count;
+        public int Count => list.Count;
 
         public bool IsReadOnly => ((IList<Replacement>)list).IsReadOnly;
 
-        public void Add(Replacement item) => ((IList<Replacement>)list).Add(item);
+        public void Add(Replacement item) => list.Add(item);
 
-        public void Clear() => ((IList<Replacement>)list).Clear();
+        public void Clear() => list.Clear();
 
-        public bool Contains(Replacement item) => ((IList<Replacement>)list).Contains(item);
+        public bool Contains(Replacement item) => list.Contains(item);
 
-        public void CopyTo(Replacement[] array, int arrayIndex) => ((IList<Replacement>)list).CopyTo(array, arrayIndex);
+        public void CopyTo(Replacement[] array, int arrayIndex) => list.CopyTo(array, arrayIndex);
 
         public IEnumerator<Replacement> GetEnumerator() => ((IList<Replacement>)list).GetEnumerator();
 
-        public int IndexOf(Replacement item) => ((IList<Replacement>)list).IndexOf(item);
+        public int IndexOf(Replacement item) => list.IndexOf(item);
 
-        public void Insert(int index, Replacement item) => ((IList<Replacement>)list).Insert(index, item);
+        public void Insert(int index, Replacement item) => list.Insert(index, item);
 
-        public bool Remove(Replacement item) => ((IList<Replacement>)list).Remove(item);
+        public bool Remove(Replacement item) => list.Remove(item);
 
-        public void RemoveAt(int index) => ((IList<Replacement>)list).RemoveAt(index);
+        public void RemoveAt(int index) => list.RemoveAt(index);
 
         IEnumerator IEnumerable.GetEnumerator() => ((IList<Replacement>)list).GetEnumerator();
     }

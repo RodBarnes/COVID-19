@@ -30,10 +30,10 @@ namespace WpfViewer.ViewModels
 
         private void BusyCancelAction(object obj)
         {
-            if (bw != null && bw.WorkerSupportsCancellation)
+            if (worker != null && worker.WorkerSupportsCancellation)
             {
                 ShowMessagePanel("Cancel!", "Action will terminate after the current operation.");
-                bw.CancelAsync();
+                worker.CancelAsync();
             }
         }
 

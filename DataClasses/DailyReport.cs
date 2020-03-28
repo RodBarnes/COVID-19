@@ -81,12 +81,6 @@ namespace DataClasses
             return report;
         }
 
-        public override string ToString()
-        {
-            return $"\"{Country}\",\"{State}\",{FileDate},{TotalConfirmed},{TotalDeaths},{TotalRecovered}";
-        }
-
         #endregion
-
     }
 }

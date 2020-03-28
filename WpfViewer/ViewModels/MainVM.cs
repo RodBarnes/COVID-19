@@ -23,7 +23,23 @@ namespace WpfViewer.ViewModels
 
     public partial class MainVM : INotifyPropertyChanged
     {
-        private BackgroundWorker bw;
+        private const string BASE_PATH = @"D:\Source\BitBucket\3rd Party\COVID-19";
+        private const string BASE_DATE = "10/1/2019";
+        private const string GLOBAL_NAME = "(GLOBAL)";
+        private const string LONG_DATE_FORMAT = "MM/dd/yyyy";
+        private const string SHORT_DATE_FORMAT = "MMM-dd";
+        private const string CONFIRMED_TITLE = "Confirmed";
+        private const string RECOVERED_TITLE = "Recovered";
+        private const string DEATHS_TITLE = "Deaths";
+        private const string TOTAL_SELECTOR = "Daily Total";
+        private const string NEW_SELECTOR = "Daily New";
+        private const string DATA_SELECTOR = "Daily Data";
+        private const string VISIBILITY_COLLAPSED = "Collapsed";
+        private const string VISIBILITY_VISIBLE = "Visible";
+        private const string GIT_COMMAND = @"""D:\Program Files\Git\cmd\git.exe"" pull";
+        private const string TRUE_LITERAL = "True";
+
+        private BackgroundWorker worker;
 
         public MainVM()
         {
@@ -132,7 +148,7 @@ namespace WpfViewer.ViewModels
             }
         }
 
-        private string lineChartVisibility = "Visible";
+        private string lineChartVisibility = VISIBILITY_VISIBLE;
         public string LineChartVisibility
         {
             get => lineChartVisibility;
@@ -143,7 +159,7 @@ namespace WpfViewer.ViewModels
             }
         }
 
-        private string barChartVisibility = "Collapsed";
+        private string barChartVisibility = VISIBILITY_COLLAPSED;
         public string BarChartVisibility
         {
             get => barChartVisibility;
@@ -154,7 +170,7 @@ namespace WpfViewer.ViewModels
             }
         }
 
-        private string dataGridVisibility = "Collapsed";
+        private string dataGridVisibility = VISIBILITY_COLLAPSED;
         public string DataGridVisibility
         {
             get => dataGridVisibility;
@@ -290,9 +306,9 @@ namespace WpfViewer.ViewModels
             RefreshDataCommand = new Command(RefreshDataAction);
 
             var col = new ObservableCollection<string>();
-            col.Add("Daily Total");
-            col.Add("Daily New");
-            col.Add("Daily Data");
+            col.Add(TOTAL_SELECTOR);
+            col.Add(NEW_SELECTOR);
+            col.Add(DATA_SELECTOR);
             ViewSelections = col;
         }
 
@@ -301,19 +317,19 @@ namespace WpfViewer.ViewModels
             switch(type)
             {
                 case ViewType.LineChart:
-                    LineChartVisibility = "Visible";
-                    BarChartVisibility = "Collapsed";
-                    DataGridVisibility = "Collapsed";
+                    LineChartVisibility = VISIBILITY_VISIBLE;
+                    BarChartVisibility = VISIBILITY_COLLAPSED;
+                    DataGridVisibility = VISIBILITY_COLLAPSED;
                     break;
                 case ViewType.BarChart:
-                    LineChartVisibility = "Collapsed";
-                    BarChartVisibility = "Visible";
-                    DataGridVisibility = "Collapsed";
+                    LineChartVisibility = VISIBILITY_COLLAPSED;
+                    BarChartVisibility = VISIBILITY_VISIBLE;
+                    DataGridVisibility = VISIBILITY_COLLAPSED;
                     break;
                 case ViewType.DataGrid:
-                    LineChartVisibility = "Collapsed";
-                    BarChartVisibility = "Collapsed";
-                    DataGridVisibility = "Visible";
+                    LineChartVisibility = VISIBILITY_COLLAPSED;
+                    BarChartVisibility = VISIBILITY_COLLAPSED;
+                    DataGridVisibility = VISIBILITY_VISIBLE;
                     break;
                 default:
                     break;
@@ -326,7 +342,7 @@ namespace WpfViewer.ViewModels
             DailyReports.AddGlobalSums();
             BuildTotalReports();
 
-            SelectedTotalReport = TotalReports.Where(a => a.Country == "(GLOBAL)").FirstOrDefault();
+            SelectedTotalReport = TotalReports.Where(a => a.Country == GLOBAL_NAME).FirstOrDefault();
         }
 
         private void PullLastestData()
@@ -340,19 +356,19 @@ namespace WpfViewer.ViewModels
 
         private void ImportData()
         {
-            bw = new BackgroundWorker
+            worker = new BackgroundWorker
             {
                 WorkerReportsProgress = true,
                 WorkerSupportsCancellation = true
             };
-            bw.DoWork += bw_LoadDataDoWork;
-            bw.ProgressChanged += bw_LoadDataProgressChanged;
-            bw.RunWorkerCompleted += bw_LoadDataRunWorkerCompleted;
-            bw.WorkerReportsProgress = true;
-            bw.WorkerSupportsCancellation = true;
-            if (!bw.IsBusy)
+            worker.DoWork += Background_LoadDataDoWork;
+            worker.ProgressChanged += Background_LoadDataProgressChanged;
+            worker.RunWorkerCompleted += Background_LoadDataRunWorkerCompleted;
+            worker.WorkerReportsProgress = true;
+            worker.WorkerSupportsCancellation = true;
+            if (!worker.IsBusy)
             {
-                bw.RunWorkerAsync();
+                worker.RunWorkerAsync();
             }
         }
 
@@ -362,21 +378,21 @@ namespace WpfViewer.ViewModels
             {
                 new LineSeries
                 {
-                    Title = "Confirmed",
+                    Title = CONFIRMED_TITLE,
                     Stroke = Brushes.Yellow,
                     Fill = Brushes.LightYellow,
                     Values = new ChartValues<int>(report.TotalConfirmed)
                 },
                 new LineSeries
                 {
-                    Title = "Recovered",
+                    Title = RECOVERED_TITLE,
                     Stroke = Brushes.Green,
                     Fill = Brushes.LightGreen,
                     Values = new ChartValues<int>(report.TotalRecovered)
                 },
                 new LineSeries
                 {
-                    Title = "Deaths",
+                    Title = DEATHS_TITLE,
                     Stroke = Brushes.Red,
                     Fill = Brushes.LightCoral,
                     Values = new ChartValues<int>(report.TotalDeaths)
@@ -393,21 +409,21 @@ namespace WpfViewer.ViewModels
             {
                 new StackedColumnSeries
                 {
-                    Title = "Confirmed",
+                    Title = CONFIRMED_TITLE,
                     Stroke = Brushes.Yellow,
                     Fill = Brushes.Yellow,
                     Values = new ChartValues<int>(report.NewConfirmed)
                 },
                 new StackedColumnSeries
                 {
-                    Title = "Recovered",
+                    Title = RECOVERED_TITLE,
                     Stroke = Brushes.Green,
                     Fill = Brushes.Green,
                     Values = new ChartValues<int>(report.NewRecovered)
                 },
                 new StackedColumnSeries
                 {
-                    Title = "Deaths",
+                    Title = DEATHS_TITLE,
                     Stroke = Brushes.Red,
                     Fill = Brushes.Red,
                     Values = new ChartValues<int>(report.NewDeaths)
@@ -455,7 +471,7 @@ namespace WpfViewer.ViewModels
                 report.FileDates = list
                     .GroupBy(r => r.FileDate)
                     .OrderBy(g => g.Key)
-                    .Select(g => g.Key.ToString("MMM-dd"));
+                    .Select(g => g.Key.ToString(SHORT_DATE_FORMAT));
             }
         }
 
@@ -489,7 +505,7 @@ namespace WpfViewer.ViewModels
                 report.FileDates = list
                     .GroupBy(r => r.FileDate)
                     .OrderBy(g => g.Key)
-                    .Select(g => g.Key.ToString("MMM-dd"));
+                    .Select(g => g.Key.ToString(SHORT_DATE_FORMAT));
             }
         }
 
@@ -533,11 +549,32 @@ namespace WpfViewer.ViewModels
             TotalReports = new ObservableCollection<TotalReport>(displayNames);
         }
 
+        private List<string> GetFileList(string path, DateTime? dateTime)
+        {
+            List<string> fileList = new List<string>(); ;
+            if (dateTime == null)
+            {
+                dateTime = DateTime.Parse(BASE_DATE);
+            }
+
+            var filePaths = Directory.GetFiles(path, "*.csv");
+            foreach (var filePath in filePaths)
+            {
+                var fileNameDate = DateTime.Parse(Path.GetFileNameWithoutExtension(filePath));
+                if (fileNameDate >= dateTime)
+                {
+                    fileList.Add(filePath);
+                }
+            }
+
+            return fileList;
+        }
+
         #endregion
 
         #region Background Workers
 
-        private void bw_LoadDataDoWork(object sender, DoWorkEventArgs e)
+        private void Background_LoadDataDoWork(object sender, DoWorkEventArgs e)
         {
             if (PullData == "True")
             {
@@ -556,7 +593,7 @@ namespace WpfViewer.ViewModels
             {
                 for (int i = 0; i < fileList.Count; i++)
                 {
-                    if (bw.CancellationPending)
+                    if (worker.CancellationPending)
                     {
                         e.Cancel = true;
                         return;
@@ -568,7 +605,7 @@ namespace WpfViewer.ViewModels
                     // Update progress
                     BusyPanelTitle = $"Reading {fileName}";
                     int val = (int)(i * BusyProgressMaximum / fileList.Count);
-                    bw.ReportProgress(val);
+                    worker.ReportProgress(val);
 
                     DailyReports.ImportData(filePath);
                 }
@@ -579,34 +616,13 @@ namespace WpfViewer.ViewModels
             }
         }
 
-        private List<string> GetFileList(string path, DateTime? dateTime)
-        {
-            List<string> fileList = new List<string>(); ;
-            if (dateTime == null)
-            {
-                dateTime = DateTime.Parse("10/1/2019");
-            }
-
-            var filePaths = Directory.GetFiles(path, "*.csv");
-            foreach (var filePath in filePaths)
-            {
-                var fileNameDate = DateTime.Parse(Path.GetFileNameWithoutExtension(filePath));
-                if (fileNameDate >= dateTime)
-                {
-                    fileList.Add(filePath);
-                }
-            }
-
-            return fileList;
-        }
-
-        private void bw_LoadDataProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void Background_LoadDataProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             BusyProgressValue = e.ProgressPercentage;
             BusyProgressText = e.ProgressPercentage.ToString();
         }
 
-        private void bw_LoadDataRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void Background_LoadDataRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if ((e.Cancelled == true))
             {
@@ -632,15 +648,14 @@ namespace WpfViewer.ViewModels
         private void LoadSettings()
         {
             var dir = Directory.GetCurrentDirectory();
-            var path = @"D:\Source\BitBucket\3rd Party\COVID-19";
             var list = new Settings
             {
-                new Setting(nameof(GitCommand), @"""D:\Program Files\Git\cmd\git.exe"" pull"),
-                new Setting(nameof(RepositoryPath), path),
-                new Setting(nameof(PullData),"True"),
-                new Setting(nameof(DataPath), $@"{path}\csse_covid_19_data\csse_covid_19_daily_reports"),
+                new Setting(nameof(GitCommand), GIT_COMMAND),
+                new Setting(nameof(RepositoryPath), BASE_PATH),
+                new Setting(nameof(PullData), TRUE_LITERAL),
+                new Setting(nameof(DataPath), $@"{BASE_PATH}\csse_covid_19_data\csse_covid_19_daily_reports"),
                 new Setting(nameof(ReplacementsPath), $@"{dir}\Replacements.csv"),
-                new Setting(nameof(LastImportDateTime), "10/1/2019")
+                new Setting(nameof(LastImportDateTime), BASE_DATE)
             };
             Utility.LoadSettings(list);
             GitCommand = list[nameof(GitCommand)].Value;
@@ -660,7 +675,7 @@ namespace WpfViewer.ViewModels
                 new Setting(nameof(PullData), PullData),
                 new Setting(nameof(DataPath), DataPath),
                 new Setting(nameof(ReplacementsPath), ReplacementsPath),
-                new Setting(nameof(LastImportDateTime), LastImportDateTime.ToString("MM/dd/yyyy"))
+                new Setting(nameof(LastImportDateTime), LastImportDateTime.ToString(LONG_DATE_FORMAT))
             };
             Utility.SaveSettings(list);
         }

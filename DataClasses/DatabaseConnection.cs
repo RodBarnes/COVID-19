@@ -6,7 +6,7 @@ namespace DataClasses
 {
     public class DatabaseConnection : IDisposable
     {
-        private SqlConnection sqlConn;
+        private readonly SqlConnection sqlConn;
 
         public DatabaseConnection()
         {
@@ -23,9 +23,10 @@ namespace DataClasses
             var filePath = @"D:\Source\BitBucket\COVID-19\Clear all data.sql";
             using (var file = new StreamReader(filePath))
             {
-                int rows;
-                var cmd = new SqlCommand();
-                cmd.Connection = sqlConn;
+                var cmd = new SqlCommand
+                {
+                    Connection = sqlConn
+                };
 
                 while (!file.EndOfStream)
                 {
@@ -33,7 +34,7 @@ namespace DataClasses
                     if (line != "" && line != "GO")
                     {
                         cmd.CommandText = line;
-                        rows = cmd.ExecuteNonQuery();
+                        _ = cmd.ExecuteNonQuery();
                     }
                 }
             }
@@ -48,8 +49,7 @@ namespace DataClasses
             cmd.Parameters.AddWithValue("@lastImportDate", lastImportDate);
             rows = cmd.ExecuteNonQuery();
             if (rows < 0)
-                throw new Exception($"ClearByDate failed: LastImportDate='{lastImportDate}'\nsql={cmd.CommandText}.");
-
+                throw new Exception($"ClearDataFromDate failed: LastImportDate='{lastImportDate}'\nsql={cmd.CommandText}.");
         }
 
         public void CountryInsert(string country, DateTime fileDate)
@@ -88,7 +88,6 @@ namespace DataClasses
                 var stateProvinceId = StateProvinceManage(report.State);
                 var countyDistrictId = CountyDistrictManage(report.County);
                 
-                // Insert DailyReport
                 int rows;
                 var sql = "INSERT INTO DailyReport(CountryRegionId, StateProvinceId, CountyDistrictId, " +
                     "FileDate, lastUpdate, TotalConfirmed, TotalRecovered, TotalDeaths, TotalActive, " +
@@ -129,7 +128,6 @@ namespace DataClasses
         {
             try
             {
-                // Update DailyReport
                 object obj;
                 var sql = $"UPDATE DailyReport SET TotalConfirmed=@totalConfirmed, TotalRecovered=@totalRecovered, TotalDeaths=@totalDeaths, " +
                     $"TotalActive=@totalActive, NewConfirmed=@newConfirmed, NewRecovered=@newRecovered, NewDeaths=@newDeaths, NewActive=@newActive, " +
@@ -172,7 +170,6 @@ namespace DataClasses
 
             try
             {
-                // Find DailyReport
                 object obj;
 
                 var sql = $"SELECT COUNT(*) as Count " +
@@ -206,7 +203,6 @@ namespace DataClasses
 
             try
             {
-                // Find DailyReport
                 var sql = $"SELECT cr.[Name] as CountryRegion, sp.[Name] as StateProvince, cd.[Name] as CountyDistrict, " +
                     "dr.FileDate, dr.LastUpdate, dr.TotalConfirmed, dr.TotalRecovered, dr.TotalDeaths, " +
                     "dr.TotalActive, dr.NewConfirmed, dr.NewRecovered, dr.NewDeaths, dr.NewActive, " +
@@ -266,7 +262,6 @@ namespace DataClasses
 
             try
             {
-                // Find previous DailyReport
                 var sql = $"SELECT cr.[Name] as CountryRegion, sp.[Name] as StateProvince, cd.[Name] as CountyDistrict, " +
                     "dr.FileDate, dr.LastUpdate, dr.TotalConfirmed, dr.TotalRecovered, dr.TotalDeaths, " +
                     "dr.TotalActive, dr.NewConfirmed, dr.NewRecovered, dr.NewDeaths, dr.NewActive, " +
@@ -326,7 +321,6 @@ namespace DataClasses
         {
             try
             {
-                // Add DailyReport
                 var sql = $"SELECT cr.[Name] as CountryRegion, sp.[Name] as StateProvince, cd.[Name] as CountyDistrict, " +
                     "dr.FileDate, dr.LastUpdate, dr.TotalConfirmed, dr.TotalRecovered, dr.TotalDeaths, dr.TotalActive, " +
                     "dr.NewConfirmed, dr.NewRecovered, dr.NewDeaths, dr.NewActive, dr.Latitude, dr.Longitude, dr.fips " +
@@ -366,8 +360,6 @@ namespace DataClasses
                             totalConfirmed, totalRecovered, totalDeaths, totalActive, 
                             newConfirmed, newRecovered, newDeaths, newActive, latitude, longitude, fips);
                         reports.Add(item);
-
-                        //System.Diagnostics.Debug.WriteLine($"{item.FileDate},{item.Country},{item.State},{item.County},{item.TotalRecovered}");
                     }
                 }
                 reader.Close();
@@ -376,12 +368,6 @@ namespace DataClasses
             {
                 throw new Exception($"ReportsRead failed.", ex);
             }
-
-            //foreach (var item in reports)
-            //{
-            //    System.Diagnostics.Debug.WriteLine($"{item.FileDate},{item.Country},{item.State},{item.County},{item.TotalRecovered}");
-            //}
-
         }
 
         private int CountryRegionManage(string name)
