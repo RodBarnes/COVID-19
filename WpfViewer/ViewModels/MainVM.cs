@@ -586,7 +586,7 @@ namespace Viewer.ViewModels
                 PullLastestData();
             }
 
-            ShowBusyPanel("Refreshing data...");
+            ShowBusyPanel("Checking for new data...");
             DailyReports.Clear(LastImportDateTime);
             DailyReports.ImportSwaps(ReplacementsPath);
 
