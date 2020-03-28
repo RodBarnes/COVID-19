@@ -8,7 +8,7 @@ using Common;
 /// 2) after copying the namespaced must be updated with the project_name.ViewModels
 /// 3) the InitBusyPanel() must be called at the top of public MainVM()
 /// </summary>
-namespace WpfViewer.ViewModels
+namespace Viewer.ViewModels
 {
     partial class MainVM : INotifyPropertyChanged
     {

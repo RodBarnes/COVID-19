@@ -1,7 +1,7 @@
 ﻿using System.Windows;
-using WpfViewer.ViewModels;
+using Viewer.ViewModels;
 
-namespace WpfViewer
+namespace Viewer
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

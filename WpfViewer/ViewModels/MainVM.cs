@@ -7,12 +7,12 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using System.Windows.Media;
-using Common;
-using DataClasses;
 using LiveCharts;
 using LiveCharts.Wpf;
+using Common;
+using DataClasses;
 
-namespace WpfViewer.ViewModels
+namespace Viewer.ViewModels
 {
     enum ViewType
     {
