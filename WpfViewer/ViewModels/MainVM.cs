@@ -16,28 +16,35 @@ namespace Viewer.ViewModels
 {
     enum ViewType
     {
-        LineChart,
-        BarChart,
+        LineSeriesChart,
+        AreaSeriesChart,
+        StackedColumnChart,
         DataGrid
     }
 
     public partial class MainVM : INotifyPropertyChanged
     {
         private const string BASE_PATH = @"D:\Source\BitBucket\3rd Party\COVID-19";
+        private const string GIT_COMMAND = @"""D:\Program Files\Git\cmd\git.exe"" pull";
+
         private const string BASE_DATE = "10/1/2019";
         private const string GLOBAL_NAME = "(GLOBAL)";
         private const string LONG_DATE_FORMAT = "MM/dd/yyyy";
         private const string SHORT_DATE_FORMAT = "MMM-dd";
+        private const string TRUE_LITERAL = "True";
+
         private const string CONFIRMED_TITLE = "Confirmed";
+        private const string ACTIVE_TITLE = "Active";
         private const string RECOVERED_TITLE = "Recovered";
         private const string DEATHS_TITLE = "Deaths";
-        private const string TOTAL_SELECTOR = "Daily Total";
-        private const string NEW_SELECTOR = "Daily New";
-        private const string DATA_SELECTOR = "Daily Data";
+
+        private const string TOTAL_LINE_SELECTOR = "Confirmed Total";
+        private const string ACTIVE_AREA_SELECTOR = "Active Total";
+        private const string NEW_BAR_SELECTOR = "New Active";
+        private const string DAILY_DATAGRID_SELECTOR = "Daily Data";
+
         private const string VISIBILITY_COLLAPSED = "Collapsed";
         private const string VISIBILITY_VISIBLE = "Visible";
-        private const string GIT_COMMAND = @"""D:\Program Files\Git\cmd\git.exe"" pull";
-        private const string TRUE_LITERAL = "True";
 
         private BackgroundWorker worker;
 
@@ -79,7 +86,7 @@ namespace Viewer.ViewModels
 
         #endregion
 
-        #region Properties
+        #region General Properties
 
         public string GitCommand { get; set; }
         public string RepositoryPath { get; set; }
@@ -88,8 +95,8 @@ namespace Viewer.ViewModels
         public string ReplacementsPath { get; set; }
         public DateTime LastImportDateTime { get; set; }
 
-        private ObservableCollection<string> viewSelections;
-        public ObservableCollection<string> ViewSelections
+        private ObservableCollection<Selection> viewSelections;
+        public ObservableCollection<Selection> ViewSelections
         {
             get => viewSelections;
             set
@@ -99,29 +106,33 @@ namespace Viewer.ViewModels
             }
         }
 
-        private int viewIndex = 0;
-        public int ViewIndex
+        private Selection selectedView;
+        public Selection SelectedView
         {
-            get => viewIndex;
+            get => selectedView;
             set
             {
-                viewIndex = value;
+                selectedView = value;
                 NotifyPropertyChanged();
-                if (viewIndex >= 0)
+                if (selectedView != null && SelectedTotalReport != null)
                 {
-                    switch (viewIndex)
+                    switch (selectedView.DisplayName)
                     {
-                        case 0:
-                            SetDisplayView(ViewType.LineChart);
+                        case TOTAL_LINE_SELECTOR:
+                            SetDisplayView(ViewType.LineSeriesChart);
                             ShowLineChart(SelectedTotalReport);
                             break;
-                        case 1:
-                            SetDisplayView(ViewType.BarChart);
-                            ShowBarChart(SelectedTotalReport);
+                        case ACTIVE_AREA_SELECTOR:
+                            SetDisplayView(ViewType.AreaSeriesChart);
+                            ShowStackedAreaSeriesChart(SelectedTotalReport);
                             break;
-                        case 2:
+                        case NEW_BAR_SELECTOR:
+                            SetDisplayView(ViewType.StackedColumnChart);
+                            ShowStackedColumnChart(SelectedTotalReport);
+                            break;
+                        case DAILY_DATAGRID_SELECTOR:
                             SetDisplayView(ViewType.DataGrid);
-                            ShowDataGrid(SelectedTotalReport);
+                            ShowDailyDataGrid(SelectedTotalReport);
                             break;
                         default:
                             break;
@@ -148,39 +159,6 @@ namespace Viewer.ViewModels
             set
             {
                 selectedDailyReport = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        private string lineChartVisibility = VISIBILITY_VISIBLE;
-        public string LineChartVisibility
-        {
-            get => lineChartVisibility;
-            set
-            {
-                lineChartVisibility = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        private string barChartVisibility = VISIBILITY_COLLAPSED;
-        public string BarChartVisibility
-        {
-            get => barChartVisibility;
-            set
-            {
-                barChartVisibility = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        private string dataGridVisibility = VISIBILITY_COLLAPSED;
-        public string DataGridVisibility
-        {
-            get => dataGridVisibility;
-            set
-            {
-                dataGridVisibility = value;
                 NotifyPropertyChanged();
             }
         }
@@ -219,19 +197,61 @@ namespace Viewer.ViewModels
                 {
                     PopulateTotalCounts(selectedTotalReport);
                     PopulateNewCounts(selectedTotalReport);
-                    switch(ViewIndex)
+                    switch (selectedView.DisplayName)
                     {
-                        case 0:
-                            ShowLineChart(selectedTotalReport);
+                        case TOTAL_LINE_SELECTOR:
+                            ShowLineChart(SelectedTotalReport);
                             break;
-                        case 1:
-                            ShowBarChart(selectedTotalReport);
+                        case ACTIVE_AREA_SELECTOR:
+                            ShowStackedAreaSeriesChart(SelectedTotalReport);
                             break;
-                        case 2:
-                            ShowDataGrid(SelectedTotalReport);
+                        case NEW_BAR_SELECTOR:
+                            ShowStackedColumnChart(SelectedTotalReport);
+                            break;
+                        case DAILY_DATAGRID_SELECTOR:
+                            ShowDailyDataGrid(SelectedTotalReport);
+                            break;
+                        default:
                             break;
                     }
                 }
+            }
+        }
+
+        #endregion
+
+        #region Chart Properties
+
+        private string lineChartVisibility = VISIBILITY_VISIBLE;
+        public string SeriesChartVisibility
+        {
+            get => lineChartVisibility;
+            set
+            {
+                lineChartVisibility = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private string barChartVisibility = VISIBILITY_COLLAPSED;
+        public string ColumnChartVisibility
+        {
+            get => barChartVisibility;
+            set
+            {
+                barChartVisibility = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private string dataGridVisibility = VISIBILITY_COLLAPSED;
+        public string DataGridVisibility
+        {
+            get => dataGridVisibility;
+            set
+            {
+                dataGridVisibility = value;
+                NotifyPropertyChanged();
             }
         }
 
@@ -309,30 +329,38 @@ namespace Viewer.ViewModels
         {
             RefreshDataCommand = new Command(RefreshDataAction);
 
-            var col = new ObservableCollection<string>();
-            col.Add(TOTAL_SELECTOR);
-            col.Add(NEW_SELECTOR);
-            col.Add(DATA_SELECTOR);
-            ViewSelections = col;
+            ViewSelections = new ObservableCollection<Selection>
+            {
+                new Selection(TOTAL_LINE_SELECTOR, nameof(ShowLineChart)),
+                new Selection(ACTIVE_AREA_SELECTOR, nameof(ShowStackedAreaSeriesChart)),
+                new Selection(NEW_BAR_SELECTOR, nameof(ShowStackedColumnChart)),
+                new Selection(DAILY_DATAGRID_SELECTOR, nameof(ShowDailyDataGrid))
+            };
+            SelectedView = viewSelections[0];
         }
 
         private void SetDisplayView(ViewType type)
         {
             switch(type)
             {
-                case ViewType.LineChart:
-                    LineChartVisibility = VISIBILITY_VISIBLE;
-                    BarChartVisibility = VISIBILITY_COLLAPSED;
+                case ViewType.LineSeriesChart:
+                    SeriesChartVisibility = VISIBILITY_VISIBLE;
+                    ColumnChartVisibility = VISIBILITY_COLLAPSED;
                     DataGridVisibility = VISIBILITY_COLLAPSED;
                     break;
-                case ViewType.BarChart:
-                    LineChartVisibility = VISIBILITY_COLLAPSED;
-                    BarChartVisibility = VISIBILITY_VISIBLE;
+                case ViewType.AreaSeriesChart:
+                    SeriesChartVisibility = VISIBILITY_VISIBLE;
+                    ColumnChartVisibility = VISIBILITY_COLLAPSED;
+                    DataGridVisibility = VISIBILITY_COLLAPSED;
+                    break;
+                case ViewType.StackedColumnChart:
+                    SeriesChartVisibility = VISIBILITY_COLLAPSED;
+                    ColumnChartVisibility = VISIBILITY_VISIBLE;
                     DataGridVisibility = VISIBILITY_COLLAPSED;
                     break;
                 case ViewType.DataGrid:
-                    LineChartVisibility = VISIBILITY_COLLAPSED;
-                    BarChartVisibility = VISIBILITY_COLLAPSED;
+                    SeriesChartVisibility = VISIBILITY_COLLAPSED;
+                    ColumnChartVisibility = VISIBILITY_COLLAPSED;
                     DataGridVisibility = VISIBILITY_VISIBLE;
                     break;
                 default:
@@ -385,7 +413,7 @@ namespace Viewer.ViewModels
                     Title = CONFIRMED_TITLE,
                     Stroke = Brushes.Yellow,
                     Fill = Brushes.LightYellow,
-                    Values = new ChartValues<int>(report.TotalConfirmed)
+                    Values = new ChartValues<int>(report.TotalActive)
                 },
                 new LineSeries
                 {
@@ -407,16 +435,16 @@ namespace Viewer.ViewModels
             LineFormatter = value => value.ToString();
         }
 
-        private void ShowBarChart(TotalReport report)
+        private void ShowStackedColumnChart(TotalReport report)
         {
             BarSeriesCollection = new SeriesCollection
             {
                 new StackedColumnSeries
                 {
-                    Title = CONFIRMED_TITLE,
+                    Title = ACTIVE_TITLE,
                     Stroke = Brushes.Yellow,
                     Fill = Brushes.Yellow,
-                    Values = new ChartValues<int>(report.NewConfirmed)
+                    Values = new ChartValues<int>(report.NewActive)
                 },
                 new StackedColumnSeries
                 {
@@ -438,7 +466,38 @@ namespace Viewer.ViewModels
             BarFormatter = value => value.ToString();
         }
 
-        private void ShowDataGrid(TotalReport report)
+        private void ShowStackedAreaSeriesChart(TotalReport report)
+        {
+            LineSeriesCollection = new SeriesCollection
+            {
+                new StackedAreaSeries
+                {
+                    Title = ACTIVE_TITLE,
+                    Stroke = Brushes.Yellow,
+                    Fill = Brushes.LightYellow,
+                    Values = new ChartValues<int>(report.TotalActive)
+                },
+                new StackedAreaSeries
+                {
+                    Title = RECOVERED_TITLE,
+                    Stroke = Brushes.Green,
+                    Fill = Brushes.LightGreen,
+                    Values = new ChartValues<int>(report.TotalRecovered)
+                },
+                new StackedAreaSeries
+                {
+                    Title = DEATHS_TITLE,
+                    Stroke = Brushes.Red,
+                    Fill = Brushes.LightCoral,
+                    Values = new ChartValues<int>(report.TotalDeaths)
+                }
+            };
+
+            LineLabels = report.FileDates.ToArray();
+            LineFormatter = value => value.ToString();
+        }
+
+        private void ShowDailyDataGrid(TotalReport report)
         {
             var list = GetFilteredList(report);
 
@@ -455,6 +514,13 @@ namespace Viewer.ViewModels
                     .GroupBy(r => r.FileDate)
                     .OrderBy(g => g.Key)
                     .Select(g => g.Sum(i => i.TotalConfirmed));
+            }
+            if (report.TotalActive == null)
+            {
+                report.TotalActive = list
+                    .GroupBy(r => r.FileDate)
+                    .OrderBy(g => g.Key)
+                    .Select(g => g.Sum(i => i.TotalActive));
             }
             if (report.TotalRecovered == null)
             {
@@ -489,6 +555,13 @@ namespace Viewer.ViewModels
                     .GroupBy(r => r.FileDate)
                     .OrderBy(g => g.Key)
                     .Select(g => g.Sum(i => i.NewConfirmed));
+            }
+            if (report.NewActive == null)
+            {
+                report.NewActive = list
+                    .GroupBy(r => r.FileDate)
+                    .OrderBy(g => g.Key)
+                    .Select(g => g.Sum(i => i.NewActive));
             }
             if (report.NewRecovered == null)
             {
@@ -563,10 +636,8 @@ namespace Viewer.ViewModels
 
             var dir = new DirectoryInfo(path);
             var files = dir.GetFiles("*.csv");
-            //var filePaths = Directory.GetFiles(path, "*.csv");
             foreach (var file in files)
             {
-                //var fileNameDate = DateTime.Parse(Path.GetFileNameWithoutExtension(filePath));
                 var fileDateTime = file.LastWriteTime;
                 if (fileDateTime >= dateTime)
                 {
@@ -685,5 +756,17 @@ namespace Viewer.ViewModels
         }
 
         #endregion
+    }
+
+    public class Selection
+    {
+        public Selection(string displayName, string chartname)
+        {
+            DisplayName = displayName;
+            ChartName = chartname;
+        }
+
+        public string DisplayName { get; set; }
+        public string ChartName { get; set; }
     }
 }
