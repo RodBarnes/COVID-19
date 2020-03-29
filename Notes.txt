@@ -1,1 +1,3 @@
 Automate determining whether there is a git -- do I have to include git in the packge?  Its 44MB.
+
+What needs done to bundle this all together including the databawe and git?
