@@ -40,13 +40,15 @@ namespace DataClasses
             }
         }
 
-        public void ClearDataFromDate(DateTime? lastImportDate)
+        public void ClearDataFromDate(DateTime lastImportDate)
         {
+            var clearDate = new DateTime(lastImportDate.Year, lastImportDate.Month, lastImportDate.Day);
+
             int rows;
 
-            var sql = $"DELETE FROM DailyReport WHERE FileDate >= @lastImportDate";
+            var sql = $"DELETE FROM DailyReport WHERE FileDate >= @clearDate";
             var cmd = new SqlCommand(sql, sqlConn);
-            cmd.Parameters.AddWithValue("@lastImportDate", lastImportDate);
+            cmd.Parameters.AddWithValue("@clearDate", clearDate);
             rows = cmd.ExecuteNonQuery();
             if (rows < 0)
                 throw new Exception($"ClearDataFromDate failed: LastImportDate='{lastImportDate}'\nsql={cmd.CommandText}.");

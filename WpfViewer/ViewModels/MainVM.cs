@@ -555,19 +555,22 @@ namespace Viewer.ViewModels
 
         private List<string> GetFileList(string path, DateTime? dateTime)
         {
-            List<string> fileList = new List<string>(); ;
+            List<string> fileList = new List<string>();
             if (dateTime == null)
             {
                 dateTime = DateTime.Parse(BASE_DATE);
             }
 
-            var filePaths = Directory.GetFiles(path, "*.csv");
-            foreach (var filePath in filePaths)
+            var dir = new DirectoryInfo(path);
+            var files = dir.GetFiles("*.csv");
+            //var filePaths = Directory.GetFiles(path, "*.csv");
+            foreach (var file in files)
             {
-                var fileNameDate = DateTime.Parse(Path.GetFileNameWithoutExtension(filePath));
-                if (fileNameDate >= dateTime)
+                //var fileNameDate = DateTime.Parse(Path.GetFileNameWithoutExtension(filePath));
+                var fileDateTime = file.LastWriteTime;
+                if (fileDateTime >= dateTime)
                 {
-                    fileList.Add(filePath);
+                    fileList.Add(file.FullName);
                 }
             }
 
@@ -587,7 +590,6 @@ namespace Viewer.ViewModels
             }
 
             ShowBusyPanel("Checking for new data...");
-            DailyReports.Clear(LastImportDateTime);
             DailyReports.ImportSwaps(ReplacementsPath);
 
             // Create a list of files to import
@@ -595,19 +597,25 @@ namespace Viewer.ViewModels
 
             if (fileList.Count > 0)
             {
-                for (int i = 0; i < fileList.Count; i++)
-                {
-                    if (worker.CancellationPending)
-                    {
-                        e.Cancel = true;
-                        return;
-                    }
+                var clearDate = DateTime.Parse(Path.GetFileNameWithoutExtension(fileList.Min()));
+                DailyReports.Clear(clearDate);
 
-                    var filePath = fileList[i];
-                    var fileName = Path.GetFileNameWithoutExtension(filePath);
-                    BusyPanelTitle = $"Reading {fileName}";
-                    DailyReports.ImportData(filePath, worker, BusyProgressMaximum);
-                    LastImportDateTime = DateTime.Parse(fileName);
+                if (fileList.Count > 0)
+                {
+                    for (int i = 0; i < fileList.Count; i++)
+                    {
+                        if (worker.CancellationPending)
+                        {
+                            e.Cancel = true;
+                            return;
+                        }
+
+                        var filePath = fileList[i];
+                        var fileName = Path.GetFileNameWithoutExtension(filePath);
+                        BusyPanelTitle = $"Reading {fileName}";
+                        DailyReports.ImportData(filePath, worker, BusyProgressMaximum);
+                        LastImportDateTime = DateTime.Parse(fileName);
+                    }
                 }
             }
         }
@@ -671,7 +679,7 @@ namespace Viewer.ViewModels
                 new Setting(nameof(PullData), PullData),
                 new Setting(nameof(DataPath), DataPath),
                 new Setting(nameof(ReplacementsPath), ReplacementsPath),
-                new Setting(nameof(LastImportDateTime), LastImportDateTime.ToString(LONG_DATE_FORMAT))
+                new Setting(nameof(LastImportDateTime), LastImportDateTime.ToString())
             };
             Utility.SaveSettings(list);
         }

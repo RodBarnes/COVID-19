@@ -38,18 +38,11 @@ namespace DataClasses
 
         #region Methods
 
-        public void Clear(DateTime? lastImportDate)
+        public void Clear(DateTime lastImportDate)
         {
             using (var db = new DatabaseConnection())
             {
-                if (lastImportDate is null)
-                {
-                    db.ClearDataAll();
-                }
-                else
-                {
-                    db.ClearDataFromDate(lastImportDate);
-                }
+                db.ClearDataFromDate(lastImportDate);
             }
             Clear();
         }
