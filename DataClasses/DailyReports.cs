@@ -290,9 +290,11 @@ namespace DataClasses
                     Country = GLOBAL_NAME,
                     FileDate = g.Key,
                     TotalConfirmed = g.Sum(s => s.TotalConfirmed),
+                    TotalActive = g.Sum(s => s.TotalActive),
                     TotalRecovered = g.Sum(s => s.TotalRecovered),
                     TotalDeaths = g.Sum(s => s.TotalDeaths),
                     NewConfirmed = g.Sum(s => s.NewConfirmed),
+                    NewActive = g.Sum(s => s.NewActive),
                     NewRecovered = g.Sum(s => s.NewRecovered),
                     NewDeaths = g.Sum(s => s.NewDeaths)
                 }).ToList();

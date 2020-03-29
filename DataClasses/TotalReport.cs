@@ -31,11 +31,13 @@ namespace DataClasses
         public string Country { get; set; }
         public string State { get; set; }
         public IEnumerable<int> TotalConfirmed { get; set; }
-        public IEnumerable<int> NewConfirmed { get; set; }
-        public IEnumerable<int> TotalDeaths { get; set; }
-        public IEnumerable<int> NewDeaths { get; set; }
+        public IEnumerable<int> TotalActive { get; set; }
         public IEnumerable<int> TotalRecovered { get; set; }
+        public IEnumerable<int> TotalDeaths { get; set; }
+        public IEnumerable<int> NewConfirmed { get; set; }
+        public IEnumerable<int> NewActive { get; set; }
         public IEnumerable<int> NewRecovered { get; set; }
+        public IEnumerable<int> NewDeaths { get; set; }
         public IEnumerable<string> FileDates { get; set; }
 
         #endregion
