@@ -195,8 +195,7 @@ namespace Viewer.ViewModels
                 NotifyPropertyChanged();
                 if (selectedTotalReport != null)
                 {
-                    PopulateTotalCounts(selectedTotalReport);
-                    PopulateNewCounts(selectedTotalReport);
+                    GenerateDailyCounts(selectedTotalReport);
                     switch (selectedView.DisplayName)
                     {
                         case TOTAL_LINE_SELECTOR:
@@ -331,10 +330,10 @@ namespace Viewer.ViewModels
 
             ViewSelections = new ObservableCollection<Selection>
             {
-                new Selection(TOTAL_LINE_SELECTOR, nameof(ShowLineChart)),
-                new Selection(ACTIVE_AREA_SELECTOR, nameof(ShowStackedAreaSeriesChart)),
-                new Selection(NEW_BAR_SELECTOR, nameof(ShowStackedColumnChart)),
-                new Selection(DAILY_DATAGRID_SELECTOR, nameof(ShowDailyDataGrid))
+                new Selection(TOTAL_LINE_SELECTOR, "Total Cases: Confirmed, Recovered, Deaths"),
+                new Selection(ACTIVE_AREA_SELECTOR, "Total Cases: Active, Recovered, Deaths"),
+                new Selection(NEW_BAR_SELECTOR, "New Cases: Active, Recovered, Deaths"),
+                new Selection(DAILY_DATAGRID_SELECTOR, "Daily Case Counts")
             };
             SelectedView = viewSelections[0];
         }
@@ -504,7 +503,7 @@ namespace Viewer.ViewModels
             CountryDailyReports = new ObservableCollection<DailyReport>(list);
         }
 
-        private void PopulateTotalCounts(TotalReport report)
+        private void GenerateDailyCounts(TotalReport report)
         {
             var list = GetFilteredList(report);
 
@@ -543,12 +542,6 @@ namespace Viewer.ViewModels
                     .OrderBy(g => g.Key)
                     .Select(g => g.Key.ToString(SHORT_DATE_FORMAT));
             }
-        }
-
-        private void PopulateNewCounts(TotalReport report)
-        {
-            var list = GetFilteredList(report);
-
             if (report.NewConfirmed == null)
             {
                 report.NewConfirmed = list
