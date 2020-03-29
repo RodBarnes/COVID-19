@@ -1,4 +1,6 @@
 Automate determining whether there is a git -- do I have to include git in the packge?  Its 44MB.
 The git.exe in D;\Program Files\Git\cmd is 40k in size.  But does it need other things for it to work?
 
+clone command: git clone https://github.com/libgit2/libgit2
+
 What needs done to bundle this all together including the databawe and git?
