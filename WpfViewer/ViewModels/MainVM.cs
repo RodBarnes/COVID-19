@@ -26,6 +26,7 @@ namespace Viewer.ViewModels
     {
         private const string BASE_PATH = @"D:\Source\BitBucket\3rd Party\COVID-19";
         private const string GIT_COMMAND = @"""D:\Program Files\Git\cmd\git.exe"" pull";
+        private const string CLEAR_SCRIPT_PATH = @"D:\Source\BitBucket\COVID-19\Clear all data.sql";
 
         private const string BASE_DATE = "10/1/2019";
         private const string GLOBAL_NAME = "(GLOBAL)";
@@ -81,7 +82,7 @@ namespace Viewer.ViewModels
         private void RefreshDataAction(object obj)
         {
             LastImportDateTime = DateTime.Parse(BASE_DATE);
-            ImportData();
+            ImportData(true);
         }
 
         #endregion
@@ -385,7 +386,7 @@ namespace Viewer.ViewModels
             }
         }
 
-        private void ImportData()
+        private void ImportData(bool clearAllData = false)
         {
             worker = new BackgroundWorker
             {
@@ -399,7 +400,7 @@ namespace Viewer.ViewModels
             worker.WorkerSupportsCancellation = true;
             if (!worker.IsBusy)
             {
-                worker.RunWorkerAsync();
+                worker.RunWorkerAsync(clearAllData);
             }
         }
 
@@ -647,6 +648,8 @@ namespace Viewer.ViewModels
 
         private void Background_LoadDataDoWork(object sender, DoWorkEventArgs e)
         {
+            var clearAllData = (bool)e.Argument;
+
             if (PullData == "True")
             {
                 ShowBusyPanel("Pulling latest data...");
@@ -654,18 +657,28 @@ namespace Viewer.ViewModels
             }
 
             ShowBusyPanel("Checking for new data...");
-            DailyReports.ImportSwaps(ReplacementsPath);
 
             // Create a list of files to import
             List<string> fileList = GetFileList(DataPath, LastImportDateTime);
 
             if (fileList.Count > 0)
             {
-                var clearDate = DateTime.Parse(Path.GetFileNameWithoutExtension(fileList.Min()));
-                DailyReports.Clear(clearDate);
+                DailyReports.ImportSwaps(ReplacementsPath);
+                if (clearAllData)
+                {
+                    DailyReports.ClearAll(CLEAR_SCRIPT_PATH);
+                }
+                else
+                {
+                    var file = fileList.Min();
+                    var clearDate = DateTime.Parse(Path.GetFileNameWithoutExtension(file));
+                    DailyReports.Clear(clearDate);
+                }
 
                 if (fileList.Count > 0)
                 {
+                    LastImportDateTime = DateTime.Now;
+
                     for (int i = 0; i < fileList.Count; i++)
                     {
                         if (worker.CancellationPending)
@@ -678,7 +691,6 @@ namespace Viewer.ViewModels
                         var fileName = Path.GetFileNameWithoutExtension(filePath);
                         BusyPanelTitle = $"Reading {fileName}";
                         DailyReports.ImportData(filePath, worker, BusyProgressMaximum);
-                        LastImportDateTime = DateTime.Parse(fileName);
                     }
                 }
             }

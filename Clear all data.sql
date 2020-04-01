@@ -2,9 +2,6 @@
 DBCC CHECKIDENT ('CountryRegion', RESEED, 1)
 GO
 
-INSERT INTO CountryRegion ([Name]) VALUES('')
-GO
-
 TRUNCATE TABLE StateProvince
 DBCC CHECKIDENT ('StateProvince', RESEED, 1)
 GO

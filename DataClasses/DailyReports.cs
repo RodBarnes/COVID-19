@@ -47,6 +47,15 @@ namespace DataClasses
             Clear();
         }
 
+        public void ClearAll(string scriptPath)
+        {
+            using (var db = new DatabaseConnection())
+            {
+                db.ClearDataAll(scriptPath);
+            }
+            Clear();
+        }
+
         public void ReadData()
         {
             using (var db = new DatabaseConnection())
@@ -196,7 +205,7 @@ namespace DataClasses
                                     throw new Exception($"Read a report matching {country},{state},{county},{fileDate:MM-dd-yyyy} but failed to match!");
                                 }
                             }
-                            else
+                            else if (!string.IsNullOrEmpty(country))
                             {
                                 // Add the report to the collection
                                 report = new DailyReport(fileDate, country, state, county, lastUpdate, totalConfirmed, totalRecovered, totalDeaths,

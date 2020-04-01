@@ -18,9 +18,8 @@ namespace DataClasses
 
         void IDisposable.Dispose() => sqlConn.Close();
 
-        public void ClearDataAll()
+        public void ClearDataAll(string filePath)
         {
-            var filePath = @"D:\Source\BitBucket\COVID-19\Clear all data.sql";
             using (var file = new StreamReader(filePath))
             {
                 var cmd = new SqlCommand
