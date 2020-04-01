@@ -4,3 +4,7 @@ The git.exe in D;\Program Files\Git\cmd is 40k in size.  But does it need other 
 clone command: git clone https://github.com/libgit2/libgit2
 
 What needs done to bundle this all together including the databawe and git?
+
+Need to write replacements into a table?
+
+Need to clear dimension tables on clear all
