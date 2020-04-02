@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
-using System.Linq;
 
 namespace DataClasses
 {
+    //foreach (SqlParameter param in cmd.Parameters)
+    //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
+
     public class DatabaseConnection : IDisposable
     {
         private const string GLOBAL_NAME = "(GLOBAL)";
@@ -93,8 +95,6 @@ namespace DataClasses
                 cmd.Parameters.AddWithValue("@latitude", report.Latitude);
                 cmd.Parameters.AddWithValue("@longitude", report.Longitude);
                 cmd.Parameters.AddWithValue("@fips", report.FIPS);
-                //foreach (SqlParameter param in cmd.Parameters)
-                //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
                 rows = cmd.ExecuteNonQuery();
                 if (rows < 0)
                     throw new Exception($"ReportInsert failed: Report='{report.Country},{report.State},{report.County}'\nsql={cmd.CommandText}.");
@@ -133,8 +133,6 @@ namespace DataClasses
                 cmd.Parameters.AddWithValue("@latitude", report.Latitude);
                 cmd.Parameters.AddWithValue("@longitude", report.Longitude);
                 cmd.Parameters.AddWithValue("@fips", report.FIPS);
-                //foreach (SqlParameter param in cmd.Parameters)
-                //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
                 obj = cmd.ExecuteScalar();
                 if (obj == null)
                     throw new Exception($"ReportUpdate failed: Report='{report.Country},{report.State},{report.County}'\nsql={cmd.CommandText}.");
@@ -165,8 +163,6 @@ namespace DataClasses
                 cmd.Parameters.AddWithValue("@stateProvince", SqlStringWrite(stateProvince));
                 cmd.Parameters.AddWithValue("@countyDistrict", SqlStringWrite(countyDistrict));
                 cmd.Parameters.AddWithValue("@fileDate", fileDate);
-                //foreach (SqlParameter param in cmd.Parameters)
-                //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
                 obj = cmd.ExecuteScalar();
                 exists = (obj != null && ((int)obj) > 0);
             }
@@ -199,8 +195,6 @@ namespace DataClasses
                 cmd.Parameters.AddWithValue("@stateProvince", SqlStringWrite(stateProvince));
                 cmd.Parameters.AddWithValue("@countyDistrict", SqlStringWrite(countyDistrict));
                 cmd.Parameters.AddWithValue("@fileDate", fileDate);
-                //foreach (SqlParameter param in cmd.Parameters)
-                //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
                 var reader = cmd.ExecuteReader();
                 if (reader == null)
                 {
@@ -259,8 +253,6 @@ namespace DataClasses
                 cmd.Parameters.AddWithValue("@stateProvince", SqlStringWrite(stateProvince));
                 cmd.Parameters.AddWithValue("@countyDistrict", SqlStringWrite(countyDistrict));
                 cmd.Parameters.AddWithValue("@fileDate", fileDate);
-                //foreach (SqlParameter param in cmd.Parameters)
-                //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
                 var reader = cmd.ExecuteReader();
                 if (reader == null)
                 {
@@ -367,8 +359,6 @@ namespace DataClasses
                 var cmd = new SqlCommand(sql, sqlConn);
                 cmd.Parameters.AddWithValue("@countryRegionId", countryRegionId);
                 cmd.Parameters.AddWithValue("@fileDate", fileDate);
-                //foreach (SqlParameter param in cmd.Parameters)
-                //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
                 rows = cmd.ExecuteNonQuery();
                 if (rows < 0)
                     throw new Exception($"CountryInsert failed: Report='{country}'\nsql={cmd.CommandText}.");
@@ -389,15 +379,11 @@ namespace DataClasses
                 var sql = "SELECT CountryRegionId FROM CountryRegion WHERE [Name]=@name";
                 var cmd = new SqlCommand(sql, sqlConn);
                 cmd.Parameters.AddWithValue("@name", SqlStringWrite(name));
-                //foreach (SqlParameter param in cmd.Parameters)
-                //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
                 obj = cmd.ExecuteScalar();
                 if (obj == null)
                 {
                     // Doesn't exist; insert the new record
                     cmd.CommandText = "INSERT INTO CountryRegion ([Name]) OUTPUT Inserted.CountryRegionId VALUES (@name)";
-                    //foreach (SqlParameter param in cmd.Parameters)
-                    //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
                     obj = cmd.ExecuteScalar();
                     if (obj != null)
                     {
@@ -431,8 +417,6 @@ namespace DataClasses
                     var sql = "SELECT [Name] FROM CountryReion WHERE [Name]=@name";
                     var cmd = new SqlCommand(sql, sqlConn);
                     cmd.Parameters.AddWithValue("@name", SqlStringWrite(name));
-                    //foreach (SqlParameter param in cmd.Parameters)
-                    //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
                     obj = cmd.ExecuteScalar();
                     if (obj != null)
                         id = (int)obj;
@@ -456,15 +440,11 @@ namespace DataClasses
                 var sql = "SELECT StateProvinceId FROM StateProvince WHERE [Name]=@name";
                 var cmd = new SqlCommand(sql, sqlConn);
                 cmd.Parameters.AddWithValue("@name", SqlStringWrite(name));
-                //foreach (SqlParameter param in cmd.Parameters)
-                //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
                 obj = cmd.ExecuteScalar();
                 if (obj == null)
                 {
                     // Doesn't exist; insert the new record
                     cmd.CommandText = "INSERT INTO StateProvince ([Name]) OUTPUT Inserted.StateProvinceId VALUES (@name)";
-                    //foreach (SqlParameter param in cmd.Parameters)
-                    //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
                     obj = cmd.ExecuteScalar();
                     if (obj != null)
                     {
@@ -498,8 +478,6 @@ namespace DataClasses
                     var sql = "SELECT [Name] FROM StateProvince WHERE [Name]=@name";
                     var cmd = new SqlCommand(sql, sqlConn);
                     cmd.Parameters.AddWithValue("@name", SqlStringWrite(name));
-                    //foreach (SqlParameter param in cmd.Parameters)
-                    //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
                     obj = cmd.ExecuteScalar();
                     if (obj != null)
                         id = (int)obj;
@@ -523,15 +501,11 @@ namespace DataClasses
                 var sql = "SELECT CountyDistrictId FROM CountyDistrict WHERE [Name]=@name";
                 var cmd = new SqlCommand(sql, sqlConn);
                 cmd.Parameters.AddWithValue("@name", SqlStringWrite(name));
-                //foreach (SqlParameter param in cmd.Parameters)
-                //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
                 obj = cmd.ExecuteScalar();
                 if (obj == null)
                 {
                     // Doesn't exist; insert the new record
                     cmd.CommandText = "INSERT INTO CountyDistrict ([Name]) OUTPUT Inserted.CountyDistrictId VALUES (@name)";
-                    //foreach (SqlParameter param in cmd.Parameters)
-                    //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
                     obj = cmd.ExecuteScalar();
                     if (obj != null)
                     {
@@ -565,8 +539,6 @@ namespace DataClasses
                     var sql = "SELECT [Name] FROM CountyDistrict WHERE [Name]=@name";
                     var cmd = new SqlCommand(sql, sqlConn);
                     cmd.Parameters.AddWithValue("@name", SqlStringWrite(name));
-                    //foreach (SqlParameter param in cmd.Parameters)
-                    //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
                     obj = cmd.ExecuteScalar();
                     if (obj != null)
                         id = (int)obj;
@@ -629,7 +601,7 @@ namespace DataClasses
                         curReport.NewRecovereds.Add((int)reader["NewRecovered"]);
                         curReport.NewDeaths.Add((int)reader["NewDeaths"]);
                         curReport.NewActives.Add((int)reader["NewActive"]);
-                        System.Diagnostics.Debug.WriteLine($"{curReport.Country},{curReport.State},{curReport.FileDates.Count},{curReport.FileDates.Max(i => DateTime.Parse(i))},{curReport.TotalConfirmeds.Count},{curReport.TotalConfirmeds.Max()}");
+                        //System.Diagnostics.Debug.WriteLine($"{curReport.Country},{curReport.State},{curReport.FileDates.Count},{curReport.FileDates.Max(i => DateTime.Parse(i))},{curReport.TotalConfirmeds.Count},{curReport.TotalConfirmeds.Max()}");
                     }
                     reader.Close();
                 }
@@ -678,7 +650,7 @@ namespace DataClasses
                         curReport.NewRecovereds.Add((int)reader["NewRecovered"]);
                         curReport.NewDeaths.Add((int)reader["NewDeaths"]);
                         curReport.NewActives.Add((int)reader["NewActive"]);
-                        System.Diagnostics.Debug.WriteLine($"{curReport.Country},{curReport.State},{curReport.FileDates.Count},{curReport.FileDates.Max(i => DateTime.Parse(i))},{curReport.TotalConfirmeds.Count},{curReport.TotalConfirmeds.Max()}");
+                        //System.Diagnostics.Debug.WriteLine($"{curReport.Country},{curReport.State},{curReport.FileDates.Count},{curReport.FileDates.Max(i => DateTime.Parse(i))},{curReport.TotalConfirmeds.Count},{curReport.TotalConfirmeds.Max()}");
                     }
                     reader.Close();
                 }
@@ -721,7 +693,7 @@ namespace DataClasses
                         curReport.NewRecovereds.Add((int)reader["NewRecovered"]);
                         curReport.NewDeaths.Add((int)reader["NewDeaths"]);
                         curReport.NewActives.Add((int)reader["NewActive"]);
-                        System.Diagnostics.Debug.WriteLine($"{curReport.Country},{curReport.State},{curReport.FileDates.Count},{curReport.FileDates.Max(i => DateTime.Parse(i))},{curReport.TotalConfirmeds.Count},{curReport.TotalConfirmeds.Max()}");
+                        //System.Diagnostics.Debug.WriteLine($"{curReport.Country},{curReport.State},{curReport.FileDates.Count},{curReport.FileDates.Max(i => DateTime.Parse(i))},{curReport.TotalConfirmeds.Count},{curReport.TotalConfirmeds.Max()}");
                     }
                     reader.Close();
                 }
@@ -745,8 +717,6 @@ namespace DataClasses
                 };
                 cmd.Parameters.AddWithValue("@country", SqlStringWrite(report.Country));
                 cmd.Parameters.AddWithValue("@state", SqlStringWrite(report.State));
-                //foreach (SqlParameter param in cmd.Parameters)
-                //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
                 var reader = cmd.ExecuteReader();
                 if (reader == null)
                 {
@@ -769,7 +739,7 @@ namespace DataClasses
                             totalConfirmed, totalRecovered, totalDeaths, totalActive,
                             newConfirmed, newRecovered, newDeaths, newActive, report.Latitude, report.Longitude, report.FIPS);
                         list.Add(item);
-                        System.Diagnostics.Debug.WriteLine($"{fileDate},{totalConfirmed},{totalRecovered},{totalDeaths}");
+                        //System.Diagnostics.Debug.WriteLine($"{fileDate},{totalConfirmed},{totalRecovered},{totalDeaths}");
                     }
                 }
                 reader.Close();
@@ -794,8 +764,6 @@ namespace DataClasses
                     CommandType = CommandType.StoredProcedure
                 };
                 cmd.Parameters.AddWithValue("@country", SqlStringWrite(report.Country));
-                //foreach (SqlParameter param in cmd.Parameters)
-                //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
                 var reader = cmd.ExecuteReader();
                 if (reader == null)
                 {
@@ -818,7 +786,7 @@ namespace DataClasses
                             totalConfirmed, totalRecovered, totalDeaths, totalActive,
                             newConfirmed, newRecovered, newDeaths, newActive, report.Latitude, report.Longitude, report.FIPS);
                         list.Add(item);
-                        System.Diagnostics.Debug.WriteLine($"{fileDate},{totalConfirmed},{totalRecovered},{totalDeaths}");
+                        //System.Diagnostics.Debug.WriteLine($"{fileDate},{totalConfirmed},{totalRecovered},{totalDeaths}");
                     }
                 }
                 reader.Close();
@@ -842,8 +810,6 @@ namespace DataClasses
                 {
                     CommandType = CommandType.StoredProcedure
                 };
-                //foreach (SqlParameter param in cmd.Parameters)
-                //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
                 var reader = cmd.ExecuteReader();
                 if (reader == null)
                 {
@@ -866,7 +832,7 @@ namespace DataClasses
                             totalConfirmed, totalRecovered, totalDeaths, totalActive,
                             newConfirmed, newRecovered, newDeaths, newActive, report.Latitude, report.Longitude, report.FIPS);
                         list.Add(item);
-                        System.Diagnostics.Debug.WriteLine($"{fileDate},{totalConfirmed},{totalRecovered},{totalDeaths}");
+                        //System.Diagnostics.Debug.WriteLine($"{fileDate},{totalConfirmed},{totalRecovered},{totalDeaths}");
                     }
                 }
                 reader.Close();

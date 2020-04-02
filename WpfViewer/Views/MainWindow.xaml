@@ -48,7 +48,10 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="60" />
                 </Grid.ColumnDefinitions>
-                <ComboBox Grid.Column="0" ItemsSource="{Binding ViewSelections}" SelectedItem="{Binding SelectedView}" DisplayMemberPath="DisplayName" Margin="2,5" />
+                <ComboBox Grid.Column="0" Margin="2,5"
+                          ItemsSource="{Binding ViewSelections}" 
+                          SelectedItem="{Binding SelectedView}" 
+                          DisplayMemberPath="DisplayName" />
                 <Button Grid.Column="1" Content="Refresh" Command="{Binding RefreshDataCommand}" Margin="2,5"/>
             </Grid>
             <ListBox Grid.Row="2" Grid.Column="1" 
