@@ -1,75 +1,99 @@
-﻿using Common;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Common;
 
 namespace DataClasses
 {
-    public class DailyReports : IList<DailyReport>
+    public static class DatabaseManager
     {
         private const string GLOBAL_NAME = "(GLOBAL)";
 
-        private readonly List<DailyReport> reports = new List<DailyReport>();
-        private bool readHeaders = true;
-        private readonly Replacements Replacements = new Replacements();
-
-        public DailyReports() { }
+        private static readonly List<DailyReport> reports = new List<DailyReport>();
+        private static bool readHeaders = true;
+        private static readonly Replacements Replacements = new Replacements();
 
         #region Properties
 
-        public string ColumnHeader01 { get; set; }
-        public string ColumnHeader02 { get; set; }
-        public string ColumnHeader03 { get; set; }
-        public string ColumnHeader04 { get; set; }
-        public string ColumnHeader05 { get; set; }
-        public string ColumnHeader06 { get; set; }
-        public string ColumnHeader07 { get; set; }
-        public string ColumnHeader08 { get; set; }
-        public string ColumnHeader09 { get; set; }
-        public string ColumnHeader10 { get; set; }
-        public string ColumnHeader11 { get; set; }
-        public string ColumnHeader12 { get; set; }
+        public static string ColumnHeader01 { get; set; }
+        public static string ColumnHeader02 { get; set; }
+        public static string ColumnHeader03 { get; set; }
+        public static string ColumnHeader04 { get; set; }
+        public static string ColumnHeader05 { get; set; }
+        public static string ColumnHeader06 { get; set; }
+        public static string ColumnHeader07 { get; set; }
+        public static string ColumnHeader08 { get; set; }
+        public static string ColumnHeader09 { get; set; }
+        public static string ColumnHeader10 { get; set; }
+        public static string ColumnHeader11 { get; set; }
+        public static string ColumnHeader12 { get; set; }
 
         #endregion
 
         #region Methods
 
-        public void Clear(DateTime lastImportDate)
+        public static void Clear(DateTime lastImportDate)
         {
             using (var db = new DatabaseConnection())
             {
                 db.ClearDataFromDate(lastImportDate);
             }
-            Clear();
+            reports.Clear();
         }
 
-        public void ClearAll(string scriptPath)
+        public static void ClearAll(string scriptPath)
         {
             using (var db = new DatabaseConnection())
             {
                 db.ClearDataAll(scriptPath);
             }
-            Clear();
+            reports.Clear();
         }
 
-        public void ReadData()
+        public static bool ImportSwaps(string path, DateTime datetime)
         {
+            return Replacements.Refresh(path, datetime);
+        }
+
+        public static List<DailyReport> ReadDailyTotalsForReport(TotalReport report)
+        {
+            List<DailyReport> list = new List<DailyReport>();
             using (var db = new DatabaseConnection())
             {
-                db.ReportsRead(this);
+                if (string.IsNullOrEmpty(report.Country) || report.Country == GLOBAL_NAME)
+                {
+                    list = db.GlobalDailiesRead(report);
+                }
+                else if (string.IsNullOrEmpty(report.State))
+                {
+                    list = db.CountryRegionDailiesRead(report);
+                }
+                else
+                {
+                    list = db.CountryRegionStateProvinceDailiesRead(report);
+                }
             }
+
+            return list;
         }
 
-        public void ImportSwaps(string path)
+        public static List<TotalReport> ReadTotalReports()
         {
-            Replacements.Refresh(path);
+            var list = new List<TotalReport>();
+            using (var db = new DatabaseConnection())
+            {
+                db.CountryRegionStateProvinceTotalsRead(list);
+                db.CountryRegionTotalsRead(list);
+                db.GlobalTotalsRead(list);
+            }
+
+            return list;
         }
 
-        public void ImportData(string filePath, BackgroundWorker worker = null, double maxProgressValue = 0)
+        public static void ImportData(string filePath, BackgroundWorker worker = null, double maxProgressValue = 0)
         {
             using (var db = new DatabaseConnection())
             {
@@ -256,7 +280,7 @@ namespace DataClasses
             }
         }
 
-        private void ExtractHeadersFromFields(string[] fields)
+        private static void ExtractHeadersFromFields(string[] fields)
         {
             if (fields.Length > 8)
             {
@@ -288,61 +312,6 @@ namespace DataClasses
                 }
             }
         }
-
-        public void AddGlobalSums()
-        {
-            // Get a list by date rolled up across all regions
-            var sums = reports
-                .GroupBy(i => i.FileDate)
-                .Select(g => new DailyReport
-                {
-                    Country = GLOBAL_NAME,
-                    FileDate = g.Key,
-                    TotalConfirmed = g.Sum(s => s.TotalConfirmed),
-                    TotalActive = g.Sum(s => s.TotalActive),
-                    TotalRecovered = g.Sum(s => s.TotalRecovered),
-                    TotalDeaths = g.Sum(s => s.TotalDeaths),
-                    NewConfirmed = g.Sum(s => s.NewConfirmed),
-                    NewActive = g.Sum(s => s.NewActive),
-                    NewRecovered = g.Sum(s => s.NewRecovered),
-                    NewDeaths = g.Sum(s => s.NewDeaths)
-                }).ToList();
-
-            foreach (DailyReport sum in sums)
-            {
-                reports.Add(sum);
-            }
-        }
-
-        #endregion
-
-        #region Standard List Operations
-
-        public DailyReport this[int index] { get => reports[index]; set => reports[index] = value; }
-
-        public int Count => reports.Count;
-
-        public void Clear() => reports.Clear();
-
-        public bool IsReadOnly => ((IList<DailyReport>)reports).IsReadOnly;
-
-        public void Add(DailyReport item) => reports.Add(item);
-
-        public bool Contains(DailyReport item) => reports.Contains(item);
-
-        public void CopyTo(DailyReport[] array, int arrayIndex) => reports.CopyTo(array, arrayIndex);
-
-        public IEnumerator<DailyReport> GetEnumerator() => ((IList<DailyReport>)reports).GetEnumerator();
-        
-        public int IndexOf(DailyReport item) => reports.IndexOf(item);
-
-        public void Insert(int index, DailyReport item) => reports.Insert(index, item);
-
-        public bool Remove(DailyReport item) => reports.Remove(item);
-
-        public void RemoveAt(int index) => reports.RemoveAt(index);
-
-        IEnumerator IEnumerable.GetEnumerator() => ((IList<DailyReport>)reports).GetEnumerator();
 
         #endregion
     }
