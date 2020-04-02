@@ -7,4 +7,5 @@ What needs done to bundle this all together including the databawe and git?
 
 Need to write replacements into a table?
 
-Need to clear dimension tables on clear all
+Need to add last replacement date into config and check the date of the file at startup.
+If the replacement.csv is new, then a full refresh should be prompted since it potentially affects older, existing data.

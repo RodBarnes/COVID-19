@@ -14,6 +14,7 @@ SELECT
  dr.NewConfirmed,
  dr.NewRecovered,
  dr.NewDeaths,
+ dr.NewActive,
  dr.Latitude,
  dr.Longitude
 FROM DailyReport dr
