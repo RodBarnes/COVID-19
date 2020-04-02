@@ -413,7 +413,7 @@ namespace Viewer.ViewModels
                     Title = CONFIRMED_TITLE,
                     Stroke = Brushes.Yellow,
                     Fill = Brushes.LightYellow,
-                    Values = new ChartValues<int>(report.TotalActive)
+                    Values = new ChartValues<int>(report.TotalConfirmed)
                 },
                 new LineSeries
                 {
