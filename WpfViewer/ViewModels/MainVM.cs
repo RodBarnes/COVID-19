@@ -57,8 +57,8 @@ namespace Viewer.ViewModels
             InitMessagePanel();
             InitMainPanel();
 
-            //ImportData();
-            ReadData();
+            ImportData();
+            //ReadData();
         }
 
         ~MainVM()
@@ -541,6 +541,7 @@ namespace Viewer.ViewModels
                 // Replacements are new; tell the user a full refresh may be needed
                 ShowMessagePanel("New replacement data", "New replacement data was found and read. " +
                     "This will require a full refresh to ensure that the swaps are applied to older data.");
+                LastReplacementDateTime = DateTime.Now;
             }
 
             // Create a list of files to import

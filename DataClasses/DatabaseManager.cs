@@ -53,10 +53,7 @@ namespace DataClasses
             reports.Clear();
         }
 
-        public static bool ImportSwaps(string path, DateTime datetime)
-        {
-            return Replacements.Refresh(path, datetime);
-        }
+        public static bool ImportSwaps(string path, DateTime datetime) => Replacements.Refresh(path, datetime);
 
         public static List<DailyReport> ReadDailyTotalsForReport(TotalReport report)
         {
