@@ -589,23 +589,20 @@ namespace Viewer.ViewModels
                     DatabaseManager.Clear(clearDate);
                 }
 
-                if (fileList.Count > 0)
+                LastImportDateTime = DateTime.Now;
+
+                for (int i = 0; i < fileList.Count; i++)
                 {
-                    LastImportDateTime = DateTime.Now;
-
-                    for (int i = 0; i < fileList.Count; i++)
+                    if (worker.CancellationPending)
                     {
-                        if (worker.CancellationPending)
-                        {
-                            e.Cancel = true;
-                            return;
-                        }
-
-                        var filePath = fileList[i];
-                        var fileName = Path.GetFileNameWithoutExtension(filePath);
-                        BusyPanelTitle = $"Reading {fileName}";
-                        DatabaseManager.ImportData(filePath, worker, BusyProgressMaximum);
+                        e.Cancel = true;
+                        return;
                     }
+
+                    var filePath = fileList[i];
+                    var fileName = Path.GetFileNameWithoutExtension(filePath);
+                    BusyPanelTitle = $"Reading {fileName}";
+                    DatabaseManager.ImportData(filePath, worker, BusyProgressMaximum);
                 }
             }
         }
