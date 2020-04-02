@@ -11,6 +11,8 @@ namespace DataClasses
 {
     public class DatabaseConnection : IDisposable
     {
+        private const string GLOBAL_NAME = "(GLOBAL)";
+
         private readonly SqlConnection sqlConn;
 
         public DatabaseConnection()
@@ -707,7 +709,7 @@ namespace DataClasses
                 {
                     var curReport = new TotalReport
                     {
-                        Country = "(GLOBAL)"
+                        Country = GLOBAL_NAME
                     };
                     reports.Add(curReport);
                     while (reader.Read())
