@@ -15,6 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Clear all data.sql = Clear all data.sql
 		Clear data from date.sql = Clear data from date.sql
 		Notes.txt = Notes.txt
+		Test Query.sql = Test Query.sql
 	EndProjectSection
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Database", "Database\Database.sqlproj", "{FA2AD65C-ED75-4125-BB98-287EC5D629C9}"

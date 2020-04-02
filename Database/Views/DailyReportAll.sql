@@ -6,6 +6,7 @@ SELECT
  cr.[Name] AS CountryRegion, dr.CountryRegionId,
  sp.[Name] AS StateProvince, dr.StateProvinceId,
  cd.[Name] AS CountyDistrict, dr.CountyDistrictId,
+ dr.FIPS,
  dr.LastUpdate,
  dr.TotalConfirmed,
  dr.TotalRecovered,
@@ -14,6 +15,7 @@ SELECT
  dr.NewConfirmed,
  dr.NewRecovered,
  dr.NewDeaths,
+ dr.NewActive,
  dr.Latitude,
  dr.Longitude
 FROM DailyReport dr
