@@ -290,56 +290,6 @@ namespace DataClasses
             return report;
         }
 
-        //public void ReportsRead(DailyReports reports)
-        //{
-        //    try
-        //    {
-        //        var sql = $"SELECT CountryRegion, StateProvince, CountyDistrict, " +
-        //            "FileDate, LastUpdate, TotalConfirmed, TotalRecovered, TotalDeaths, TotalActive, " +
-        //            "NewConfirmed, NewRecovered, NewDeaths, NewActive, Latitude, Longitude, FIPS " +
-        //            $"FROM DailyReportAll";
-        //        var cmd = new SqlCommand(sql, sqlConn);
-        //        //foreach (SqlParameter param in cmd.Parameters)
-        //        //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
-        //        var reader = cmd.ExecuteReader();
-        //        if (reader == null)
-        //        {
-        //            throw new Exception($"ReportsRead failed: reader={reader}\nsql={cmd.CommandText}.");
-        //        }
-        //        else
-        //        {
-        //            while (reader.Read())
-        //            {
-        //                var countryRegion = SqlStringRead(reader["CountryRegion"].ToString());
-        //                var stateProvince = SqlStringRead(reader["StateProvince"].ToString());
-        //                var countyDistrict = SqlStringRead(reader["CountyDistrict"].ToString());
-        //                var fileDate = DateTime.Parse(reader["FileDate"].ToString());
-        //                var lastUpdate = DateTime.Parse(reader["LastUpdate"].ToString());
-        //                var totalConfirmed = (int)reader["TotalConfirmed"];
-        //                var totalRecovered = (int)reader["TotalRecovered"];
-        //                var totalDeaths = (int)reader["TotalDeaths"];
-        //                var totalActive = (int)reader["TotalActive"];
-        //                var newConfirmed = (int)reader["NewConfirmed"];
-        //                var newRecovered = (int)reader["NewRecovered"];
-        //                var newDeaths = (int)reader["NewDeaths"];
-        //                var newActive = (int)reader["NewActive"];
-        //                var latitude = (double)reader["Latitude"];
-        //                var longitude = (double)reader["Longitude"];
-        //                var fips = (int)reader["FIPS"];
-        //                var item = new DailyReport(fileDate, countryRegion, stateProvince, countyDistrict, lastUpdate,
-        //                    totalConfirmed, totalRecovered, totalDeaths, totalActive, 
-        //                    newConfirmed, newRecovered, newDeaths, newActive, latitude, longitude, fips);
-        //                reports.Add(item);
-        //            }
-        //        }
-        //        reader.Close();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception($"ReportsRead failed.", ex);
-        //    }
-        //}
-
         #endregion
 
         #region Dimension Methods
@@ -556,7 +506,7 @@ namespace DataClasses
 
         #region Total Methods
 
-        public void CountryRegionStateProvinceTotalsRead(List<TotalReport> reports)
+        public void CountryRegionStateProvinceTotalsRead(List<TotalReport> list)
         {
             try
             {
@@ -590,7 +540,7 @@ namespace DataClasses
                                 Country = countryRegion,
                                 State = stateProvince
                             };
-                            reports.Add(curReport);
+                            list.Add(curReport);
                         }
                         curReport.FileDates.Add(reader["FileDate"].ToString());
                         curReport.TotalConfirmeds.Add((int)reader["TotalConfirmed"]);
@@ -601,7 +551,6 @@ namespace DataClasses
                         curReport.NewRecovereds.Add((int)reader["NewRecovered"]);
                         curReport.NewDeaths.Add((int)reader["NewDeaths"]);
                         curReport.NewActives.Add((int)reader["NewActive"]);
-                        //System.Diagnostics.Debug.WriteLine($"{curReport.Country},{curReport.State},{curReport.FileDates.Count},{curReport.FileDates.Max(i => DateTime.Parse(i))},{curReport.TotalConfirmeds.Count},{curReport.TotalConfirmeds.Max()}");
                     }
                     reader.Close();
                 }
@@ -612,7 +561,7 @@ namespace DataClasses
             }
         }
 
-        public void CountryRegionTotalsRead(List<TotalReport> reports)
+        public void CountryRegionTotalsRead(List<TotalReport> list)
         {
             try
             {
@@ -632,14 +581,17 @@ namespace DataClasses
                     while (reader.Read())
                     {
                         var countryRegion = SqlStringRead(reader["CountryRegion"].ToString());
-                        if (countryRegion != curReport.Country)
+                        if (string.IsNullOrEmpty(countryRegion))
                         {
-                            curReport.Country = countryRegion;
+                            continue;
+                        }
+                        else if (countryRegion != curReport.Country)
+                        {
                             curReport = new TotalReport
                             {
                                 Country = countryRegion,
                             };
-                            reports.Add(curReport);
+                            list.Add(curReport);
                         }
                         curReport.FileDates.Add(reader["FileDate"].ToString());
                         curReport.TotalConfirmeds.Add((int)reader["TotalConfirmed"]);
@@ -650,7 +602,6 @@ namespace DataClasses
                         curReport.NewRecovereds.Add((int)reader["NewRecovered"]);
                         curReport.NewDeaths.Add((int)reader["NewDeaths"]);
                         curReport.NewActives.Add((int)reader["NewActive"]);
-                        //System.Diagnostics.Debug.WriteLine($"{curReport.Country},{curReport.State},{curReport.FileDates.Count},{curReport.FileDates.Max(i => DateTime.Parse(i))},{curReport.TotalConfirmeds.Count},{curReport.TotalConfirmeds.Max()}");
                     }
                     reader.Close();
                 }
@@ -661,7 +612,7 @@ namespace DataClasses
             }
         }
 
-        public void GlobalTotalsRead(List<TotalReport> reports)
+        public void GlobalTotalsRead(List<TotalReport> list)
         {
             try
             {
@@ -681,7 +632,7 @@ namespace DataClasses
                     {
                         Country = GLOBAL_NAME
                     };
-                    reports.Add(curReport);
+                    list.Add(curReport);
                     while (reader.Read())
                     {
                         curReport.FileDates.Add(reader["FileDate"].ToString());
@@ -693,7 +644,6 @@ namespace DataClasses
                         curReport.NewRecovereds.Add((int)reader["NewRecovered"]);
                         curReport.NewDeaths.Add((int)reader["NewDeaths"]);
                         curReport.NewActives.Add((int)reader["NewActive"]);
-                        //System.Diagnostics.Debug.WriteLine($"{curReport.Country},{curReport.State},{curReport.FileDates.Count},{curReport.FileDates.Max(i => DateTime.Parse(i))},{curReport.TotalConfirmeds.Count},{curReport.TotalConfirmeds.Max()}");
                     }
                     reader.Close();
                 }
@@ -739,7 +689,6 @@ namespace DataClasses
                             totalConfirmed, totalRecovered, totalDeaths, totalActive,
                             newConfirmed, newRecovered, newDeaths, newActive, report.Latitude, report.Longitude, report.FIPS);
                         list.Add(item);
-                        //System.Diagnostics.Debug.WriteLine($"{fileDate},{totalConfirmed},{totalRecovered},{totalDeaths}");
                     }
                 }
                 reader.Close();
@@ -786,7 +735,6 @@ namespace DataClasses
                             totalConfirmed, totalRecovered, totalDeaths, totalActive,
                             newConfirmed, newRecovered, newDeaths, newActive, report.Latitude, report.Longitude, report.FIPS);
                         list.Add(item);
-                        //System.Diagnostics.Debug.WriteLine($"{fileDate},{totalConfirmed},{totalRecovered},{totalDeaths}");
                     }
                 }
                 reader.Close();
@@ -832,7 +780,6 @@ namespace DataClasses
                             totalConfirmed, totalRecovered, totalDeaths, totalActive,
                             newConfirmed, newRecovered, newDeaths, newActive, report.Latitude, report.Longitude, report.FIPS);
                         list.Add(item);
-                        //System.Diagnostics.Debug.WriteLine($"{fileDate},{totalConfirmed},{totalRecovered},{totalDeaths}");
                     }
                 }
                 reader.Close();

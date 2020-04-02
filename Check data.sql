@@ -7,3 +7,4 @@ order by FileDate, CountryRegion, StateProvince
 select min(FileDate), max(FileDate) from DailyReportAll
 
 exec spCountryRegionStateProvinceTotalsRead 'US','Washington'
+exec spCountryRegionTotalsRead

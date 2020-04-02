@@ -2,6 +2,12 @@
 
 namespace DataClasses
 {
+    /// <summary>
+    /// DailyReport is a class that contains the counts for a Country, State for a given date
+    /// Each DailyReport has the Country,State,and totals for that one date
+    /// A DailyReport is built during import for each record and written to the database
+    /// List<DailyReport> is built from a selected TotalReport's Country,State and is used during DataGrid display
+    /// </summary>
     public class DailyReport
     {
         public DailyReport() { }

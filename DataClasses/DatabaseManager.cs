@@ -53,14 +53,6 @@ namespace DataClasses
             reports.Clear();
         }
 
-        //public void ReadData()
-        //{
-        //    using (var db = new DatabaseConnection())
-        //    {
-        //        db.ReportsRead(this);
-        //    }
-        //}
-
         public static bool ImportSwaps(string path, DateTime datetime)
         {
             return Replacements.Refresh(path, datetime);
@@ -320,31 +312,6 @@ namespace DataClasses
                 }
             }
         }
-
-        //public static void AddGlobalSums()
-        //{
-        //    // Get a list by date rolled up across all regions
-        //    var sums = reports
-        //        .GroupBy(i => i.FileDate)
-        //        .Select(g => new DailyReport
-        //        {
-        //            Country = GLOBAL_NAME,
-        //            FileDate = g.Key,
-        //            TotalConfirmed = g.Sum(s => s.TotalConfirmed),
-        //            TotalActive = g.Sum(s => s.TotalActive),
-        //            TotalRecovered = g.Sum(s => s.TotalRecovered),
-        //            TotalDeaths = g.Sum(s => s.TotalDeaths),
-        //            NewConfirmed = g.Sum(s => s.NewConfirmed),
-        //            NewActive = g.Sum(s => s.NewActive),
-        //            NewRecovered = g.Sum(s => s.NewRecovered),
-        //            NewDeaths = g.Sum(s => s.NewDeaths)
-        //        }).ToList();
-
-        //    foreach (DailyReport sum in sums)
-        //    {
-        //        reports.Add(sum);
-        //    }
-        //}
 
         #endregion
     }

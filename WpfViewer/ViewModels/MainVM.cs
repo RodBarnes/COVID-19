@@ -57,8 +57,6 @@ namespace Viewer.ViewModels
             InitMessagePanel();
             InitMainPanel();
 
-            //DailyReports = new DailyReports();
-
             //ImportData();
             ReadData();
         }
@@ -88,7 +86,7 @@ namespace Viewer.ViewModels
 
         #endregion
 
-        #region General Properties
+        #region Main Properties
 
         public string GitCommand { get; set; }
         public string RepositoryPath { get; set; }
@@ -166,17 +164,6 @@ namespace Viewer.ViewModels
             }
         }
 
-        //private DailyReports dailyReports;
-        //public DailyReports DailyReports
-        //{
-        //    get => dailyReports;
-        //    set
-        //    {
-        //        dailyReports = value;
-        //        NotifyPropertyChanged();
-        //    }
-        //}
-
         private ObservableCollection<TotalReport> totalReports;
         public ObservableCollection<TotalReport> TotalReports
         {
@@ -198,7 +185,6 @@ namespace Viewer.ViewModels
                 NotifyPropertyChanged();
                 if (selectedTotalReport != null)
                 {
-                    //GenerateDailyCounts(selectedTotalReport);
                     switch (selectedView.DisplayName)
                     {
                         case TOTAL_LINE_SELECTOR:
@@ -352,7 +338,7 @@ namespace Viewer.ViewModels
 
         #endregion
 
-        #region ShowChart Methods
+        #region Chart Methods
 
         private void ShowLineChart(TotalReport report)
         {
@@ -662,17 +648,5 @@ namespace Viewer.ViewModels
         }
 
         #endregion
-    }
-
-    public class Selection
-    {
-        public Selection(string displayName, string chartname)
-        {
-            DisplayName = displayName;
-            ChartName = chartname;
-        }
-
-        public string DisplayName { get; set; }
-        public string ChartName { get; set; }
     }
 }

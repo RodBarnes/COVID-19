@@ -2,6 +2,12 @@
 
 namespace DataClasses
 {
+    /// <summary>
+    /// TotalReport is a class that contains the list of daily dates and totals for a Country, State for a given date
+    /// Each TotalReport has the Country, State, and totals for all dates for each dimension
+    /// List<TotalReport> is built from the database to be used to display the County,State in the list and the data for the charts
+    /// A TotalReport (SelectedTotalReport) is used when displaying data in a chart
+    /// </summary>
     public class TotalReport
     {
         public TotalReport() { }
