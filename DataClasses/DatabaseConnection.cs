@@ -533,8 +533,6 @@ namespace DataClasses
                         }
                         else if (stateProvince != curReport.State || countryRegion != curReport.Country)
                         {
-                            curReport.Country = countryRegion;
-                            curReport.State = stateProvince;
                             curReport = new TotalReport
                             {
                                 Country = countryRegion,
