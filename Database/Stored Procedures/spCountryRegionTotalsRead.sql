@@ -16,6 +16,6 @@ SELECT
 FROM DailyReportAll
 WHERE (@country IS NULL OR @country = CountryRegion)
 GROUP BY CountryRegion, FileDate
-ORDER BY CountryRegion, FileDate
+ORDER BY CountryRegion ASC, FileDate ASC
 
 RETURN 0

@@ -19,6 +19,6 @@ FROM DailyReportAll
 WHERE (@country IS NULL AND @state IS NULL)
  OR (@country = CountryRegion AND @state = StateProvince)
 GROUP BY CountryRegion, StateProvince, FileDate
-ORDER BY CountryRegion, StateProvince, FileDate
+ORDER BY CountryRegion ASC, StateProvince ASC, FileDate ASC
 
 RETURN 0

@@ -13,6 +13,6 @@ SELECT
  SUM(NewActive) AS NewActive
 FROM DailyReportAll
 GROUP BY FileDate
-ORDER BY FileDate
+ORDER BY FileDate ASC
 
 RETURN 0
