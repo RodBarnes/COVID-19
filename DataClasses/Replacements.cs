@@ -43,14 +43,18 @@ namespace DataClasses
 
         public void Swap(ref string country, ref string state, ref string county)
         {
+            bool matched = false;
+
             foreach (var rep in list)
             {
+
                 switch (rep.ReplacementType)
                 {
                     case 1:
                         if (country == rep.FromCountry)
                         {
                             country = rep.ToCountry;
+                            matched = true;
                         }
                         break;
                     case 2:
@@ -58,6 +62,7 @@ namespace DataClasses
                         {
                             country = rep.ToCountry;
                             state = rep.ToState;
+                            matched = true;
                         }
                         break;
                     case 3:
@@ -66,11 +71,14 @@ namespace DataClasses
                             country = rep.ToCountry;
                             state = rep.ToState;
                             county = rep.ToDistrict;
+                            matched = true;
                         }
                         break;
                     default:
                         break;
                 }
+                if (matched)
+                    break;
             }
         }
 
