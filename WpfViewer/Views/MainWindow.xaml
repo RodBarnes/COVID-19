@@ -68,7 +68,7 @@
             </lvc:CartesianChart>
 
             <DataGrid x:Name="DataGridPanel" Grid.Column="2" Grid.Row="2" Visibility="{Binding DataGridVisibility}"
-                      ItemsSource="{Binding CountryDailyReports}"
+                      ItemsSource="{Binding DailyTotalReports}"
                       SelectedItem="{Binding SelectedDailyReport}"
                       AutoGenerateColumns="False"
                       IsReadOnly="True"

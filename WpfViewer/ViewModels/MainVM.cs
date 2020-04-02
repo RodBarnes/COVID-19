@@ -96,6 +96,7 @@ namespace Viewer.ViewModels
         public string PullData { get; set; }
         public string ReplacementsPath { get; set; }
         public DateTime LastImportDateTime { get; set; }
+        public DateTime LastReplacementDateTime { get; set; }
 
         private ObservableCollection<Selection> viewSelections;
         public ObservableCollection<Selection> ViewSelections
@@ -144,7 +145,7 @@ namespace Viewer.ViewModels
         }
 
         private ObservableCollection<DailyReport> regionDailyReports;
-        public ObservableCollection<DailyReport> CountryDailyReports
+        public ObservableCollection<DailyReport> DailyTotalReports
         {
             get => regionDailyReports;
             set
@@ -217,6 +218,33 @@ namespace Viewer.ViewModels
                     }
                 }
             }
+        }
+
+        #endregion
+
+        #region Main Methods
+
+        private void InitMainPanel()
+        {
+            RefreshDataCommand = new Command(RefreshDataAction);
+
+            ViewSelections = new ObservableCollection<Selection>
+            {
+                new Selection(TOTAL_LINE_SELECTOR, "Total Cases: Confirmed, Recovered, Deaths"),
+                new Selection(ACTIVE_AREA_SELECTOR, "Total Cases: Active, Recovered, Deaths"),
+                new Selection(NEW_BAR_SELECTOR, "New Cases: Active, Recovered, Deaths"),
+                new Selection(DAILY_DATAGRID_SELECTOR, "Daily Case Counts")
+            };
+            SelectedView = viewSelections[0];
+        }
+
+        private void ReadData()
+        {
+            DailyReports.ReadData();
+            var list = DailyReports.ReadTotalReports();
+            TotalReports = new ObservableCollection<TotalReport>(list);
+
+            SelectedTotalReport = TotalReports.Where(a => a.Country == GLOBAL_NAME).FirstOrDefault();
         }
 
         #endregion
@@ -324,86 +352,7 @@ namespace Viewer.ViewModels
 
         #endregion
 
-        #region Methods
-
-        private void InitMainPanel()
-        {
-            RefreshDataCommand = new Command(RefreshDataAction);
-
-            ViewSelections = new ObservableCollection<Selection>
-            {
-                new Selection(TOTAL_LINE_SELECTOR, "Total Cases: Confirmed, Recovered, Deaths"),
-                new Selection(ACTIVE_AREA_SELECTOR, "Total Cases: Active, Recovered, Deaths"),
-                new Selection(NEW_BAR_SELECTOR, "New Cases: Active, Recovered, Deaths"),
-                new Selection(DAILY_DATAGRID_SELECTOR, "Daily Case Counts")
-            };
-            SelectedView = viewSelections[0];
-        }
-
-        private void SetDisplayView(ViewType type)
-        {
-            switch(type)
-            {
-                case ViewType.LineSeriesChart:
-                    SeriesChartVisibility = VISIBILITY_VISIBLE;
-                    ColumnChartVisibility = VISIBILITY_COLLAPSED;
-                    DataGridVisibility = VISIBILITY_COLLAPSED;
-                    break;
-                case ViewType.AreaSeriesChart:
-                    SeriesChartVisibility = VISIBILITY_VISIBLE;
-                    ColumnChartVisibility = VISIBILITY_COLLAPSED;
-                    DataGridVisibility = VISIBILITY_COLLAPSED;
-                    break;
-                case ViewType.StackedColumnChart:
-                    SeriesChartVisibility = VISIBILITY_COLLAPSED;
-                    ColumnChartVisibility = VISIBILITY_VISIBLE;
-                    DataGridVisibility = VISIBILITY_COLLAPSED;
-                    break;
-                case ViewType.DataGrid:
-                    SeriesChartVisibility = VISIBILITY_COLLAPSED;
-                    ColumnChartVisibility = VISIBILITY_COLLAPSED;
-                    DataGridVisibility = VISIBILITY_VISIBLE;
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        private void ReadData()
-        {
-            DailyReports.ReadData();
-            //DailyReports.AddGlobalSums();
-            GetTotalReports();
-
-            SelectedTotalReport = TotalReports.Where(a => a.Country == GLOBAL_NAME).FirstOrDefault();
-        }
-
-        private void PullLastestData()
-        {
-            var result = Utility.RunCommand(GitCommand, RepositoryPath);
-            if (!result.Contains("Already up to date."))
-            {
-                ShowMessagePanel("Result", result);
-            }
-        }
-
-        private void ImportData(bool clearAllData = false)
-        {
-            worker = new BackgroundWorker
-            {
-                WorkerReportsProgress = true,
-                WorkerSupportsCancellation = true
-            };
-            worker.DoWork += Background_LoadDataDoWork;
-            worker.ProgressChanged += Background_LoadDataProgressChanged;
-            worker.RunWorkerCompleted += Background_LoadDataRunWorkerCompleted;
-            worker.WorkerReportsProgress = true;
-            worker.WorkerSupportsCancellation = true;
-            if (!worker.IsBusy)
-            {
-                worker.RunWorkerAsync(clearAllData);
-            }
-        }
+        #region ShowChart Methods
 
         private void ShowLineChart(TotalReport report)
         {
@@ -500,148 +449,68 @@ namespace Viewer.ViewModels
 
         private void ShowDailyDataGrid(TotalReport report)
         {
-            //var list = GetFilteredList(report);
-            List<DailyReport> list;
-            using (var db = new DatabaseConnection())
-            {
-                if (string.IsNullOrEmpty(report.Country) || report.Country == "(GLOBAL)")
-                {
-                    list = db.GlobalDailiesRead(report);
-                }
-                else if (string.IsNullOrEmpty(report.State))
-                {
-                    list = db.CountryRegionDailiesRead(report);
-                }
-                else
-                {
-                    list = db.CountryRegionStateProvinceDailiesRead(report);
-                }
-            }
-            CountryDailyReports = new ObservableCollection<DailyReport>(list);
+            var list = DailyReports.ReadDailyTotalsForReport(report);
+            DailyTotalReports = new ObservableCollection<DailyReport>(list);
         }
 
-        //private void GenerateDailyCounts(TotalReport report)
-        //{
-        //    var list = GetFilteredList(report);
-
-        //    if (report.TotalConfirmed == null)
-        //    {
-        //        report.TotalConfirmed = list
-        //            .GroupBy(r => r.FileDate)
-        //            .OrderBy(g => g.Key)
-        //            .Select(g => g.Sum(i => i.TotalConfirmed));
-        //    }
-        //    if (report.TotalActive == null)
-        //    {
-        //        report.TotalActive = list
-        //            .GroupBy(r => r.FileDate)
-        //            .OrderBy(g => g.Key)
-        //            .Select(g => g.Sum(i => i.TotalActive));
-        //    }
-        //    if (report.TotalRecovered == null)
-        //    {
-        //        report.TotalRecovered = list
-        //            .GroupBy(r => r.FileDate)
-        //            .OrderBy(g => g.Key)
-        //            .Select(g => g.Sum(i => i.TotalRecovered));
-        //    }
-        //    if (report.TotalDeaths == null)
-        //    {
-        //        report.TotalDeaths = list
-        //            .GroupBy(r => r.FileDate)
-        //            .OrderBy(g => g.Key)
-        //            .Select(g => g.Sum(i => i.TotalDeaths));
-        //    }
-        //    if (report.FileDates == null)
-        //    {
-        //        report.FileDates = list
-        //            .GroupBy(r => r.FileDate)
-        //            .OrderBy(g => g.Key)
-        //            .Select(g => g.Key.ToString(SHORT_DATE_FORMAT));
-        //    }
-        //    if (report.NewConfirmed == null)
-        //    {
-        //        report.NewConfirmed = list
-        //            .GroupBy(r => r.FileDate)
-        //            .OrderBy(g => g.Key)
-        //            .Select(g => g.Sum(i => i.NewConfirmed));
-        //    }
-        //    if (report.NewActive == null)
-        //    {
-        //        report.NewActive = list
-        //            .GroupBy(r => r.FileDate)
-        //            .OrderBy(g => g.Key)
-        //            .Select(g => g.Sum(i => i.NewActive));
-        //    }
-        //    if (report.NewRecovered == null)
-        //    {
-        //        report.NewRecovered = list
-        //            .GroupBy(r => r.FileDate)
-        //            .OrderBy(g => g.Key)
-        //            .Select(g => g.Sum(i => i.NewRecovered));
-        //    }
-        //    if (report.NewDeaths == null)
-        //    {
-        //        report.NewDeaths = list
-        //            .GroupBy(r => r.FileDate)
-        //            .OrderBy(g => g.Key)
-        //            .Select(g => g.Sum(i => i.NewDeaths));
-        //    }
-        //    if (report.FileDates == null)
-        //    {
-        //        report.FileDates = list
-        //            .GroupBy(r => r.FileDate)
-        //            .OrderBy(g => g.Key)
-        //            .Select(g => g.Key.ToString(SHORT_DATE_FORMAT));
-        //    }
-        //}
-
-        //private List<DailyReport> GetFilteredList(TotalReport report)
-        //{
-        //    List<DailyReport> list;
-
-        //    if (!string.IsNullOrEmpty(report.Country))
-        //    {
-        //        list = DailyReports.Where(r => r.Country == report.Country).ToList();
-        //        if (!string.IsNullOrEmpty(report.State))
-        //        {
-        //            list = list.Where(r => r.State == report.State).ToList();
-        //        }
-        //    }
-        //    else
-        //    {
-        //        list = DailyReports.ToList();
-        //    }
-
-        //    return list.OrderBy(r => r.FileDate).ThenBy(r => r.Country).ThenBy(r => r.State).ThenBy(r => r.County).ToList();
-        //}
-
-        private void GetTotalReports()
+        private void SetDisplayView(ViewType type)
         {
-            TotalReports = new ObservableCollection<TotalReport>();
-
-            using (var db = new DatabaseConnection())
+            switch (type)
             {
-                db.CountryRegionStateProvinceTotalsRead(TotalReports);
-                db.CountryRegionTotalsRead(TotalReports);
-                db.GlobalTotalsRead(TotalReports);
+                case ViewType.LineSeriesChart:
+                    SeriesChartVisibility = VISIBILITY_VISIBLE;
+                    ColumnChartVisibility = VISIBILITY_COLLAPSED;
+                    DataGridVisibility = VISIBILITY_COLLAPSED;
+                    break;
+                case ViewType.AreaSeriesChart:
+                    SeriesChartVisibility = VISIBILITY_VISIBLE;
+                    ColumnChartVisibility = VISIBILITY_COLLAPSED;
+                    DataGridVisibility = VISIBILITY_COLLAPSED;
+                    break;
+                case ViewType.StackedColumnChart:
+                    SeriesChartVisibility = VISIBILITY_COLLAPSED;
+                    ColumnChartVisibility = VISIBILITY_VISIBLE;
+                    DataGridVisibility = VISIBILITY_COLLAPSED;
+                    break;
+                case ViewType.DataGrid:
+                    SeriesChartVisibility = VISIBILITY_COLLAPSED;
+                    ColumnChartVisibility = VISIBILITY_COLLAPSED;
+                    DataGridVisibility = VISIBILITY_VISIBLE;
+                    break;
+                default:
+                    break;
             }
-            //// Get the list of reports for the combo box
-            //// by Country, State without regard to date
-            //var displayNames = DailyReports
-            //    .GroupBy(r => new
-            //    {
-            //        r.Country,
-            //        r.State
-            //    })
-            //    .Select(g => new TotalReport()
-            //    {
-            //        Country = g.Key.Country,
-            //        State = g.Key.State
-            //    })
-            //    .OrderBy(a => a.DisplayName);
+        }
 
-            //TotalReports = new ObservableCollection<TotalReport>(displayNames);
+        #endregion
+
+        #region Import Methods
+
+        private void ImportData(bool clearAllData = false)
+        {
+            worker = new BackgroundWorker
+            {
+                WorkerReportsProgress = true,
+                WorkerSupportsCancellation = true
+            };
+            worker.DoWork += Background_LoadDataDoWork;
+            worker.ProgressChanged += Background_LoadDataProgressChanged;
+            worker.RunWorkerCompleted += Background_LoadDataRunWorkerCompleted;
+            worker.WorkerReportsProgress = true;
+            worker.WorkerSupportsCancellation = true;
+            if (!worker.IsBusy)
+            {
+                worker.RunWorkerAsync(clearAllData);
+            }
+        }
+
+        private void PullLastestData()
+        {
+            var result = Utility.RunCommand(GitCommand, RepositoryPath);
+            if (!result.Contains("Already up to date."))
+            {
+                ShowMessagePanel("Result", result);
+            }
         }
 
         private List<string> GetFileList(string path, DateTime? dateTime)
@@ -681,13 +550,18 @@ namespace Viewer.ViewModels
             }
 
             ShowBusyPanel("Checking for new data...");
+            if (DailyReports.ImportSwaps(ReplacementsPath, LastReplacementDateTime))
+            {
+                // Replacements are new; tell the user a full refresh may be needed
+                ShowMessagePanel("New replacement data", "New replacement data was found and read. " +
+                    "This will require a full refresh to ensure that the swaps are applied to older data.");
+            }
 
             // Create a list of files to import
             List<string> fileList = GetFileList(DataPath, LastImportDateTime);
 
             if (fileList.Count > 0)
             {
-                DailyReports.ImportSwaps(ReplacementsPath);
                 if (clearAllData)
                 {
                     DailyReports.ClearAll(CLEAR_SCRIPT_PATH);
@@ -759,7 +633,8 @@ namespace Viewer.ViewModels
                 new Setting(nameof(PullData), TRUE_LITERAL),
                 new Setting(nameof(DataPath), $@"{BASE_PATH}\csse_covid_19_data\csse_covid_19_daily_reports"),
                 new Setting(nameof(ReplacementsPath), $@"{dir}\Replacements.csv"),
-                new Setting(nameof(LastImportDateTime), BASE_DATE)
+                new Setting(nameof(LastImportDateTime), BASE_DATE),
+                new Setting(nameof(LastReplacementDateTime), BASE_DATE)
             };
             Utility.LoadSettings(list);
             GitCommand = list[nameof(GitCommand)].Value;
@@ -768,6 +643,7 @@ namespace Viewer.ViewModels
             DataPath = list[nameof(DataPath)].Value;
             ReplacementsPath = list[nameof(ReplacementsPath)].Value;
             LastImportDateTime = DateTime.Parse(list[nameof(LastImportDateTime)].Value);
+            LastReplacementDateTime = DateTime.Parse(list[nameof(LastReplacementDateTime)].Value);
         }
 
         private void SaveSettings()
@@ -779,7 +655,8 @@ namespace Viewer.ViewModels
                 new Setting(nameof(PullData), PullData),
                 new Setting(nameof(DataPath), DataPath),
                 new Setting(nameof(ReplacementsPath), ReplacementsPath),
-                new Setting(nameof(LastImportDateTime), LastImportDateTime.ToString())
+                new Setting(nameof(LastImportDateTime), LastImportDateTime.ToString()),
+                new Setting(nameof(LastReplacementDateTime), LastReplacementDateTime.ToString())
             };
             Utility.SaveSettings(list);
         }

@@ -58,32 +58,7 @@ namespace DataClasses
                 throw new Exception($"ClearDataFromDate failed: LastImportDate='{lastImportDate}'\nsql={cmd.CommandText}.");
         }
 
-        public void CountryInsert(string country, DateTime fileDate)
-        {
-            try
-            {
-                // Check name tables
-                var countryRegionId = CountryRegionManage(country);
-
-                // Insert Country-only DailyReport
-                int rows;
- 
-                var sql = "INSERT INTO DailyReport(CountryRegionId, StateProvinceId, CountyDistrictId, FileDate, LastUpdate) " +
-                    "VALUES (@countryRegionId, 1, 1, @fileDate, @fileDate)";
-                var cmd = new SqlCommand(sql, sqlConn);
-                cmd.Parameters.AddWithValue("@countryRegionId", countryRegionId);
-                cmd.Parameters.AddWithValue("@fileDate", fileDate);
-                //foreach (SqlParameter param in cmd.Parameters)
-                //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
-                rows = cmd.ExecuteNonQuery();
-                if (rows < 0)
-                    throw new Exception($"CountryInsert failed: Report='{country}'\nsql={cmd.CommandText}.");
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"CountryInsert failed: Report='{country}'.", ex);
-            }
-        }
+        #region DailyReport Methods
 
         public void ReportInsert(DailyReport report)
         {
@@ -327,13 +302,10 @@ namespace DataClasses
         {
             try
             {
-                var sql = $"SELECT cr.[Name] as CountryRegion, sp.[Name] as StateProvince, cd.[Name] as CountyDistrict, " +
-                    "dr.FileDate, dr.LastUpdate, dr.TotalConfirmed, dr.TotalRecovered, dr.TotalDeaths, dr.TotalActive, " +
-                    "dr.NewConfirmed, dr.NewRecovered, dr.NewDeaths, dr.NewActive, dr.Latitude, dr.Longitude, dr.fips " +
-                    $"FROM DailyReport dr " +
-                    "JOIN CountryRegion cr ON cr.CountryRegionId=dr.CountryRegionId " +
-                    "JOIN StateProvince sp ON sp.StateProvinceId=dr.StateProvinceId " +
-                    "JOIN CountyDistrict cd ON cd.CountyDistrictId=dr.CountyDistrictId";
+                var sql = $"SELECT CountryRegion, StateProvince, CountyDistrict, " +
+                    "FileDate, LastUpdate, TotalConfirmed, TotalRecovered, TotalDeaths, TotalActive, " +
+                    "NewConfirmed, NewRecovered, NewDeaths, NewActive, Latitude, Longitude, FIPS " +
+                    $"FROM DailyReportAll";
                 var cmd = new SqlCommand(sql, sqlConn);
                 //foreach (SqlParameter param in cmd.Parameters)
                 //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
@@ -373,6 +345,37 @@ namespace DataClasses
             catch (Exception ex)
             {
                 throw new Exception($"ReportsRead failed.", ex);
+            }
+        }
+
+        #endregion
+
+        #region Dimension Methods
+
+        public void CountryInsert(string country, DateTime fileDate)
+        {
+            try
+            {
+                // Check name tables
+                var countryRegionId = CountryRegionManage(country);
+
+                // Insert Country-only DailyReport
+                int rows;
+
+                var sql = "INSERT INTO DailyReport(CountryRegionId, StateProvinceId, CountyDistrictId, FileDate, LastUpdate) " +
+                    "VALUES (@countryRegionId, 1, 1, @fileDate, @fileDate)";
+                var cmd = new SqlCommand(sql, sqlConn);
+                cmd.Parameters.AddWithValue("@countryRegionId", countryRegionId);
+                cmd.Parameters.AddWithValue("@fileDate", fileDate);
+                //foreach (SqlParameter param in cmd.Parameters)
+                //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
+                rows = cmd.ExecuteNonQuery();
+                if (rows < 0)
+                    throw new Exception($"CountryInsert failed: Report='{country}'\nsql={cmd.CommandText}.");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"CountryInsert failed: Report='{country}'.", ex);
             }
         }
 
@@ -577,7 +580,11 @@ namespace DataClasses
             return id;
         }
 
-        public void CountryRegionStateProvinceTotalsRead(ObservableCollection<TotalReport> reports)
+        #endregion
+
+        #region Total Methods
+
+        public void CountryRegionStateProvinceTotalsRead(List<TotalReport> reports)
         {
             try
             {
@@ -633,7 +640,7 @@ namespace DataClasses
             }
         }
 
-        public void CountryRegionTotalsRead(ObservableCollection<TotalReport> reports)
+        public void CountryRegionTotalsRead(List<TotalReport> reports)
         {
             try
             {
@@ -682,7 +689,7 @@ namespace DataClasses
             }
         }
 
-        public void GlobalTotalsRead(ObservableCollection<TotalReport> reports)
+        public void GlobalTotalsRead(List<TotalReport> reports)
         {
             try
             {
@@ -871,6 +878,8 @@ namespace DataClasses
 
             return list;
         }
+
+        #endregion
 
         #region Helpers
 

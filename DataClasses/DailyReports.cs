@@ -64,9 +64,44 @@ namespace DataClasses
             }
         }
 
-        public void ImportSwaps(string path)
+        public bool ImportSwaps(string path, DateTime datetime)
         {
-            Replacements.Refresh(path);
+            return Replacements.Refresh(path, datetime);
+        }
+
+        public List<DailyReport> ReadDailyTotalsForReport(TotalReport report)
+        {
+            List<DailyReport> list = new List<DailyReport>();
+            using (var db = new DatabaseConnection())
+            {
+                if (string.IsNullOrEmpty(report.Country) || report.Country == "(GLOBAL)")
+                {
+                    list = db.GlobalDailiesRead(report);
+                }
+                else if (string.IsNullOrEmpty(report.State))
+                {
+                    list = db.CountryRegionDailiesRead(report);
+                }
+                else
+                {
+                    list = db.CountryRegionStateProvinceDailiesRead(report);
+                }
+            }
+
+            return list;
+        }
+
+        public List<TotalReport> ReadTotalReports()
+        {
+            var list = new List<TotalReport>();
+            using (var db = new DatabaseConnection())
+            {
+                db.CountryRegionStateProvinceTotalsRead(list);
+                db.CountryRegionTotalsRead(list);
+                db.GlobalTotalsRead(list);
+            }
+
+            return list;
         }
 
         public void ImportData(string filePath, BackgroundWorker worker = null, double maxProgressValue = 0)

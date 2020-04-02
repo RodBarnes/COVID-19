@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using Common;
 
 namespace DataClasses
@@ -12,21 +14,30 @@ namespace DataClasses
 
         #region Methods
 
-        public void Refresh(string path)
+        public bool Refresh(string path, DateTime datetime)
         {
-            list.Clear();
+            var refresh = false;
 
-            using (var parser = new TextFieldParser(path))
+            var fileWriteTime = File.GetLastWriteTime(path);
+            if (fileWriteTime > datetime)
             {
-                parser.SetDelimiters(",");
-                parser.HasFieldsEnclosedInQuotes = true;
-                do
+                refresh = true;
+                list.Clear();
+
+                using (var parser = new TextFieldParser(path))
                 {
-                    var fields = parser.ReadFields();
-                    list.Add(new Replacement(fields));
+                    parser.SetDelimiters(",");
+                    parser.HasFieldsEnclosedInQuotes = true;
+                    do
+                    {
+                        var fields = parser.ReadFields();
+                        list.Add(new Replacement(fields));
+                    }
+                    while (!parser.EndOfData);
                 }
-                while (!parser.EndOfData);
             }
+
+            return refresh;
         }
 
         public void Swap(ref string country, ref string state, ref string county)
