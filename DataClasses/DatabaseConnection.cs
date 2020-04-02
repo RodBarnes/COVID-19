@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data;
 using System.Data.SqlClient;
 using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace DataClasses
 {
@@ -221,7 +226,7 @@ namespace DataClasses
                 cmd.Parameters.AddWithValue("@fileDate", fileDate);
                 //foreach (SqlParameter param in cmd.Parameters)
                 //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
-                SqlDataReader reader = cmd.ExecuteReader();
+                var reader = cmd.ExecuteReader();
                 if (reader == null)
                 {
                     throw new Exception($"ReportsRead failed: reader={reader}\nsql={cmd.CommandText}.");
@@ -281,7 +286,7 @@ namespace DataClasses
                 cmd.Parameters.AddWithValue("@fileDate", fileDate);
                 //foreach (SqlParameter param in cmd.Parameters)
                 //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
-                SqlDataReader reader = cmd.ExecuteReader();
+                var reader = cmd.ExecuteReader();
                 if (reader == null)
                 {
                     throw new Exception($"ReportReadPrevious failed: reader={reader}\nsql={cmd.CommandText}.");
@@ -332,7 +337,7 @@ namespace DataClasses
                 var cmd = new SqlCommand(sql, sqlConn);
                 //foreach (SqlParameter param in cmd.Parameters)
                 //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
-                SqlDataReader reader = cmd.ExecuteReader();
+                var reader = cmd.ExecuteReader();
                 if (reader == null)
                 {
                     throw new Exception($"ReportsRead failed: reader={reader}\nsql={cmd.CommandText}.");
@@ -570,6 +575,301 @@ namespace DataClasses
             }
 
             return id;
+        }
+
+        public void CountryRegionStateProvinceTotalsRead(ObservableCollection<TotalReport> reports)
+        {
+            try
+            {
+                var procedure = "spCountryRegionStateProvinceTotalsRead";
+                var cmd = new SqlCommand(procedure, sqlConn)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+                var reader = cmd.ExecuteReader();
+                if (reader == null)
+                {
+                    throw new Exception($"CountryRegionStateProvinceTotalsRead failed: reader={reader}\nsql={cmd.CommandText}.");
+                }
+                else
+                {
+                    var curReport = new TotalReport();
+                    while (reader.Read())
+                    {
+                        var countryRegion = SqlStringRead(reader["CountryRegion"].ToString());
+                        var stateProvince = SqlStringRead(reader["StateProvince"].ToString());
+                        if (string.IsNullOrEmpty(stateProvince))
+                        {
+                            continue;
+                        }
+                        else if (stateProvince != curReport.State || countryRegion != curReport.Country)
+                        {
+                            curReport.Country = countryRegion;
+                            curReport.State = stateProvince;
+                            curReport = new TotalReport
+                            {
+                                Country = countryRegion,
+                                State = stateProvince
+                            };
+                            reports.Add(curReport);
+                        }
+                        curReport.FileDates.Add(reader["FileDate"].ToString());
+                        curReport.TotalConfirmeds.Add((int)reader["TotalConfirmed"]);
+                        curReport.TotalRecovereds.Add((int)reader["TotalRecovered"]);
+                        curReport.TotalDeaths.Add((int)reader["TotalDeaths"]);
+                        curReport.TotalActives.Add((int)reader["TotalActive"]);
+                        curReport.NewConfirmeds.Add((int)reader["NewConfirmed"]);
+                        curReport.NewRecovereds.Add((int)reader["NewRecovered"]);
+                        curReport.NewDeaths.Add((int)reader["NewDeaths"]);
+                        curReport.NewActives.Add((int)reader["NewActive"]);
+                        System.Diagnostics.Debug.WriteLine($"{curReport.Country},{curReport.State},{curReport.FileDates.Count},{curReport.FileDates.Max(i => DateTime.Parse(i))},{curReport.TotalConfirmeds.Count},{curReport.TotalConfirmeds.Max()}");
+                    }
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"CountryRegionStateProvinceTotalsRead failed.", ex);
+            }
+        }
+
+        public void CountryRegionTotalsRead(ObservableCollection<TotalReport> reports)
+        {
+            try
+            {
+                var procedure = "spCountryRegionTotalsRead";
+                var cmd = new SqlCommand(procedure, sqlConn)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+                var reader = cmd.ExecuteReader();
+                if (reader == null)
+                {
+                    throw new Exception($"CountryRegionTotalsRead failed: reader={reader}\nsql={cmd.CommandText}.");
+                }
+                else
+                {
+                    var curReport = new TotalReport();
+                    while (reader.Read())
+                    {
+                        var countryRegion = SqlStringRead(reader["CountryRegion"].ToString());
+                        if (countryRegion != curReport.Country)
+                        {
+                            curReport.Country = countryRegion;
+                            curReport = new TotalReport
+                            {
+                                Country = countryRegion,
+                            };
+                            reports.Add(curReport);
+                        }
+                        curReport.FileDates.Add(reader["FileDate"].ToString());
+                        curReport.TotalConfirmeds.Add((int)reader["TotalConfirmed"]);
+                        curReport.TotalRecovereds.Add((int)reader["TotalRecovered"]);
+                        curReport.TotalDeaths.Add((int)reader["TotalDeaths"]);
+                        curReport.TotalActives.Add((int)reader["TotalActive"]);
+                        curReport.NewConfirmeds.Add((int)reader["NewConfirmed"]);
+                        curReport.NewRecovereds.Add((int)reader["NewRecovered"]);
+                        curReport.NewDeaths.Add((int)reader["NewDeaths"]);
+                        curReport.NewActives.Add((int)reader["NewActive"]);
+                        System.Diagnostics.Debug.WriteLine($"{curReport.Country},{curReport.State},{curReport.FileDates.Count},{curReport.FileDates.Max(i => DateTime.Parse(i))},{curReport.TotalConfirmeds.Count},{curReport.TotalConfirmeds.Max()}");
+                    }
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"CountryRegionTotalsRead failed.", ex);
+            }
+        }
+
+        public void GlobalTotalsRead(ObservableCollection<TotalReport> reports)
+        {
+            try
+            {
+                var procedure = "spGlobalTotalsRead";
+                var cmd = new SqlCommand(procedure, sqlConn)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+                var reader = cmd.ExecuteReader();
+                if (reader == null)
+                {
+                    throw new Exception($"GlobalTotalsRead failed: reader={reader}\nsql={cmd.CommandText}.");
+                }
+                else
+                {
+                    var curReport = new TotalReport
+                    {
+                        Country = "(GLOBAL)"
+                    };
+                    reports.Add(curReport);
+                    while (reader.Read())
+                    {
+                        curReport.FileDates.Add(reader["FileDate"].ToString());
+                        curReport.TotalConfirmeds.Add((int)reader["TotalConfirmed"]);
+                        curReport.TotalRecovereds.Add((int)reader["TotalRecovered"]);
+                        curReport.TotalDeaths.Add((int)reader["TotalDeaths"]);
+                        curReport.TotalActives.Add((int)reader["TotalActive"]);
+                        curReport.NewConfirmeds.Add((int)reader["NewConfirmed"]);
+                        curReport.NewRecovereds.Add((int)reader["NewRecovered"]);
+                        curReport.NewDeaths.Add((int)reader["NewDeaths"]);
+                        curReport.NewActives.Add((int)reader["NewActive"]);
+                        System.Diagnostics.Debug.WriteLine($"{curReport.Country},{curReport.State},{curReport.FileDates.Count},{curReport.FileDates.Max(i => DateTime.Parse(i))},{curReport.TotalConfirmeds.Count},{curReport.TotalConfirmeds.Max()}");
+                    }
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"GlobalTotalsRead failed.", ex);
+            }
+        }
+
+        public List<DailyReport> CountryRegionStateProvinceDailiesRead(TotalReport report)
+        {
+            var list = new List<DailyReport>();
+
+            try
+            {
+                var procedure = "spCountryRegionStateProvinceTotalsRead";
+                var cmd = new SqlCommand(procedure, sqlConn)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+                cmd.Parameters.AddWithValue("@country", SqlStringWrite(report.Country));
+                cmd.Parameters.AddWithValue("@state", SqlStringWrite(report.State));
+                //foreach (SqlParameter param in cmd.Parameters)
+                //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
+                var reader = cmd.ExecuteReader();
+                if (reader == null)
+                {
+                    throw new Exception($"CountryRegionStateProvinceDailiesRead failed: reader={reader}\nsql={cmd.CommandText}.");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        var fileDate = DateTime.Parse(reader["FileDate"].ToString());
+                        var totalConfirmed = (int)reader["TotalConfirmed"];
+                        var totalRecovered = (int)reader["TotalRecovered"];
+                        var totalDeaths = (int)reader["TotalDeaths"];
+                        var totalActive = (int)reader["TotalActive"];
+                        var newConfirmed = (int)reader["NewConfirmed"];
+                        var newRecovered = (int)reader["NewRecovered"];
+                        var newDeaths = (int)reader["NewDeaths"];
+                        var newActive = (int)reader["NewActive"];
+                        var item = new DailyReport(fileDate, report.Country, report.State, "", DateTime.Now,
+                            totalConfirmed, totalRecovered, totalDeaths, totalActive,
+                            newConfirmed, newRecovered, newDeaths, newActive, report.Latitude, report.Longitude, report.FIPS);
+                        list.Add(item);
+                        System.Diagnostics.Debug.WriteLine($"{fileDate},{totalConfirmed},{totalRecovered},{totalDeaths}");
+                    }
+                }
+                reader.Close();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"CountryRegionStateProvinceDailiesRead failed.", ex);
+            }
+
+            return list;
+        }
+
+        public List<DailyReport> CountryRegionDailiesRead(TotalReport report)
+        {
+            var list = new List<DailyReport>();
+
+            try
+            {
+                var procedure = "spCountryRegionTotalsRead";
+                var cmd = new SqlCommand(procedure, sqlConn)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+                cmd.Parameters.AddWithValue("@country", SqlStringWrite(report.Country));
+                //foreach (SqlParameter param in cmd.Parameters)
+                //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
+                var reader = cmd.ExecuteReader();
+                if (reader == null)
+                {
+                    throw new Exception($"CountryRegionDailiesRead failed: reader={reader}\nsql={cmd.CommandText}.");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        var fileDate = DateTime.Parse(reader["FileDate"].ToString());
+                        var totalConfirmed = (int)reader["TotalConfirmed"];
+                        var totalRecovered = (int)reader["TotalRecovered"];
+                        var totalDeaths = (int)reader["TotalDeaths"];
+                        var totalActive = (int)reader["TotalActive"];
+                        var newConfirmed = (int)reader["NewConfirmed"];
+                        var newRecovered = (int)reader["NewRecovered"];
+                        var newDeaths = (int)reader["NewDeaths"];
+                        var newActive = (int)reader["NewActive"];
+                        var item = new DailyReport(fileDate, report.Country, "", "", DateTime.Now,
+                            totalConfirmed, totalRecovered, totalDeaths, totalActive,
+                            newConfirmed, newRecovered, newDeaths, newActive, report.Latitude, report.Longitude, report.FIPS);
+                        list.Add(item);
+                        System.Diagnostics.Debug.WriteLine($"{fileDate},{totalConfirmed},{totalRecovered},{totalDeaths}");
+                    }
+                }
+                reader.Close();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"CountryRegionDailiesRead failed.", ex);
+            }
+
+            return list;
+        }
+
+        public List<DailyReport> GlobalDailiesRead(TotalReport report)
+        {
+            var list = new List<DailyReport>();
+
+            try
+            {
+                var procedure = "spGlobalTotalsRead";
+                var cmd = new SqlCommand(procedure, sqlConn)
+                {
+                    CommandType = CommandType.StoredProcedure
+                };
+                //foreach (SqlParameter param in cmd.Parameters)
+                //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
+                var reader = cmd.ExecuteReader();
+                if (reader == null)
+                {
+                    throw new Exception($"GlobalDailiesRead failed: reader={reader}\nsql={cmd.CommandText}.");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        var fileDate = DateTime.Parse(reader["FileDate"].ToString());
+                        var totalConfirmed = (int)reader["TotalConfirmed"];
+                        var totalRecovered = (int)reader["TotalRecovered"];
+                        var totalDeaths = (int)reader["TotalDeaths"];
+                        var totalActive = (int)reader["TotalActive"];
+                        var newConfirmed = (int)reader["NewConfirmed"];
+                        var newRecovered = (int)reader["NewRecovered"];
+                        var newDeaths = (int)reader["NewDeaths"];
+                        var newActive = (int)reader["NewActive"];
+                        var item = new DailyReport(fileDate, report.Country, "", "", DateTime.Now,
+                            totalConfirmed, totalRecovered, totalDeaths, totalActive,
+                            newConfirmed, newRecovered, newDeaths, newActive, report.Latitude, report.Longitude, report.FIPS);
+                        list.Add(item);
+                        System.Diagnostics.Debug.WriteLine($"{fileDate},{totalConfirmed},{totalRecovered},{totalDeaths}");
+                    }
+                }
+                reader.Close();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"GlobalDailiesRead failed.", ex);
+            }
+
+            return list;
         }
 
         #region Helpers

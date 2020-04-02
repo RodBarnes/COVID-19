@@ -59,7 +59,8 @@ namespace Viewer.ViewModels
 
             DailyReports = new DailyReports();
 
-            ImportData();
+            //ImportData();
+            ReadData();
         }
 
         ~MainVM()
@@ -196,7 +197,7 @@ namespace Viewer.ViewModels
                 NotifyPropertyChanged();
                 if (selectedTotalReport != null)
                 {
-                    GenerateDailyCounts(selectedTotalReport);
+                    //GenerateDailyCounts(selectedTotalReport);
                     switch (selectedView.DisplayName)
                     {
                         case TOTAL_LINE_SELECTOR:
@@ -371,8 +372,8 @@ namespace Viewer.ViewModels
         private void ReadData()
         {
             DailyReports.ReadData();
-            DailyReports.AddGlobalSums();
-            BuildTotalReports();
+            //DailyReports.AddGlobalSums();
+            GetTotalReports();
 
             SelectedTotalReport = TotalReports.Where(a => a.Country == GLOBAL_NAME).FirstOrDefault();
         }
@@ -413,14 +414,14 @@ namespace Viewer.ViewModels
                     Title = CONFIRMED_TITLE,
                     Stroke = Brushes.Yellow,
                     Fill = Brushes.LightYellow,
-                    Values = new ChartValues<int>(report.TotalActive)
+                    Values = new ChartValues<int>(report.TotalConfirmeds)
                 },
                 new LineSeries
                 {
                     Title = RECOVERED_TITLE,
                     Stroke = Brushes.Green,
                     Fill = Brushes.LightGreen,
-                    Values = new ChartValues<int>(report.TotalRecovered)
+                    Values = new ChartValues<int>(report.TotalRecovereds)
                 },
                 new LineSeries
                 {
@@ -444,14 +445,14 @@ namespace Viewer.ViewModels
                     Title = ACTIVE_TITLE,
                     Stroke = Brushes.Yellow,
                     Fill = Brushes.Yellow,
-                    Values = new ChartValues<int>(report.NewActive)
+                    Values = new ChartValues<int>(report.NewActives)
                 },
                 new StackedColumnSeries
                 {
                     Title = RECOVERED_TITLE,
                     Stroke = Brushes.Green,
                     Fill = Brushes.Green,
-                    Values = new ChartValues<int>(report.NewRecovered)
+                    Values = new ChartValues<int>(report.NewRecovereds)
                 },
                 new StackedColumnSeries
                 {
@@ -475,14 +476,14 @@ namespace Viewer.ViewModels
                     Title = ACTIVE_TITLE,
                     Stroke = Brushes.Yellow,
                     Fill = Brushes.LightYellow,
-                    Values = new ChartValues<int>(report.TotalActive)
+                    Values = new ChartValues<int>(report.TotalActives)
                 },
                 new StackedAreaSeries
                 {
                     Title = RECOVERED_TITLE,
                     Stroke = Brushes.Green,
                     Fill = Brushes.LightGreen,
-                    Values = new ChartValues<int>(report.TotalRecovered)
+                    Values = new ChartValues<int>(report.TotalRecovereds)
                 },
                 new StackedAreaSeries
                 {
@@ -499,125 +500,148 @@ namespace Viewer.ViewModels
 
         private void ShowDailyDataGrid(TotalReport report)
         {
-            var list = GetFilteredList(report);
-
+            //var list = GetFilteredList(report);
+            List<DailyReport> list;
+            using (var db = new DatabaseConnection())
+            {
+                if (string.IsNullOrEmpty(report.Country) || report.Country == "(GLOBAL)")
+                {
+                    list = db.GlobalDailiesRead(report);
+                }
+                else if (string.IsNullOrEmpty(report.State))
+                {
+                    list = db.CountryRegionDailiesRead(report);
+                }
+                else
+                {
+                    list = db.CountryRegionStateProvinceDailiesRead(report);
+                }
+            }
             CountryDailyReports = new ObservableCollection<DailyReport>(list);
         }
 
-        private void GenerateDailyCounts(TotalReport report)
+        //private void GenerateDailyCounts(TotalReport report)
+        //{
+        //    var list = GetFilteredList(report);
+
+        //    if (report.TotalConfirmed == null)
+        //    {
+        //        report.TotalConfirmed = list
+        //            .GroupBy(r => r.FileDate)
+        //            .OrderBy(g => g.Key)
+        //            .Select(g => g.Sum(i => i.TotalConfirmed));
+        //    }
+        //    if (report.TotalActive == null)
+        //    {
+        //        report.TotalActive = list
+        //            .GroupBy(r => r.FileDate)
+        //            .OrderBy(g => g.Key)
+        //            .Select(g => g.Sum(i => i.TotalActive));
+        //    }
+        //    if (report.TotalRecovered == null)
+        //    {
+        //        report.TotalRecovered = list
+        //            .GroupBy(r => r.FileDate)
+        //            .OrderBy(g => g.Key)
+        //            .Select(g => g.Sum(i => i.TotalRecovered));
+        //    }
+        //    if (report.TotalDeaths == null)
+        //    {
+        //        report.TotalDeaths = list
+        //            .GroupBy(r => r.FileDate)
+        //            .OrderBy(g => g.Key)
+        //            .Select(g => g.Sum(i => i.TotalDeaths));
+        //    }
+        //    if (report.FileDates == null)
+        //    {
+        //        report.FileDates = list
+        //            .GroupBy(r => r.FileDate)
+        //            .OrderBy(g => g.Key)
+        //            .Select(g => g.Key.ToString(SHORT_DATE_FORMAT));
+        //    }
+        //    if (report.NewConfirmed == null)
+        //    {
+        //        report.NewConfirmed = list
+        //            .GroupBy(r => r.FileDate)
+        //            .OrderBy(g => g.Key)
+        //            .Select(g => g.Sum(i => i.NewConfirmed));
+        //    }
+        //    if (report.NewActive == null)
+        //    {
+        //        report.NewActive = list
+        //            .GroupBy(r => r.FileDate)
+        //            .OrderBy(g => g.Key)
+        //            .Select(g => g.Sum(i => i.NewActive));
+        //    }
+        //    if (report.NewRecovered == null)
+        //    {
+        //        report.NewRecovered = list
+        //            .GroupBy(r => r.FileDate)
+        //            .OrderBy(g => g.Key)
+        //            .Select(g => g.Sum(i => i.NewRecovered));
+        //    }
+        //    if (report.NewDeaths == null)
+        //    {
+        //        report.NewDeaths = list
+        //            .GroupBy(r => r.FileDate)
+        //            .OrderBy(g => g.Key)
+        //            .Select(g => g.Sum(i => i.NewDeaths));
+        //    }
+        //    if (report.FileDates == null)
+        //    {
+        //        report.FileDates = list
+        //            .GroupBy(r => r.FileDate)
+        //            .OrderBy(g => g.Key)
+        //            .Select(g => g.Key.ToString(SHORT_DATE_FORMAT));
+        //    }
+        //}
+
+        //private List<DailyReport> GetFilteredList(TotalReport report)
+        //{
+        //    List<DailyReport> list;
+
+        //    if (!string.IsNullOrEmpty(report.Country))
+        //    {
+        //        list = DailyReports.Where(r => r.Country == report.Country).ToList();
+        //        if (!string.IsNullOrEmpty(report.State))
+        //        {
+        //            list = list.Where(r => r.State == report.State).ToList();
+        //        }
+        //    }
+        //    else
+        //    {
+        //        list = DailyReports.ToList();
+        //    }
+
+        //    return list.OrderBy(r => r.FileDate).ThenBy(r => r.Country).ThenBy(r => r.State).ThenBy(r => r.County).ToList();
+        //}
+
+        private void GetTotalReports()
         {
-            var list = GetFilteredList(report);
+            TotalReports = new ObservableCollection<TotalReport>();
 
-            if (report.TotalConfirmed == null)
+            using (var db = new DatabaseConnection())
             {
-                report.TotalConfirmed = list
-                    .GroupBy(r => r.FileDate)
-                    .OrderBy(g => g.Key)
-                    .Select(g => g.Sum(i => i.TotalConfirmed));
+                db.CountryRegionStateProvinceTotalsRead(TotalReports);
+                db.CountryRegionTotalsRead(TotalReports);
+                db.GlobalTotalsRead(TotalReports);
             }
-            if (report.TotalActive == null)
-            {
-                report.TotalActive = list
-                    .GroupBy(r => r.FileDate)
-                    .OrderBy(g => g.Key)
-                    .Select(g => g.Sum(i => i.TotalActive));
-            }
-            if (report.TotalRecovered == null)
-            {
-                report.TotalRecovered = list
-                    .GroupBy(r => r.FileDate)
-                    .OrderBy(g => g.Key)
-                    .Select(g => g.Sum(i => i.TotalRecovered));
-            }
-            if (report.TotalDeaths == null)
-            {
-                report.TotalDeaths = list
-                    .GroupBy(r => r.FileDate)
-                    .OrderBy(g => g.Key)
-                    .Select(g => g.Sum(i => i.TotalDeaths));
-            }
-            if (report.FileDates == null)
-            {
-                report.FileDates = list
-                    .GroupBy(r => r.FileDate)
-                    .OrderBy(g => g.Key)
-                    .Select(g => g.Key.ToString(SHORT_DATE_FORMAT));
-            }
-            if (report.NewConfirmed == null)
-            {
-                report.NewConfirmed = list
-                    .GroupBy(r => r.FileDate)
-                    .OrderBy(g => g.Key)
-                    .Select(g => g.Sum(i => i.NewConfirmed));
-            }
-            if (report.NewActive == null)
-            {
-                report.NewActive = list
-                    .GroupBy(r => r.FileDate)
-                    .OrderBy(g => g.Key)
-                    .Select(g => g.Sum(i => i.NewActive));
-            }
-            if (report.NewRecovered == null)
-            {
-                report.NewRecovered = list
-                    .GroupBy(r => r.FileDate)
-                    .OrderBy(g => g.Key)
-                    .Select(g => g.Sum(i => i.NewRecovered));
-            }
-            if (report.NewDeaths == null)
-            {
-                report.NewDeaths = list
-                    .GroupBy(r => r.FileDate)
-                    .OrderBy(g => g.Key)
-                    .Select(g => g.Sum(i => i.NewDeaths));
-            }
-            if (report.FileDates == null)
-            {
-                report.FileDates = list
-                    .GroupBy(r => r.FileDate)
-                    .OrderBy(g => g.Key)
-                    .Select(g => g.Key.ToString(SHORT_DATE_FORMAT));
-            }
-        }
+            //// Get the list of reports for the combo box
+            //// by Country, State without regard to date
+            //var displayNames = DailyReports
+            //    .GroupBy(r => new
+            //    {
+            //        r.Country,
+            //        r.State
+            //    })
+            //    .Select(g => new TotalReport()
+            //    {
+            //        Country = g.Key.Country,
+            //        State = g.Key.State
+            //    })
+            //    .OrderBy(a => a.DisplayName);
 
-        private List<DailyReport> GetFilteredList(TotalReport report)
-        {
-            List<DailyReport> list;
-
-            if (!string.IsNullOrEmpty(report.Country))
-            {
-                list = DailyReports.Where(r => r.Country == report.Country).ToList();
-                if (!string.IsNullOrEmpty(report.State))
-                {
-                    list = list.Where(r => r.State == report.State).ToList();
-                }
-            }
-            else
-            {
-                list = DailyReports.ToList();
-            }
-
-            return list.OrderBy(r => r.FileDate).ThenBy(r => r.Country).ThenBy(r => r.State).ThenBy(r => r.County).ToList();
-        }
-
-        private void BuildTotalReports()
-        {
-            // Get the list of reports for the combo box
-            // by Country, State without regard to date
-            var displayNames = DailyReports
-                .GroupBy(r => new
-                {
-                    r.Country,
-                    r.State
-                })
-                .Select(g => new TotalReport()
-                {
-                    Country = g.Key.Country,
-                    State = g.Key.State
-                })
-                .OrderBy(a => a.DisplayName);
-
-            TotalReports = new ObservableCollection<TotalReport>(displayNames);
+            //TotalReports = new ObservableCollection<TotalReport>(displayNames);
         }
 
         private List<string> GetFileList(string path, DateTime? dateTime)

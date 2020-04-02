@@ -12,6 +12,13 @@ namespace DataClasses
             State = state;
         }
 
+        public TotalReport(string region, string state, double latitude, double longitude, int fips) : this(region, state)
+        {
+            Latitude = latitude;
+            Longitude = longitude;
+            FIPS = fips;
+        }
+
         #region Properties
 
         public string DisplayName
@@ -28,17 +35,20 @@ namespace DataClasses
             }
         }
 
-        public string Country { get; set; }
-        public string State { get; set; }
-        public IEnumerable<int> TotalConfirmed { get; set; }
-        public IEnumerable<int> TotalActive { get; set; }
-        public IEnumerable<int> TotalRecovered { get; set; }
-        public IEnumerable<int> TotalDeaths { get; set; }
-        public IEnumerable<int> NewConfirmed { get; set; }
-        public IEnumerable<int> NewActive { get; set; }
-        public IEnumerable<int> NewRecovered { get; set; }
-        public IEnumerable<int> NewDeaths { get; set; }
-        public IEnumerable<string> FileDates { get; set; }
+        public string Country { get; set; } = "";
+        public string State { get; set; } = "";
+        public double Latitude { get; set; } = 0;
+        public double Longitude { get; set; } = 0;
+        public int FIPS { get; set; } = 0;
+        public List<string> FileDates { get; set; } = new List<string>();
+        public List<int> TotalConfirmeds { get; set; } = new List<int>();
+        public List<int> TotalActives { get; set; } = new List<int>();
+        public List<int> TotalRecovereds { get; set; } = new List<int>();
+        public List<int> TotalDeaths { get; set; } = new List<int>();
+        public List<int> NewConfirmeds { get; set; } = new List<int>();
+        public List<int> NewActives { get; set; } = new List<int>();
+        public List<int> NewRecovereds { get; set; } = new List<int>();
+        public List<int> NewDeaths { get; set; } = new List<int>();
 
         #endregion
     }
