@@ -11,6 +11,7 @@ using LiveCharts;
 using LiveCharts.Wpf;
 using Common;
 using DataClasses;
+using System.Windows.Data;
 
 namespace Viewer.ViewModels
 {
@@ -57,8 +58,9 @@ namespace Viewer.ViewModels
             InitMessagePanel();
             InitMainPanel();
 
-            ImportData();
-            //ReadData();
+            //ImportData();   // Normal
+            ImportData(true);   // For testing with always doing a refresh
+            //ReadData(); // For testing with no changes in DB
         }
 
         ~MainVM()
@@ -153,6 +155,17 @@ namespace Viewer.ViewModels
             }
         }
 
+        private CollectionViewSource dailyTotalsView = new CollectionViewSource();
+        public CollectionViewSource DailyTotalsView
+        {
+            get => dailyTotalsView;
+            set
+            {
+                dailyTotalsView = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         private DailyReport selectedDailyReport;
         public DailyReport SelectedDailyReport
         {
@@ -171,6 +184,17 @@ namespace Viewer.ViewModels
             set
             {
                 totalReports = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private CollectionViewSource totalReportsView = new CollectionViewSource();
+        public CollectionViewSource TotalReportsView
+        {
+            get => totalReportsView;
+            set
+            {
+                totalReportsView = value;
                 NotifyPropertyChanged();
             }
         }
@@ -226,10 +250,12 @@ namespace Viewer.ViewModels
 
         private void ReadData()
         {
-            //DailyReports.ReadData();
             var list = DatabaseManager.ReadTotalReports();
             TotalReports = new ObservableCollection<TotalReport>(list);
 
+            TotalReportsView.Source = TotalReports;
+            TotalReportsView.SortDescriptions.Add(new SortDescription("Country", ListSortDirection.Ascending));
+            TotalReportsView.SortDescriptions.Add(new SortDescription("State", ListSortDirection.Ascending));
             SelectedTotalReport = TotalReports.Where(a => a.Country == GLOBAL_NAME).FirstOrDefault();
         }
 
@@ -437,6 +463,9 @@ namespace Viewer.ViewModels
         {
             var list = DatabaseManager.ReadDailyTotalsForReport(report);
             DailyTotalReports = new ObservableCollection<DailyReport>(list);
+            DailyTotalsView.Source = DailyTotalReports;
+            DailyTotalsView.SortDescriptions.Add(new SortDescription("State", ListSortDirection.Ascending));
+            DailyTotalsView.SortDescriptions.Add(new SortDescription("FileDate", ListSortDirection.Descending));
         }
 
         private void SetDisplayView(ViewType type)

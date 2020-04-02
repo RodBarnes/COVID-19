@@ -31,7 +31,8 @@ namespace DataClasses
                     do
                     {
                         var fields = parser.ReadFields();
-                        list.Add(new Replacement(fields));
+                        var replacement = new Replacement(fields);
+                        list.Add(replacement);
                     }
                     while (!parser.EndOfData);
                 }
@@ -47,24 +48,24 @@ namespace DataClasses
                 switch (rep.ReplacementType)
                 {
                     case 1:
-                        if (country == rep.FromRegion)
+                        if (country == rep.FromCountry)
                         {
-                            country = rep.ToRegion;
+                            country = rep.ToCountry;
                         }
                         break;
                     case 2:
-                        if (country == rep.FromRegion && state == rep.FromState)
+                        if (country == rep.FromCountry && state == rep.FromState)
                         {
-                            country = rep.ToRegion;
+                            country = rep.ToCountry;
                             state = rep.ToState;
                         }
                         break;
                     case 3:
-                        if (country == rep.FromRegion && state == rep.FromState && county == rep.FromCounty)
+                        if (country == rep.FromCountry && state == rep.FromState && county == rep.FromDistrict)
                         {
-                            country = rep.ToRegion;
+                            country = rep.ToCountry;
                             state = rep.ToState;
-                            county = rep.ToCounty;
+                            county = rep.ToDistrict;
                         }
                         break;
                     default:
