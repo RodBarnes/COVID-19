@@ -57,7 +57,7 @@ namespace Viewer.ViewModels
             InitMessagePanel();
             InitMainPanel();
 
-            DailyReports = new DailyReports();
+            //DailyReports = new DailyReports();
 
             //ImportData();
             ReadData();
@@ -166,16 +166,16 @@ namespace Viewer.ViewModels
             }
         }
 
-        private DailyReports dailyReports;
-        public DailyReports DailyReports
-        {
-            get => dailyReports;
-            set
-            {
-                dailyReports = value;
-                NotifyPropertyChanged();
-            }
-        }
+        //private DailyReports dailyReports;
+        //public DailyReports DailyReports
+        //{
+        //    get => dailyReports;
+        //    set
+        //    {
+        //        dailyReports = value;
+        //        NotifyPropertyChanged();
+        //    }
+        //}
 
         private ObservableCollection<TotalReport> totalReports;
         public ObservableCollection<TotalReport> TotalReports
@@ -240,8 +240,8 @@ namespace Viewer.ViewModels
 
         private void ReadData()
         {
-            DailyReports.ReadData();
-            var list = DailyReports.ReadTotalReports();
+            //DailyReports.ReadData();
+            var list = DatabaseManager.ReadTotalReports();
             TotalReports = new ObservableCollection<TotalReport>(list);
 
             SelectedTotalReport = TotalReports.Where(a => a.Country == GLOBAL_NAME).FirstOrDefault();
@@ -449,7 +449,7 @@ namespace Viewer.ViewModels
 
         private void ShowDailyDataGrid(TotalReport report)
         {
-            var list = DailyReports.ReadDailyTotalsForReport(report);
+            var list = DatabaseManager.ReadDailyTotalsForReport(report);
             DailyTotalReports = new ObservableCollection<DailyReport>(list);
         }
 
@@ -550,7 +550,7 @@ namespace Viewer.ViewModels
             }
 
             ShowBusyPanel("Checking for new data...");
-            if (DailyReports.ImportSwaps(ReplacementsPath, LastReplacementDateTime))
+            if (DatabaseManager.ImportSwaps(ReplacementsPath, LastReplacementDateTime))
             {
                 // Replacements are new; tell the user a full refresh may be needed
                 ShowMessagePanel("New replacement data", "New replacement data was found and read. " +
@@ -564,13 +564,13 @@ namespace Viewer.ViewModels
             {
                 if (clearAllData)
                 {
-                    DailyReports.ClearAll(CLEAR_SCRIPT_PATH);
+                    DatabaseManager.ClearAll(CLEAR_SCRIPT_PATH);
                 }
                 else
                 {
                     var file = fileList.Min();
                     var clearDate = DateTime.Parse(Path.GetFileNameWithoutExtension(file));
-                    DailyReports.Clear(clearDate);
+                    DatabaseManager.Clear(clearDate);
                 }
 
                 if (fileList.Count > 0)
@@ -588,7 +588,7 @@ namespace Viewer.ViewModels
                         var filePath = fileList[i];
                         var fileName = Path.GetFileNameWithoutExtension(filePath);
                         BusyPanelTitle = $"Reading {fileName}";
-                        DailyReports.ImportData(filePath, worker, BusyProgressMaximum);
+                        DatabaseManager.ImportData(filePath, worker, BusyProgressMaximum);
                     }
                 }
             }

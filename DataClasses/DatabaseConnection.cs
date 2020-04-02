@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace DataClasses
 {
@@ -300,55 +298,55 @@ namespace DataClasses
             return report;
         }
 
-        public void ReportsRead(DailyReports reports)
-        {
-            try
-            {
-                var sql = $"SELECT CountryRegion, StateProvince, CountyDistrict, " +
-                    "FileDate, LastUpdate, TotalConfirmed, TotalRecovered, TotalDeaths, TotalActive, " +
-                    "NewConfirmed, NewRecovered, NewDeaths, NewActive, Latitude, Longitude, FIPS " +
-                    $"FROM DailyReportAll";
-                var cmd = new SqlCommand(sql, sqlConn);
-                //foreach (SqlParameter param in cmd.Parameters)
-                //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
-                var reader = cmd.ExecuteReader();
-                if (reader == null)
-                {
-                    throw new Exception($"ReportsRead failed: reader={reader}\nsql={cmd.CommandText}.");
-                }
-                else
-                {
-                    while (reader.Read())
-                    {
-                        var countryRegion = SqlStringRead(reader["CountryRegion"].ToString());
-                        var stateProvince = SqlStringRead(reader["StateProvince"].ToString());
-                        var countyDistrict = SqlStringRead(reader["CountyDistrict"].ToString());
-                        var fileDate = DateTime.Parse(reader["FileDate"].ToString());
-                        var lastUpdate = DateTime.Parse(reader["LastUpdate"].ToString());
-                        var totalConfirmed = (int)reader["TotalConfirmed"];
-                        var totalRecovered = (int)reader["TotalRecovered"];
-                        var totalDeaths = (int)reader["TotalDeaths"];
-                        var totalActive = (int)reader["TotalActive"];
-                        var newConfirmed = (int)reader["NewConfirmed"];
-                        var newRecovered = (int)reader["NewRecovered"];
-                        var newDeaths = (int)reader["NewDeaths"];
-                        var newActive = (int)reader["NewActive"];
-                        var latitude = (double)reader["Latitude"];
-                        var longitude = (double)reader["Longitude"];
-                        var fips = (int)reader["FIPS"];
-                        var item = new DailyReport(fileDate, countryRegion, stateProvince, countyDistrict, lastUpdate,
-                            totalConfirmed, totalRecovered, totalDeaths, totalActive, 
-                            newConfirmed, newRecovered, newDeaths, newActive, latitude, longitude, fips);
-                        reports.Add(item);
-                    }
-                }
-                reader.Close();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"ReportsRead failed.", ex);
-            }
-        }
+        //public void ReportsRead(DailyReports reports)
+        //{
+        //    try
+        //    {
+        //        var sql = $"SELECT CountryRegion, StateProvince, CountyDistrict, " +
+        //            "FileDate, LastUpdate, TotalConfirmed, TotalRecovered, TotalDeaths, TotalActive, " +
+        //            "NewConfirmed, NewRecovered, NewDeaths, NewActive, Latitude, Longitude, FIPS " +
+        //            $"FROM DailyReportAll";
+        //        var cmd = new SqlCommand(sql, sqlConn);
+        //        //foreach (SqlParameter param in cmd.Parameters)
+        //        //    System.Diagnostics.Debug.WriteLine($"name={param.ParameterName}, type={param.SqlDbType}, value={param.Value}");
+        //        var reader = cmd.ExecuteReader();
+        //        if (reader == null)
+        //        {
+        //            throw new Exception($"ReportsRead failed: reader={reader}\nsql={cmd.CommandText}.");
+        //        }
+        //        else
+        //        {
+        //            while (reader.Read())
+        //            {
+        //                var countryRegion = SqlStringRead(reader["CountryRegion"].ToString());
+        //                var stateProvince = SqlStringRead(reader["StateProvince"].ToString());
+        //                var countyDistrict = SqlStringRead(reader["CountyDistrict"].ToString());
+        //                var fileDate = DateTime.Parse(reader["FileDate"].ToString());
+        //                var lastUpdate = DateTime.Parse(reader["LastUpdate"].ToString());
+        //                var totalConfirmed = (int)reader["TotalConfirmed"];
+        //                var totalRecovered = (int)reader["TotalRecovered"];
+        //                var totalDeaths = (int)reader["TotalDeaths"];
+        //                var totalActive = (int)reader["TotalActive"];
+        //                var newConfirmed = (int)reader["NewConfirmed"];
+        //                var newRecovered = (int)reader["NewRecovered"];
+        //                var newDeaths = (int)reader["NewDeaths"];
+        //                var newActive = (int)reader["NewActive"];
+        //                var latitude = (double)reader["Latitude"];
+        //                var longitude = (double)reader["Longitude"];
+        //                var fips = (int)reader["FIPS"];
+        //                var item = new DailyReport(fileDate, countryRegion, stateProvince, countyDistrict, lastUpdate,
+        //                    totalConfirmed, totalRecovered, totalDeaths, totalActive, 
+        //                    newConfirmed, newRecovered, newDeaths, newActive, latitude, longitude, fips);
+        //                reports.Add(item);
+        //            }
+        //        }
+        //        reader.Close();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception($"ReportsRead failed.", ex);
+        //    }
+        //}
 
         #endregion
 
