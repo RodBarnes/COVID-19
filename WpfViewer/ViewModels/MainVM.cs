@@ -5,13 +5,13 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using LiveCharts;
 using LiveCharts.Wpf;
 using Common;
 using DataClasses;
-using System.Windows.Data;
 
 namespace Viewer.ViewModels
 {
