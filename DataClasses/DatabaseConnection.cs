@@ -12,6 +12,8 @@ namespace DataClasses
     public class DatabaseConnection : IDisposable
     {
         private const string GLOBAL_NAME = "(GLOBAL)";
+        private const string LONG_DATE_FORMAT = "MM/dd/yyyy";
+        private const string SHORT_DATE_FORMAT = "MMM-dd";
 
         private readonly SqlConnection sqlConn;
 
@@ -627,7 +629,7 @@ namespace DataClasses
                             list.Add(curReport);
                         }
                         var dateTime = DateTime.Parse(reader["FileDate"].ToString());
-                        curReport.FileDates.Add(dateTime.ToString("MMM-dd"));
+                        curReport.FileDates.Add(dateTime.ToString(SHORT_DATE_FORMAT));
                         curReport.TotalConfirmeds.Add((int)reader["TotalConfirmed"]);
                         curReport.TotalRecovereds.Add((int)reader["TotalRecovered"]);
                         curReport.TotalDeaths.Add((int)reader["TotalDeaths"]);
@@ -679,7 +681,7 @@ namespace DataClasses
                             list.Add(curReport);
                         }
                         var dateTime = DateTime.Parse(reader["FileDate"].ToString());
-                        curReport.FileDates.Add(dateTime.ToString("MMM-dd"));
+                        curReport.FileDates.Add(dateTime.ToString(SHORT_DATE_FORMAT));
                         curReport.TotalConfirmeds.Add((int)reader["TotalConfirmed"]);
                         curReport.TotalRecovereds.Add((int)reader["TotalRecovered"]);
                         curReport.TotalDeaths.Add((int)reader["TotalDeaths"]);
@@ -722,7 +724,7 @@ namespace DataClasses
                     while (reader.Read())
                     {
                         var dateTime = DateTime.Parse(reader["FileDate"].ToString());
-                        curReport.FileDates.Add(dateTime.ToString("MMM-dd"));
+                        curReport.FileDates.Add(dateTime.ToString(SHORT_DATE_FORMAT));
                         curReport.TotalConfirmeds.Add((int)reader["TotalConfirmed"]);
                         curReport.TotalRecovereds.Add((int)reader["TotalRecovered"]);
                         curReport.TotalDeaths.Add((int)reader["TotalDeaths"]);

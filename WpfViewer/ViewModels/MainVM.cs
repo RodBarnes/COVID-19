@@ -31,8 +31,6 @@ namespace Viewer.ViewModels
 
         private const string BASE_DATE = "10/1/2019";
         private const string GLOBAL_NAME = "(GLOBAL)";
-        private const string LONG_DATE_FORMAT = "MM/dd/yyyy";
-        private const string SHORT_DATE_FORMAT = "MMM-dd";
         private const string TRUE_LITERAL = "True";
 
         private const string CONFIRMED_TITLE = "Confirmed";
