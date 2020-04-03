@@ -15,7 +15,7 @@ namespace DataClasses
         public DailyReport(DateTime fileDate, string country, string state, string county, DateTime lastUpdate,
             int totalConfirmed, int totalRecoverd, int totalDeaths, int totalActive,
             int newConfirmed, int newRecovered, int newDeaths, int newActive,
-            double latitude = 0, double longitude = 0, int fips = 0)
+            decimal latitude = 0, decimal longitude = 0, int fips = 0)
         {
             FileDate = fileDate;
             Country = country;
@@ -56,8 +56,8 @@ namespace DataClasses
         public int NewRecovered { get; set; }
         public int NewDeaths { get; set; }
         public int NewActive { get; set; }
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
+        public decimal Latitude { get; set; }
+        public decimal Longitude { get; set; }
         public int FIPS { get; set; }
 
         #endregion

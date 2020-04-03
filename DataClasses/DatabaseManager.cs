@@ -184,8 +184,8 @@ namespace DataClasses
                             int newDeaths = 0;
                             int newRecovered = 0;
                             int newActive = 0;
-                            double latitude = 0;
-                            double longitude = 0;
+                            decimal latitude = 0;
+                            decimal longitude = 0;
                             int fips = 0;
 
                             isValid = DateTime.TryParse(Path.GetFileNameWithoutExtension(filePath).ToString(), out DateTime dateTimeChk);
@@ -201,9 +201,9 @@ namespace DataClasses
                                 country = fields[3].Trim();
                                 isValid = DateTime.TryParse(fields[4], out DateTime dateTime);
                                 lastUpdate = isValid ? dateTime : fileDate;
-                                isValid = double.TryParse(fields[5], out double lat);
+                                isValid = decimal.TryParse(fields[5], out decimal lat);
                                 latitude = isValid ? lat : 0;
-                                isValid = double.TryParse(fields[6], out double lng);
+                                isValid = decimal.TryParse(fields[6], out decimal lng);
                                 longitude = isValid ? lng : 0;
                                 isValid = int.TryParse(fields[7], out int confirmed);
                                 totalConfirmed = isValid ? confirmed : 0;
@@ -243,9 +243,9 @@ namespace DataClasses
                                 totalRecovered = isValid ? recovered : 0;
                                 if (fields.Length > 6)
                                 {
-                                    isValid = double.TryParse(fields[6], out double lat);
+                                    isValid = decimal.TryParse(fields[6], out decimal lat);
                                     latitude = isValid ? lat : 0;
-                                    isValid = double.TryParse(fields[7], out double lng);
+                                    isValid = decimal.TryParse(fields[7], out decimal lng);
                                     longitude = isValid ? lng : 0;
                                 }
                             }

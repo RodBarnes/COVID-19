@@ -299,8 +299,8 @@ namespace DataClasses
                         var newRecovered = (int)reader["NewRecovered"];
                         var newDeaths = (int)reader["NewDeaths"];
                         var newActive = (int)reader["NewActive"];
-                        var latitude = (double)reader["Latitude"];
-                        var longitude = (double)reader["Longitude"];
+                        var latitude = (decimal)reader["Latitude"];
+                        var longitude = (decimal)reader["Longitude"];
                         var fips = (int)reader["FIPS"];
                         report = new DailyReport(fileDate, countryRegion, stateProvince, countyDistrict, lastUpdate, 
                             totalConfirmed, totalRecovered, totalDeaths, totalActive, 
@@ -357,8 +357,8 @@ namespace DataClasses
                         var newRecovered = (int)reader["NewRecovered"];
                         var newDeaths = (int)reader["NewDeaths"];
                         var newActive = (int)reader["NewActive"];
-                        var latitude = (double)reader["Latitude"];
-                        var longitude = (double)reader["Longitude"];
+                        var latitude = (decimal)reader["Latitude"];
+                        var longitude = (decimal)reader["Longitude"];
                         var fips = (int)reader["FIPS"];
                         report = new DailyReport(fileDate, countryRegion, stateProvince, countyDistrict, lastUpdate,
                             totalConfirmed, totalRecovered, totalDeaths, totalActive, 

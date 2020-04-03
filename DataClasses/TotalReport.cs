@@ -18,7 +18,7 @@ namespace DataClasses
             State = state;
         }
 
-        public TotalReport(string region, string state, double latitude, double longitude, int fips) : this(region, state)
+        public TotalReport(string region, string state, decimal latitude, decimal longitude, int fips) : this(region, state)
         {
             Latitude = latitude;
             Longitude = longitude;
@@ -43,8 +43,8 @@ namespace DataClasses
 
         public string Country { get; set; } = "";
         public string State { get; set; } = "";
-        public double Latitude { get; set; } = 0;
-        public double Longitude { get; set; } = 0;
+        public decimal Latitude { get; set; } = 0;
+        public decimal Longitude { get; set; } = 0;
         public int FIPS { get; set; } = 0;
         public List<string> FileDates { get; set; } = new List<string>();
         public List<int> TotalConfirmeds { get; set; } = new List<int>();
