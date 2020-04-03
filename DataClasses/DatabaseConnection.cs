@@ -626,7 +626,8 @@ namespace DataClasses
                             };
                             list.Add(curReport);
                         }
-                        curReport.FileDates.Add(reader["FileDate"].ToString());
+                        var dateTime = DateTime.Parse(reader["FileDate"].ToString());
+                        curReport.FileDates.Add(dateTime.ToString("MMM-dd"));
                         curReport.TotalConfirmeds.Add((int)reader["TotalConfirmed"]);
                         curReport.TotalRecovereds.Add((int)reader["TotalRecovered"]);
                         curReport.TotalDeaths.Add((int)reader["TotalDeaths"]);
@@ -677,7 +678,8 @@ namespace DataClasses
                             };
                             list.Add(curReport);
                         }
-                        curReport.FileDates.Add(reader["FileDate"].ToString());
+                        var dateTime = DateTime.Parse(reader["FileDate"].ToString());
+                        curReport.FileDates.Add(dateTime.ToString("MMM-dd"));
                         curReport.TotalConfirmeds.Add((int)reader["TotalConfirmed"]);
                         curReport.TotalRecovereds.Add((int)reader["TotalRecovered"]);
                         curReport.TotalDeaths.Add((int)reader["TotalDeaths"]);
@@ -719,7 +721,8 @@ namespace DataClasses
                     list.Add(curReport);
                     while (reader.Read())
                     {
-                        curReport.FileDates.Add(reader["FileDate"].ToString());
+                        var dateTime = DateTime.Parse(reader["FileDate"].ToString());
+                        curReport.FileDates.Add(dateTime.ToString("MMM-dd"));
                         curReport.TotalConfirmeds.Add((int)reader["TotalConfirmed"]);
                         curReport.TotalRecovereds.Add((int)reader["TotalRecovered"]);
                         curReport.TotalDeaths.Add((int)reader["TotalDeaths"]);
