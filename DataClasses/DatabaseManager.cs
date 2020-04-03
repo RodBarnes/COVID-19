@@ -175,6 +175,7 @@ namespace DataClasses
                                     state = fields[0].Trim();
                                     country = fields[1].Trim();
                                 }
+                                county = county.Replace("County", "").Trim();
 
                                 isValid = DateTime.TryParse(fields[2], out DateTime dateTime);
                                 lastUpdate = isValid ? dateTime : fileDate;
@@ -193,7 +194,9 @@ namespace DataClasses
                                 }
                             }
 
+                            //System.Diagnostics.Debug.WriteLine($"BEFORE: {country},{state},{county}");
                             Replacements.Swap(ref country, ref state, ref county);
+                            //System.Diagnostics.Debug.WriteLine($"AFTER: {country},{state},{county}");
 
                             // Calculate the total active
                             if (totalActive == 0)

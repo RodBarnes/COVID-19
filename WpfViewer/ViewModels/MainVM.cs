@@ -58,8 +58,8 @@ namespace Viewer.ViewModels
             InitMessagePanel();
             InitMainPanel();
 
-            //ImportData();   // Normal
-            ImportData(true);   // For testing with always doing a refresh
+            ImportData();   // Normal
+            //ImportData(true);   // For testing with always doing a refresh
             //ReadData(); // For testing with no changes in DB
         }
 
@@ -256,6 +256,7 @@ namespace Viewer.ViewModels
             TotalReportsView.Source = TotalReports;
             TotalReportsView.SortDescriptions.Add(new SortDescription("Country", ListSortDirection.Ascending));
             TotalReportsView.SortDescriptions.Add(new SortDescription("State", ListSortDirection.Ascending));
+
             SelectedTotalReport = TotalReports.Where(a => a.Country == GLOBAL_NAME).FirstOrDefault();
         }
 
@@ -463,6 +464,7 @@ namespace Viewer.ViewModels
         {
             var list = DatabaseManager.ReadDailyTotalsForReport(report);
             DailyTotalReports = new ObservableCollection<DailyReport>(list);
+
             DailyTotalsView.Source = DailyTotalReports;
             DailyTotalsView.SortDescriptions.Add(new SortDescription("State", ListSortDirection.Ascending));
             DailyTotalsView.SortDescriptions.Add(new SortDescription("FileDate", ListSortDirection.Descending));
@@ -557,6 +559,12 @@ namespace Viewer.ViewModels
         private void Background_LoadDataDoWork(object sender, DoWorkEventArgs e)
         {
             var clearAllData = (bool)e.Argument;
+            if (clearAllData)
+            {
+                var dateTime = DateTime.Parse(BASE_DATE);
+                LastReplacementDateTime = dateTime;
+                LastImportDateTime = dateTime;
+            }
 
             if (PullData == "True")
             {
@@ -567,10 +575,13 @@ namespace Viewer.ViewModels
             ShowBusyPanel("Checking for new data...");
             if (DatabaseManager.ImportSwaps(ReplacementsPath, LastReplacementDateTime))
             {
-                // Replacements are new; tell the user a full refresh may be needed
-                ShowMessagePanel("New replacement data", "New replacement data was found and read. " +
-                    "This will require a full refresh to ensure that the swaps are applied to older data.");
                 LastReplacementDateTime = DateTime.Now;
+                if (!clearAllData)
+                {
+                    // Replacements are new; tell the user a full refresh may be needed
+                    ShowMessagePanel("New replacement data", "New replacement data was found and read. " +
+                        "This will require a full refresh to ensure that the swaps are applied to older data.");
+                }
             }
 
             // Create a list of files to import
