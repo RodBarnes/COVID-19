@@ -94,9 +94,11 @@ namespace Viewer.ViewModels
         public string RepositoryPath { get; set; }
         public string DataPath { get; set; }
         public string PullData { get; set; }
-        public string ReplacementsPath { get; set; }
         public DateTime LastImportDateTime { get; set; }
+        public string ReplacementsPath { get; set; }
         public DateTime LastReplacementDateTime { get; set; }
+        public string CountryStatsPath { get; set; }
+        public DateTime LastCountryStatsDateTime { get; set; }
 
         private ObservableCollection<Selection> viewSelections;
         public ObservableCollection<Selection> ViewSelections
@@ -250,8 +252,10 @@ namespace Viewer.ViewModels
 
         private void ReadData()
         {
-            var list = DatabaseManager.ReadTotalReports();
-            TotalReports = new ObservableCollection<TotalReport>(list);
+            var stats = DatabaseManager.ReadCountryStats();
+
+            var reports = DatabaseManager.ReadTotalReports();
+            TotalReports = new ObservableCollection<TotalReport>(reports);
 
             TotalReportsView.Source = TotalReports;
             TotalReportsView.SortDescriptions.Add(new SortDescription("Country", ListSortDirection.Ascending));
@@ -584,6 +588,11 @@ namespace Viewer.ViewModels
                 }
             }
 
+            if (DatabaseManager.ImportCountryStats(CountryStatsPath, LastCountryStatsDateTime))
+            {
+                LastCountryStatsDateTime = DateTime.Now;
+            }
+
             // Create a list of files to import
             List<string> fileList = GetFileList(DataPath, LastImportDateTime);
 
@@ -656,18 +665,22 @@ namespace Viewer.ViewModels
                 new Setting(nameof(RepositoryPath), BASE_PATH),
                 new Setting(nameof(PullData), TRUE_LITERAL),
                 new Setting(nameof(DataPath), $@"{BASE_PATH}\csse_covid_19_data\csse_covid_19_daily_reports"),
-                new Setting(nameof(ReplacementsPath), $@"{dir}\Replacements.csv"),
                 new Setting(nameof(LastImportDateTime), BASE_DATE),
-                new Setting(nameof(LastReplacementDateTime), BASE_DATE)
+                new Setting(nameof(ReplacementsPath), $@"{dir}\{nameof(Replacements)}.csv"),
+                new Setting(nameof(LastReplacementDateTime), BASE_DATE),
+                new Setting(nameof(CountryStatsPath), $@"{dir}\{nameof(CountryStats)}.csv"),
+                new Setting(nameof(LastCountryStatsDateTime), BASE_DATE)
             };
             Utility.LoadSettings(list);
             GitCommand = list[nameof(GitCommand)].Value;
             RepositoryPath = list[nameof(RepositoryPath)].Value;
             PullData = list[nameof(PullData)].Value;
             DataPath = list[nameof(DataPath)].Value;
-            ReplacementsPath = list[nameof(ReplacementsPath)].Value;
             LastImportDateTime = DateTime.Parse(list[nameof(LastImportDateTime)].Value);
+            ReplacementsPath = list[nameof(ReplacementsPath)].Value;
             LastReplacementDateTime = DateTime.Parse(list[nameof(LastReplacementDateTime)].Value);
+            CountryStatsPath = list[nameof(CountryStatsPath)].Value;
+            LastCountryStatsDateTime = DateTime.Parse(list[nameof(LastCountryStatsDateTime)].Value);
         }
 
         private void SaveSettings()
@@ -678,9 +691,11 @@ namespace Viewer.ViewModels
                 new Setting(nameof(RepositoryPath), RepositoryPath),
                 new Setting(nameof(PullData), PullData),
                 new Setting(nameof(DataPath), DataPath),
-                new Setting(nameof(ReplacementsPath), ReplacementsPath),
                 new Setting(nameof(LastImportDateTime), LastImportDateTime.ToString()),
-                new Setting(nameof(LastReplacementDateTime), LastReplacementDateTime.ToString())
+                new Setting(nameof(ReplacementsPath), ReplacementsPath),
+                new Setting(nameof(LastReplacementDateTime), LastReplacementDateTime.ToString()),
+                new Setting(nameof(CountryStatsPath), CountryStatsPath),
+                new Setting(nameof(LastCountryStatsDateTime), LastCountryStatsDateTime.ToString())
             };
             Utility.SaveSettings(list);
         }

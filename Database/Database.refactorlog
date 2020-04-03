@@ -119,4 +119,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="LastUpdate" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="864e67b9-7b9d-42b8-993d-626834e38ced" ChangeDateTime="04/03/2020 02:51:15">
+    <Property Name="ElementName" Value="[dbo].[CountryStats].[PctWorldShare]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[CountryStats]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="PctWorld" />
+  </Operation>
 </Operations>

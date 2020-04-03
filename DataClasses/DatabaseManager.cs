@@ -55,6 +55,62 @@ namespace DataClasses
 
         public static bool ImportSwaps(string path, DateTime datetime) => Replacements.Refresh(path, datetime);
 
+        public static bool ImportCountryStats(string path, DateTime datetime)
+        {
+            var refresh = false;
+            var firstLine = true;
+
+            if (File.Exists(path))
+            {
+                var fileWriteTime = File.GetLastWriteTime(path);
+                if (fileWriteTime > datetime)
+                {
+                    refresh = true;
+
+                    using (var db = new DatabaseConnection())
+                    {
+                        db.CountryStatsClear();
+                        using (var parser = new TextFieldParser(path))
+                        {
+                            parser.SetDelimiters(",");
+                            parser.HasFieldsEnclosedInQuotes = true;
+                            do
+                            {
+                                var fields = parser.ReadFields();
+                                if (firstLine)
+                                {
+                                    firstLine = false;
+                                }
+                                else
+                                {
+                                    var stats = new CountryStats(fields);
+                                    db.CountryStatsInsert(stats);
+                                }
+                            }
+                            while (!parser.EndOfData);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                throw new FileNotFoundException($"No file found at '{path}");
+            }
+
+            return refresh;
+        }
+
+        public static List<CountryStats> ReadCountryStats()
+        {
+            var list = new List<CountryStats>();
+            using (var db = new DatabaseConnection())
+            {
+                db.CountryStatsRead(list);
+            }
+
+            return list;
+        }
+
         public static List<DailyReport> ReadDailyTotalsForReport(TotalReport report)
         {
             List<DailyReport> list = new List<DailyReport>();

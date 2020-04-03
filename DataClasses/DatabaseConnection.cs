@@ -25,6 +25,8 @@ namespace DataClasses
 
         void IDisposable.Dispose() => sqlConn.Close();
 
+        #region Clear Methods
+
         public void ClearDataAll(string filePath)
         {
             using (var file = new StreamReader(filePath))
@@ -59,6 +61,90 @@ namespace DataClasses
             if (rows < 0)
                 throw new Exception($"ClearDataFromDate failed: LastImportDate='{lastImportDate}'\nsql={cmd.CommandText}.");
         }
+
+        #endregion
+
+        #region CountryStats Methods
+
+        public void CountryStatsClear()
+        {
+            var cmd = new SqlCommand("TRUNCATE TABLE CountryStats", sqlConn);
+            cmd.ExecuteNonQuery();
+        }
+
+        public void CountryStatsInsert(CountryStats item)
+        {
+            try
+            {
+                int rows;
+                var sql = "INSERT INTO CountryStats(Rank, Country, Population, PctChange, NetChange, Density, " +
+                    "Area, Migrants, FertilityRate, MedianAge, PctUrban, PctWorld) " +
+                    "VALUES (@rank, @country, @population, @pctChange, @netChange, @density, @area, " +
+                    "@migrants, @fertilityRate, @medianAge, @pctUrban, @pctWorld)";
+                var cmd = new SqlCommand(sql, sqlConn);
+                cmd.Parameters.AddWithValue("@rank", item.Rank);
+                cmd.Parameters.AddWithValue("@country", item.Country);
+                cmd.Parameters.AddWithValue("@population", item.Population);
+                cmd.Parameters.AddWithValue("@pctChange", item.PctChange);
+                cmd.Parameters.AddWithValue("@netChange", item.NetChange);
+                cmd.Parameters.AddWithValue("@density", item.Density);
+                cmd.Parameters.AddWithValue("@area", item.Area);
+                cmd.Parameters.AddWithValue("@migrants", item.Migrants);
+                cmd.Parameters.AddWithValue("@fertilityRate", item.FertilityRate);
+                cmd.Parameters.AddWithValue("@medianAge", item.MedianAge);
+                cmd.Parameters.AddWithValue("@pctUrban", item.PctUrban);
+                cmd.Parameters.AddWithValue("@pctWorld", item.PctWorld);
+                rows = cmd.ExecuteNonQuery();
+                if (rows < 0)
+                    throw new Exception($"CountryStatsInsert failed: Report='{item.Country}'\nsql={cmd.CommandText}.");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"CountryStatsInsert failed: Report='{item.Country}'.", ex);
+            }
+        }
+
+        public void CountryStatsRead(List<CountryStats> list)
+        {
+            try
+            {
+                var sql = "SELECT Rank, Country, Population, PctChange, NetChange, Density, Area, Migrants, FertilityRate, " +
+                    "MedianAge, PctUrban, PctWorld FROM CountryStats";
+                var cmd = new SqlCommand(sql, sqlConn);
+                var reader = cmd.ExecuteReader();
+                if (reader == null)
+                {
+                    throw new Exception($"GlobalTotalsRead failed: reader={reader}\nsql={cmd.CommandText}.");
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        var item = new CountryStats();
+                        item.Rank = (int)reader["Rank"];
+                        item.Country = reader["Country"].ToString();
+                        item.Population = long.Parse(reader["Population"].ToString());
+                        item.PctChange = decimal.Parse(reader["PctChange"].ToString());
+                        item.NetChange = (int)reader["NetChange"];
+                        item.Density = long.Parse(reader["Density"].ToString());
+                        item.Area = long.Parse(reader["Area"].ToString());
+                        item.Migrants = long.Parse(reader["Migrants"].ToString());
+                        item.FertilityRate = decimal.Parse(reader["FertilityRate"].ToString());
+                        item.MedianAge = (int)reader["MedianAge"];
+                        item.PctUrban = decimal.Parse(reader["PctUrban"].ToString());
+                        item.PctWorld = decimal.Parse(reader["PctWorld"].ToString());
+                        list.Add(item);
+                    }
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"GlobalTotalsRead failed.", ex);
+            }
+        }
+
+        #endregion
 
         #region DailyReport Methods
 

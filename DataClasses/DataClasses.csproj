@@ -44,6 +44,7 @@
     <Compile Include="DailyReport.cs" />
     <Compile Include="DatabaseManager.cs" />
     <Compile Include="DatabaseConnection.cs" />
+    <Compile Include="CountryStats.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Replacement.cs" />
     <Compile Include="Replacements.cs" />

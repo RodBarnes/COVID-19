@@ -18,24 +18,31 @@ namespace DataClasses
         {
             var refresh = false;
 
-            var fileWriteTime = File.GetLastWriteTime(path);
-            if (fileWriteTime > datetime)
+            if (File.Exists(path))
             {
-                refresh = true;
-                list.Clear();
-
-                using (var parser = new TextFieldParser(path))
+                var fileWriteTime = File.GetLastWriteTime(path);
+                if (fileWriteTime > datetime)
                 {
-                    parser.SetDelimiters(",");
-                    parser.HasFieldsEnclosedInQuotes = true;
-                    do
+                    refresh = true;
+                    list.Clear();
+
+                    using (var parser = new TextFieldParser(path))
                     {
-                        var fields = parser.ReadFields();
-                        var replacement = new Replacement(fields);
-                        list.Add(replacement);
+                        parser.SetDelimiters(",");
+                        parser.HasFieldsEnclosedInQuotes = true;
+                        do
+                        {
+                            var fields = parser.ReadFields();
+                            var replacement = new Replacement(fields);
+                            list.Add(replacement);
+                        }
+                        while (!parser.EndOfData);
                     }
-                    while (!parser.EndOfData);
                 }
+            }
+            else
+            {
+                throw new FileNotFoundException($"No file found at '{path}'");
             }
 
             return refresh;

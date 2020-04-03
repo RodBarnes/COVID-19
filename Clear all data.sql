@@ -16,6 +16,9 @@ GO
 INSERT INTO CountyDistrict ([Name]) VALUES('')
 GO
 
-
 TRUNCATE TABLE DailyReport
 GO
+
+TRUNCATE TABLE CountryStats
+GO
+
