@@ -1,8 +1,10 @@
 ﻿using System;
-using System.Windows;
+using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Windows;
 using System.Windows.Interop;
 using Viewer.ViewModels;
+using Common;
 
 namespace Viewer
 {
@@ -11,14 +13,22 @@ namespace Viewer
     /// </summary>
     public partial class MainWindow : Window
     {
-        readonly MainVM vm = new MainVM();
+        private readonly MainVM vm = new MainVM();
+        private static string aboutDescription;
+
         public MainWindow()
         {
             InitializeComponent();
             DataContext = vm;
+            aboutDescription = vm.AboutDescription;
         }
 
         #region System Menu
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            AddMenuItemsToSystemMenu();
+        }
 
         // Related to managing the System Menu
         private IntPtr Handle
@@ -38,7 +48,8 @@ namespace Viewer
                 switch (wParam.ToInt32())
                 {
                     case AboutMenuID:
-                        AboutWindow wdw = new AboutWindow();
+                        var assembly = Assembly.GetExecutingAssembly();
+                        AboutWindow wdw = new AboutWindow(assembly.GetName().Name, assembly.GetName().Version, aboutDescription);
                         wdw.ShowDialog();
                         handled = true;
                         break;
@@ -85,10 +96,5 @@ namespace Viewer
         public const int MF_STRING = 0x0;
 
         #endregion
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            AddMenuItemsToSystemMenu();
-        }
     }
 }

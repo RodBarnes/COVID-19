@@ -164,15 +164,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>COVID-19.mdf</DependentUpon>
     </Content>
-    <Compile Include="Views\AboutWindow.xaml.cs">
-      <DependentUpon>AboutWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-	</Compile>
-    <Compile Include="ViewModels\AboutVM.cs" />
-    <Page Include="Views\AboutWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">

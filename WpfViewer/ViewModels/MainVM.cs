@@ -26,7 +26,8 @@ namespace Viewer.ViewModels
     public partial class MainVM : INotifyPropertyChanged
     {
         private const string BASE_PATH = @"D:\Source\BitBucket\3rd Party\COVID-19";
-        private const string GIT_COMMAND = @"""D:\Program Files\Git\cmd\git.exe"" pull";
+        private const string GIT_PULL_COMMAND = @"""D:\Program Files\Git\cmd\git.exe"" pull";
+        private const string GIT_CLONE_COMMAND = "git clone https://github.com/libgit2/libgit2";
         private const string CLEAR_SCRIPT_PATH = @"D:\Source\BitBucket\COVID-19\Clear all data.sql";
 
         private const string BASE_DATE = "10/1/2019";
@@ -88,6 +89,8 @@ namespace Viewer.ViewModels
 
         #region Main Properties
 
+        public string AboutDescription { get => "This application provides visual presenation of the spread and impact of COVID-19 virus from 2020.\n" +
+                "It relies upon data from Github respository https://github.com/CSSEGISandData/COVID-19.git."; }
         public string GitCommand { get; set; }
         public string RepositoryPath { get; set; }
         public string DataPath { get; set; }
@@ -659,7 +662,7 @@ namespace Viewer.ViewModels
             var dir = Directory.GetCurrentDirectory();
             var list = new Settings
             {
-                new Setting(nameof(GitCommand), GIT_COMMAND),
+                new Setting(nameof(GitCommand), GIT_PULL_COMMAND),
                 new Setting(nameof(RepositoryPath), BASE_PATH),
                 new Setting(nameof(PullData), TRUE_LITERAL),
                 new Setting(nameof(DataPath), $@"{BASE_PATH}\csse_covid_19_data\csse_covid_19_daily_reports"),
