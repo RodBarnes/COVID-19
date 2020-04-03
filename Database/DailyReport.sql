@@ -13,8 +13,8 @@
     [NewRecovered] INT NULL DEFAULT 0, 
     [NewDeaths] INT NULL DEFAULT 0, 
     [NewActive] INT DEFAULT ((0)) NULL,
-    [Latitude] FLOAT NULL DEFAULT 0, 
-    [Longitude] FLOAT NULL DEFAULT 0, 
+    [Latitude] DECIMAL(10, 4) NULL DEFAULT 0, 
+    [Longitude] DECIMAL(10, 4) NULL DEFAULT 0, 
     [FIPS] INT DEFAULT ((0)) NULL,
     CONSTRAINT [PK_DailyReport] PRIMARY KEY ([CountryRegionId], [StateProvinceId], [CountyDistrictId], [FileDate]), 
 )
