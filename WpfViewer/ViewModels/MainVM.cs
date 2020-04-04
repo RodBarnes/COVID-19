@@ -100,6 +100,7 @@ namespace Viewer.ViewModels
         public DateTime LastReplacementDateTime { get; set; }
         public string CountryStatsPath { get; set; }
         public DateTime LastCountryStatsDateTime { get; set; }
+        public List<CountryStats> CountryStats { get; set; }
 
         private ObservableCollection<Selection> viewSelections;
         public ObservableCollection<Selection> ViewSelections
@@ -253,9 +254,14 @@ namespace Viewer.ViewModels
 
         private void ReadData()
         {
-            var stats = DatabaseManager.ReadCountryStats();
+            CountryStats = DatabaseManager.ReadCountryStats();
 
             var reports = DatabaseManager.ReadTotalReports();
+            foreach (var report in reports)
+            {
+                var stat = CountryStats.Where(i => i.Country == report.Country).FirstOrDefault();
+                report.Population = (stat != null) ? stat.Population : 0;
+            }
             TotalReports = new ObservableCollection<TotalReport>(reports);
 
             TotalReportsView.Source = TotalReports;
@@ -567,8 +573,9 @@ namespace Viewer.ViewModels
             if (clearAllData)
             {
                 var dateTime = DateTime.Parse(BASE_DATE);
-                LastReplacementDateTime = dateTime;
                 LastImportDateTime = dateTime;
+                LastReplacementDateTime = dateTime;
+                LastCountryStatsDateTime = dateTime;
             }
 
             if (PullData == "True")

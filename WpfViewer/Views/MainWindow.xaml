@@ -9,22 +9,23 @@
         Loaded="Window_Loaded"
         Title="Virus Viewer"
         Icon="/Images/coronavirus.ico"
-        Height="759.019" Width="1144.62">
+        MinHeight="800" MinWidth="1250">
     <Grid>
         <Grid Background="LightSteelBlue">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="10" />
-                <ColumnDefinition Width="200" />
+                <ColumnDefinition Width="300" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="10" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="0" />
-                <RowDefinition Height="30" />
+                <RowDefinition Height="35" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="10" />
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center" >
+                <TextBlock Text="{Binding SelectedTotalReport.Population, StringFormat='{}{0:0,0}'}" FontSize="18" VerticalAlignment="Center" Margin="5,5" />
                 <TextBlock Text="{Binding SelectedTotalReport.DisplayName}" FontSize="18" VerticalAlignment="Center" Margin="5,5" />
                 <TextBlock Text="{Binding SelectedView.ChartName}" FontSize="18" VerticalAlignment="Center" Margin="5,5"/>
             </StackPanel>

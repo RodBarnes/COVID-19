@@ -18,7 +18,3 @@ GO
 
 TRUNCATE TABLE DailyReport
 GO
-
-TRUNCATE TABLE CountryStats
-GO
-

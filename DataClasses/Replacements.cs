@@ -81,6 +81,15 @@ namespace DataClasses
                             matched = true;
                         }
                         break;
+                    case 4:
+                        if (country == rep.FromCountry && state == rep.FromState)
+                        {
+                            country = rep.ToCountry;
+                            state = rep.ToState;
+                            county = rep.ToDistrict;
+                            matched = true;
+                        }
+                        break;
                     default:
                         break;
                 }

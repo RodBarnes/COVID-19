@@ -25,6 +25,13 @@
                     ToState = fields[4];
                     ToCountry = fields[5];
                     break;
+                case 4:
+                    FromState = fields[1];
+                    FromCountry = fields[2];
+                    ToDistrict = fields[3];
+                    ToState = fields[4];
+                    ToCountry = fields[5];
+                    break;
                 default:
                     break;
             }

@@ -46,6 +46,7 @@ namespace DataClasses
         public decimal Latitude { get; set; } = 0;
         public decimal Longitude { get; set; } = 0;
         public int FIPS { get; set; } = 0;
+        public long Population { get; set; }
         public List<string> FileDates { get; set; } = new List<string>();
         public List<int> TotalConfirmeds { get; set; } = new List<int>();
         public List<int> TotalActives { get; set; } = new List<int>();
