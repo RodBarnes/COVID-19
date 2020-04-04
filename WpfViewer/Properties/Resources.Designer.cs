@@ -59,5 +59,14 @@ namespace VirusViewer.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This application provides visual presenation of the spread and impact of COVID-19 virus from 2020.  It relies upon CSSEGIS data from Github respository (https://github.com/CSSEGISandData/COVID-19.git) and Worldometer.info.
+        /// </summary>
+        internal static string AboutDescription {
+            get {
+                return ResourceManager.GetString("AboutDescription", resourceCulture);
+            }
+        }
     }
 }

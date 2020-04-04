@@ -89,8 +89,7 @@ namespace Viewer.ViewModels
 
         #region Main Properties
 
-        public string AboutDescription { get => "This application provides visual presenation of the spread and impact of COVID-19 virus from 2020.\n" +
-                "It relies upon data from Github respository https://github.com/CSSEGISandData/COVID-19.git."; }
+        public string AboutDescription { get; private set; }
         public string GitCommand { get; set; }
         public string RepositoryPath { get; set; }
         public string DataPath { get; set; }
@@ -250,6 +249,8 @@ namespace Viewer.ViewModels
                 new Selection(DAILY_DATAGRID_SELECTOR, "Daily Case Counts")
             };
             SelectedView = viewSelections[0];
+
+            AboutDescription = VirusViewer.Properties.Resources.AboutDescription;
         }
 
         private void ReadData()
