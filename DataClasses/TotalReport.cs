@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace DataClasses
 {
@@ -41,6 +42,9 @@ namespace DataClasses
             }
         }
 
+        public decimal PctDeathPopulation => Math.Round(TotalDeaths[TotalDeaths.Count-1] / (decimal)Population * 100, 4);
+        public decimal PctConfirmedPopulation => Math.Round(TotalConfirmeds[TotalConfirmeds.Count - 1] / (decimal)Population * 100, 4);
+        public decimal PctDeathConfirmed => Math.Round(TotalDeaths[TotalDeaths.Count - 1] / (decimal)TotalConfirmeds[TotalConfirmeds.Count - 1] * 100, 4);
         public string Country { get; set; } = "";
         public string State { get; set; } = "";
         public decimal Latitude { get; set; } = 0;
