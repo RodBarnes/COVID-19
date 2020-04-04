@@ -15,12 +15,14 @@ namespace Viewer
     {
         private readonly MainVM vm = new MainVM();
         private static string aboutDescription;
+        private static string aboutImagePath;
 
         public MainWindow()
         {
             InitializeComponent();
             DataContext = vm;
             aboutDescription = vm.AboutDescription;
+            aboutImagePath = vm.AboutImagePath;
         }
 
         #region System Menu
@@ -49,7 +51,7 @@ namespace Viewer
                 {
                     case AboutMenuID:
                         var assembly = Assembly.GetExecutingAssembly();
-                        AboutWindow wdw = new AboutWindow(assembly.GetName().Name, assembly.GetName().Version, aboutDescription);
+                        AboutWindow wdw = new AboutWindow(assembly.GetName().Name, assembly.GetName().Version, aboutDescription, aboutImagePath);
                         wdw.ShowDialog();
                         handled = true;
                         break;

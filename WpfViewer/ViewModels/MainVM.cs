@@ -90,6 +90,7 @@ namespace Viewer.ViewModels
         #region Main Properties
 
         public string AboutDescription { get; private set; }
+        public string AboutImagePath { get; private set; }
         public string GitCommand { get; set; }
         public string RepositoryPath { get; set; }
         public string DataPath { get; set; }
@@ -251,6 +252,7 @@ namespace Viewer.ViewModels
             SelectedView = viewSelections[0];
 
             AboutDescription = VirusViewer.Properties.Resources.AboutDescription;
+            AboutImagePath = "/Viewer;component/Images/coronavirus_96x96.png";
         }
 
         private void ReadData()

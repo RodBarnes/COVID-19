@@ -164,6 +164,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>COVID-19.mdf</DependentUpon>
     </Content>
+    <Resource Include="Images\coronavirus_96x96.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
