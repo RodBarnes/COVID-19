@@ -1,18 +1,16 @@
 ﻿using System.Reflection;
-using System.Resources;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("COVID-19 Data Viewer")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("COVID-19 Viewer")]
+[assembly: AssemblyDescription("This application provides visual presenation of the spread and impact of COVID - 19 virus from 2020.It relies upon CSSEGIS data from Github respository (https://github.com/CSSEGISandData/COVID-19.git) and Worldometer.info")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("COVID-19 Data Viewer")]
-[assembly: AssemblyCopyright("Copyright ©  2020")]
+[assembly: AssemblyCompany("Advanced Applications")]
+[assembly: AssemblyProduct("COVID-19 Viewer")]
+[assembly: AssemblyCopyright("Copyright © 2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

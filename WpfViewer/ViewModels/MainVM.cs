@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Windows.Data;
 using System.Windows.Input;
@@ -89,8 +90,7 @@ namespace Viewer.ViewModels
 
         #region Main Properties
 
-        public string AboutDescription { get; private set; }
-        public string AboutImagePath { get; private set; }
+        public AboutProperties AboutProperties { get; set; }
         public string GitCommand { get; set; }
         public string RepositoryPath { get; set; }
         public string DataPath { get; set; }
@@ -251,8 +251,16 @@ namespace Viewer.ViewModels
             };
             SelectedView = viewSelections[0];
 
-            AboutDescription = VirusViewer.Properties.Resources.AboutDescription;
-            AboutImagePath = "/Viewer;component/Images/coronavirus_96x96.png";
+            var assyInfo = new AssemblyInfo(Assembly.GetExecutingAssembly());
+            AboutProperties = new AboutProperties
+            {
+                ApplicationName = assyInfo.Product,
+                ApplicationVersion = assyInfo.AssemblyVersionString,
+                Copyright = $"{assyInfo.Copyright} {assyInfo.Company}",
+                Description = assyInfo.Description,
+                Background = nameof(Colors.LightBlue),
+                ImagePath = @"D:\Source\BitBucket\COVID-19\WpfViewer\Images\coronavirus_96x96.png"
+            };
         }
 
         private void ReadData()

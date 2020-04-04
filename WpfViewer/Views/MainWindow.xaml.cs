@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
@@ -14,15 +13,13 @@ namespace Viewer
     public partial class MainWindow : Window
     {
         private readonly MainVM vm = new MainVM();
-        private static string aboutDescription;
-        private static string aboutImagePath;
+        private static AboutProperties aboutProperties = new AboutProperties();
 
         public MainWindow()
         {
             InitializeComponent();
             DataContext = vm;
-            aboutDescription = vm.AboutDescription;
-            aboutImagePath = vm.AboutImagePath;
+            aboutProperties = vm.AboutProperties;
         }
 
         #region System Menu
@@ -50,8 +47,7 @@ namespace Viewer
                 switch (wParam.ToInt32())
                 {
                     case AboutMenuID:
-                        var assembly = Assembly.GetExecutingAssembly();
-                        AboutWindow wdw = new AboutWindow(assembly.GetName().Name, assembly.GetName().Version, aboutDescription, aboutImagePath);
+                        AboutWindow wdw = new AboutWindow(aboutProperties);
                         wdw.ShowDialog();
                         handled = true;
                         break;
