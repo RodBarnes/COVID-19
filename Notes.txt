@@ -4,5 +4,3 @@ The git.exe in D:\Program Files\Git\cmd is 40k in size.  But does it need other 
 What needs done to bundle this all together including the databawe and git?
 
 Modify the list to display the country-state entries in a different color, maybe gray?
-
-Update the common AboutWindow to use the format of the MoneyPro about which includes an icon.

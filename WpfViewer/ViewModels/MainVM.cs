@@ -258,7 +258,7 @@ namespace Viewer.ViewModels
                 ApplicationVersion = assyInfo.AssemblyVersionString,
                 Copyright = $"{assyInfo.Copyright} {assyInfo.Company}",
                 Description = assyInfo.Description,
-                Background = nameof(Colors.LightBlue),
+                Background = nameof(Colors.LightSteelBlue),
                 ImagePath = @"D:\Source\BitBucket\COVID-19\WpfViewer\Images\coronavirus_96x96.png"
             };
         }
