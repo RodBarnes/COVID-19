@@ -25,8 +25,11 @@
                 <RowDefinition Height="10" />
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center" >
+                <TextBlock Text="Pop." FontSize="18" VerticalAlignment="Center" Margin="5,5" />
                 <TextBlock Text="{Binding SelectedTotalReport.Population, StringFormat='{}{0:0,0}'}" FontSize="18" VerticalAlignment="Center" Margin="5,5" />
+                <TextBlock Text=" - " FontSize="18" VerticalAlignment="Center" />
                 <TextBlock Text="{Binding SelectedTotalReport.DisplayName}" FontSize="18" VerticalAlignment="Center" Margin="5,5" />
+                <TextBlock Text=" - " FontSize="18" VerticalAlignment="Center" />
                 <TextBlock Text="{Binding SelectedView.ChartName}" FontSize="18" VerticalAlignment="Center" Margin="5,5"/>
             </StackPanel>
             <Grid  Grid.Row="1" Grid.Column="1" >

@@ -262,6 +262,8 @@ namespace Viewer.ViewModels
                 var stat = CountryStats.Where(i => i.Country == report.Country).FirstOrDefault();
                 report.Population = (stat != null) ? stat.Population : 0;
             }
+            var global = reports.Where(i => i.Country == GLOBAL_NAME).FirstOrDefault();
+            global.Population = CountryStats.Sum(i => i.Population);
             TotalReports = new ObservableCollection<TotalReport>(reports);
 
             TotalReportsView.Source = TotalReports;
