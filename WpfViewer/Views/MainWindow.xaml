@@ -32,7 +32,7 @@
                 <TextBlock Text="; Mort. " FontSize="18" VerticalAlignment="Center" />
                 <TextBlock Text="{Binding SelectedTotalReport.PctDeathConfirmed, StringFormat='{}{0:F2}%'}" FontSize="18" VerticalAlignment="Center" />
                 <TextBlock Text=" - " FontSize="18" VerticalAlignment="Center" />
-                <TextBlock Text="{Binding SelectedTotalReport.DisplayName}" FontSize="18" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding SelectedTotalReport.TitleName}" FontSize="18" VerticalAlignment="Center" />
                 <TextBlock Text=" - " FontSize="18" VerticalAlignment="Center" />
                 <TextBlock Text="{Binding SelectedView.ChartName}" FontSize="18" VerticalAlignment="Center" />
             </StackPanel>
@@ -52,7 +52,7 @@
 		        SelectedItem="{Binding SelectedTotalReport}" >
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding DisplayName}" Foreground="{Binding ItemForeColor}" Background="{Binding ItemBackColor}" />
+                        <TextBlock Text="{Binding ListName}" Foreground="{Binding ItemForeColor}" Background="{Binding ItemBackColor}" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>

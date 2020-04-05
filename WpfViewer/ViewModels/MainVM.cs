@@ -213,8 +213,6 @@ namespace Viewer.ViewModels
                 NotifyPropertyChanged();
                 if (selectedTotalReport != null)
                 {
-                    selectedTotalReport.ItemForeColor = new SolidColorBrush(selectedTotalReport.State != "" ? Colors.Gray : Colors.Black);
-                    selectedTotalReport.ItemBackColor = new SolidColorBrush(Colors.Transparent);
                     switch (selectedView.DisplayName)
                     {
                         case TOTAL_LINE_SELECTOR:

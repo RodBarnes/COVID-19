@@ -39,7 +39,20 @@ namespace DataClasses
 
         #region Properties
 
-        public string DisplayName
+        public string ListName
+        {
+            get
+            {
+                var result = Country;
+                if (!string.IsNullOrEmpty(State))
+                {
+                    result = $" - {State}";
+                }
+                return result;
+            }
+        }
+
+        public string TitleName
         {
             get
             {
@@ -48,7 +61,6 @@ namespace DataClasses
                 {
                     result += $", {State}";
                 }
-
                 return result;
             }
         }
