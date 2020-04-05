@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows.Media;
 
 namespace DataClasses
 {
@@ -9,11 +12,15 @@ namespace DataClasses
     /// List<TotalReport> is built from the database to be used to display the County,State in the list and the data for the charts
     /// A TotalReport (SelectedTotalReport) is used when displaying data in a chart
     /// </summary>
-    public class TotalReport
+    public class TotalReport : INotifyPropertyChanged
     {
-        public TotalReport() { }
+        public TotalReport()
+        {
+            ItemForeColor = new SolidColorBrush(Colors.Black);
+            ItemBackColor = new SolidColorBrush(Colors.Transparent);
+        }
 
-        public TotalReport(string region, string state)
+        public TotalReport(string region, string state) : this()
         {
             Country = region;
             State = state;
@@ -25,6 +32,10 @@ namespace DataClasses
             Longitude = longitude;
             FIPS = fips;
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         #region Properties
 
@@ -42,11 +53,69 @@ namespace DataClasses
             }
         }
 
-        public decimal PctDeathPopulation => Math.Round(TotalDeaths[TotalDeaths.Count-1] / (decimal)Population * 100, 4);
-        public decimal PctConfirmedPopulation => Math.Round(TotalConfirmeds[TotalConfirmeds.Count - 1] / (decimal)Population * 100, 4);
-        public decimal PctDeathConfirmed => Math.Round(TotalDeaths[TotalDeaths.Count - 1] / (decimal)TotalConfirmeds[TotalConfirmeds.Count - 1] * 100, 4);
+        private SolidColorBrush itemForeColor;
+        public SolidColorBrush ItemForeColor
+        {
+            get => itemForeColor;
+            set
+            {
+                itemForeColor = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private SolidColorBrush itemBackColor;
+        public SolidColorBrush ItemBackColor
+        {
+            get => itemBackColor;
+            set
+            {
+                itemBackColor = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public decimal PctDeathPopulation
+        {
+            get
+            {
+                decimal denominator = Population;
+                int numerator = TotalDeaths[TotalDeaths.Count - 1];
+                int precision = 4;
+                return (denominator > 0) ? Math.Round(numerator / denominator * 100, precision) : 0;
+            }
+        }
+        public decimal PctConfirmedPopulation
+        {
+            get
+            {
+                decimal denominator = Population;
+                int numerator = TotalConfirmeds[TotalConfirmeds.Count - 1];
+                int precision = 4;
+                return (denominator > 0) ? Math.Round(numerator / denominator * 100, precision) : 0;
+            }
+        }
+        public decimal PctDeathConfirmed
+        {
+            get
+            {
+                decimal denominator = TotalConfirmeds[TotalConfirmeds.Count - 1];
+                int numerator = TotalDeaths[TotalDeaths.Count - 1];
+                int precision = 4;
+                return (denominator > 0) ? Math.Round(numerator / denominator * 100, precision) : 0;
+            }
+        }
         public string Country { get; set; } = "";
-        public string State { get; set; } = "";
+        private string state = "";
+        public string State
+        {
+            get => state;
+            set
+            {
+                state = value;
+                ItemForeColor = new SolidColorBrush(state != "" ? Colors.Gray : Colors.Black);
+            }
+        }
         public decimal Latitude { get; set; } = 0;
         public decimal Longitude { get; set; } = 0;
         public int FIPS { get; set; } = 0;

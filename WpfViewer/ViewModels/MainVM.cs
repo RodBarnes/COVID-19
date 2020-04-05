@@ -148,17 +148,6 @@ namespace Viewer.ViewModels
             }
         }
 
-        private ObservableCollection<DailyReport> regionDailyReports;
-        public ObservableCollection<DailyReport> DailyTotalReports
-        {
-            get => regionDailyReports;
-            set
-            {
-                regionDailyReports = value;
-                NotifyPropertyChanged();
-            }
-        }
-
         private CollectionViewSource dailyTotalsView = new CollectionViewSource();
         public CollectionViewSource DailyTotalsView
         {
@@ -166,6 +155,17 @@ namespace Viewer.ViewModels
             set
             {
                 dailyTotalsView = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private ObservableCollection<DailyReport> regionDailyReports;
+        public ObservableCollection<DailyReport> DailyTotalReports
+        {
+            get => regionDailyReports;
+            set
+            {
+                regionDailyReports = value;
                 NotifyPropertyChanged();
             }
         }
@@ -181,17 +181,6 @@ namespace Viewer.ViewModels
             }
         }
 
-        private ObservableCollection<TotalReport> totalReports;
-        public ObservableCollection<TotalReport> TotalReports
-        {
-            get => totalReports;
-            set
-            {
-                totalReports = value;
-                NotifyPropertyChanged();
-            }
-        }
-
         private CollectionViewSource totalReportsView = new CollectionViewSource();
         public CollectionViewSource TotalReportsView
         {
@@ -199,6 +188,17 @@ namespace Viewer.ViewModels
             set
             {
                 totalReportsView = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private ObservableCollection<TotalReport> totalReports;
+        public ObservableCollection<TotalReport> TotalReports
+        {
+            get => totalReports;
+            set
+            {
+                totalReports = value;
                 NotifyPropertyChanged();
             }
         }
@@ -213,19 +213,21 @@ namespace Viewer.ViewModels
                 NotifyPropertyChanged();
                 if (selectedTotalReport != null)
                 {
+                    selectedTotalReport.ItemForeColor = new SolidColorBrush(selectedTotalReport.State != "" ? Colors.Gray : Colors.Black);
+                    selectedTotalReport.ItemBackColor = new SolidColorBrush(Colors.Transparent);
                     switch (selectedView.DisplayName)
                     {
                         case TOTAL_LINE_SELECTOR:
-                            ShowLineChart(SelectedTotalReport);
+                            ShowLineChart(selectedTotalReport);
                             break;
                         case ACTIVE_AREA_SELECTOR:
-                            ShowStackedAreaSeriesChart(SelectedTotalReport);
+                            ShowStackedAreaSeriesChart(selectedTotalReport);
                             break;
                         case NEW_BAR_SELECTOR:
-                            ShowStackedColumnChart(SelectedTotalReport);
+                            ShowStackedColumnChart(selectedTotalReport);
                             break;
                         case DAILY_DATAGRID_SELECTOR:
-                            ShowDailyDataGrid(SelectedTotalReport);
+                            ShowDailyDataGrid(selectedTotalReport);
                             break;
                         default:
                             break;

@@ -2,5 +2,3 @@ Automate determining whether there is a git -- do I have to include git in the p
 The git.exe in D:\Program Files\Git\cmd is 40k in size.  But does it need other things for it to work?
 
 What needs done to bundle this all together including the databawe and git?
-
-Modify the list to display the country-state entries in a different color, maybe gray?
