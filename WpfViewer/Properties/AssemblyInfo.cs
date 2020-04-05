@@ -6,7 +6,7 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("COVID-19 Viewer")]
-[assembly: AssemblyDescription("This application provides visual presenation of the spread and impact of COVID - 19 virus from 2020.It relies upon CSSEGIS data from Github respository (https://github.com/CSSEGISandData/COVID-19.git) and Worldometer.info")]
+[assembly: AssemblyDescription("This application provides visual presenation of the spread and impact of COVID-19 virus from 2020.  It relies upon data managed by John's Hopkins CSSEGIS (https://github.com/CSSEGISandData/COVID-19.git) and Worldometer.info")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Advanced Applications")]
 [assembly: AssemblyProduct("COVID-19 Viewer")]
