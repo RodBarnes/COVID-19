@@ -19,6 +19,7 @@ namespace Viewer
         {
             InitializeComponent();
             DataContext = vm;
+            vm.AboutProperties.Owner = this;
             aboutProperties = vm.AboutProperties;
         }
 
