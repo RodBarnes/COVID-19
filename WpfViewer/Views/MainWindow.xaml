@@ -25,11 +25,11 @@
                 <RowDefinition Height="10" />
             </Grid.RowDefinitions>
             <StackPanel Grid.Row="1" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Center" >
-                <TextBlock Text="Pop." FontSize="18" VerticalAlignment="Center" />
+                <TextBlock Text="Pop. " FontSize="18" VerticalAlignment="Center" />
                 <TextBlock Text="{Binding SelectedTotalReport.Population, StringFormat='{}{0:0,0}'}" FontSize="18" VerticalAlignment="Center" />
-                <TextBlock Text=" - " FontSize="18" VerticalAlignment="Center" />
+                <TextBlock Text="; Inf. " FontSize="18" VerticalAlignment="Center" />
                 <TextBlock Text="{Binding SelectedTotalReport.PctConfirmedPopulation, StringFormat='{}{0:F4}%'}" FontSize="18" VerticalAlignment="Center" />
-                <TextBlock Text=" - " FontSize="18" VerticalAlignment="Center" />
+                <TextBlock Text="; Mort. " FontSize="18" VerticalAlignment="Center" />
                 <TextBlock Text="{Binding SelectedTotalReport.PctDeathConfirmed, StringFormat='{}{0:F2}%'}" FontSize="18" VerticalAlignment="Center" />
                 <TextBlock Text=" - " FontSize="18" VerticalAlignment="Center" />
                 <TextBlock Text="{Binding SelectedTotalReport.DisplayName}" FontSize="18" VerticalAlignment="Center" />
