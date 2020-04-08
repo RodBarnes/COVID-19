@@ -49,13 +49,15 @@ namespace Viewer.ViewModels
         private const string VISIBILITY_VISIBLE = "Visible";
 
         private BackgroundWorker worker;
+        private MainWindow AssociatedWindow;
 
-        public MainVM()
+        public MainVM(MainWindow wdw)
         {
+            AssociatedWindow = wdw;
+
             LoadSettings();
 
             InitBusyPanel();
-            InitMessagePanel();
             InitMainPanel();
 
             ImportData();   // Normal
@@ -550,7 +552,7 @@ namespace Viewer.ViewModels
             var result = Utility.RunCommand(GitCommand, RepositoryPath);
             if (!result.Contains("Already up to date."))
             {
-                ShowMessagePanel("Result", result);
+                AssociatedWindow.MessagePanel.Show("Result", result);
             }
         }
 
@@ -604,7 +606,7 @@ namespace Viewer.ViewModels
                 if (!clearAllData)
                 {
                     // Replacements are new; tell the user a full refresh may be needed
-                    ShowMessagePanel("New replacement data", "New replacement data was found and read. " +
+                    AssociatedWindow.MessagePanel.Show("New replacement data", "New replacement data was found and read. " +
                         "This will require a full refresh to ensure that the swaps are applied to older data.");
                 }
             }
@@ -663,7 +665,7 @@ namespace Viewer.ViewModels
             else if (!(e.Error == null))
             {
                 HideBusyPanel();
-                ShowMessagePanel("Error!!", $"{e.Error.Message}");
+                AssociatedWindow.MessagePanel.Show("Error!!", $"{e.Error.Message}");
             }
             else
             {

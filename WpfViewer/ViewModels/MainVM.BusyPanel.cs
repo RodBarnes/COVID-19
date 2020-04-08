@@ -32,7 +32,7 @@ namespace Viewer.ViewModels
         {
             if (worker != null && worker.WorkerSupportsCancellation)
             {
-                ShowMessagePanel("Cancel!", "Action will terminate after the current operation.");
+                AssociatedWindow.MessagePanel.Show("Cancel!", "Action will terminate after the current operation.");
                 worker.CancelAsync();
             }
         }

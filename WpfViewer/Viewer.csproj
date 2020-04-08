@@ -97,7 +97,6 @@
     </Page>
     <Compile Include="ViewModels\MainVM.BusyPanel.cs" />
     <Compile Include="ViewModels\MainVM.cs" />
-    <Compile Include="ViewModels\MainVM.MessagePanel.cs" />
     <Compile Include="Views\App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>

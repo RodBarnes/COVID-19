@@ -12,12 +12,13 @@ namespace Viewer
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly MainVM vm = new MainVM();
         private static AboutProperties aboutProperties = new AboutProperties();
 
         public MainWindow()
         {
             InitializeComponent();
+
+            MainVM vm = new MainVM(this);
             DataContext = vm;
             vm.AboutProperties.Owner = this;
             aboutProperties = vm.AboutProperties;
