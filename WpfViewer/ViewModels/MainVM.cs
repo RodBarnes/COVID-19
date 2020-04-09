@@ -616,7 +616,7 @@ namespace Viewer.ViewModels
                     // Replacements are new; tell the user a full refresh may be needed
                     //AssociatedWindow.MessagePanel.Show("New replacement data", "New replacement data was found and read. " +
                     //    "This will require a full refresh to ensure that the swaps are applied to older data.");
-                    MessageBox.Show("New replacement data was found and read.\nThis will require a full refresh to ensure that the swaps are applied to older data.",
+                    MessageBox.Show(AssociatedWindow, "New replacement data was found and read.\nThis will require a full refresh to ensure that the swaps are applied to older data.",
                         "New replacement data");
                 }
             }
