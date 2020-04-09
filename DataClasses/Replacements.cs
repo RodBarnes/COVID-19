@@ -14,16 +14,16 @@ namespace DataClasses
 
         #region Methods
 
-        public bool Refresh(string path, DateTime datetime)
+        public DateTime? Refresh(string path, DateTime datetime)
         {
-            var refresh = false;
+            DateTime? lastWriteTime = null;
 
             if (File.Exists(path))
             {
-                var fileWriteTime = File.GetLastWriteTime(path);
+                var fileWriteTime = File.GetLastWriteTime(path).TrimMilliseconds();
                 if (fileWriteTime > datetime)
                 {
-                    refresh = true;
+                    lastWriteTime = fileWriteTime;
                     list.Clear();
 
                     using (var parser = new TextFieldParser(path))
@@ -45,7 +45,7 @@ namespace DataClasses
                 throw new FileNotFoundException($"No file found at '{path}'");
             }
 
-            return refresh;
+            return lastWriteTime;
         }
 
         public void Swap(ref string country, ref string state, ref string county)

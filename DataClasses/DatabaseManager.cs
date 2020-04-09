@@ -53,19 +53,20 @@ namespace DataClasses
             reports.Clear();
         }
 
-        public static bool ImportSwaps(string path, DateTime datetime) => Replacements.Refresh(path, datetime);
+        public static DateTime? ImportSwaps(string path, DateTime datetime) => Replacements.Refresh(path, datetime);
 
-        public static bool ImportCountryStats(string path, DateTime datetime)
+        public static DateTime? ImportCountryStats(string path, DateTime datetime)
         {
-            var refresh = false;
+            DateTime? lastWriteTime = null;
+
             var firstLine = true;
 
             if (File.Exists(path))
             {
-                var fileWriteTime = File.GetLastWriteTime(path);
+                var fileWriteTime = File.GetLastWriteTime(path).TrimMilliseconds();
                 if (fileWriteTime > datetime)
                 {
-                    refresh = true;
+                    lastWriteTime = fileWriteTime;
 
                     using (var db = new DatabaseConnection())
                     {
@@ -97,7 +98,7 @@ namespace DataClasses
                 throw new FileNotFoundException($"No file found at '{path}");
             }
 
-            return refresh;
+            return lastWriteTime;
         }
 
         public static List<CountryStats> ReadCountryStats()
@@ -146,8 +147,10 @@ namespace DataClasses
             return list;
         }
 
-        public static void ImportData(string filePath, BackgroundWorker worker = null, double maxProgressValue = 0)
+        public static DateTime? ImportData(string filePath, BackgroundWorker worker = null, double maxProgressValue = 0)
         {
+            DateTime? lastWriteTime = null;
+
             using (var db = new DatabaseConnection())
             {
                 // Used to provide progress bar values
@@ -156,6 +159,11 @@ namespace DataClasses
 
                 // Used when checking for missing country-only entries
                 var countries = new List<string>();
+
+                // Retrieve the actual writetime on the file for use in checking later
+                lastWriteTime = File.GetLastWriteTime(filePath);
+
+                // Used to store the date of the collected data -- see details below where the value is set
                 DateTime fileDate = DateTime.Now;
 
                 // Used to parse each file
@@ -188,6 +196,9 @@ namespace DataClasses
                             decimal longitude = 0;
                             int fips = 0;
 
+                            // The name of the file is a date; use that as the last update date in the DailyReport.
+                            // We can't use the actual file WriteTime because the files can get updated later with corrected data
+                            // but it still is data for the date the file represents and for which the data was originally collected.
                             isValid = DateTime.TryParse(Path.GetFileNameWithoutExtension(filePath).ToString(), out DateTime dateTimeChk);
                             fileDate = isValid ? dateTimeChk : new DateTime();
 
@@ -217,7 +228,7 @@ namespace DataClasses
                             }
                             else
                             {
-                                // Old structure
+                                // Original file structure
                                 if (fields[0].Contains(','))
                                 {
                                     var split = fields[0].Split(',');
@@ -243,6 +254,7 @@ namespace DataClasses
                                 totalRecovered = isValid ? recovered : 0;
                                 if (fields.Length > 6)
                                 {
+                                    // They added these a little later
                                     isValid = decimal.TryParse(fields[6], out decimal lat);
                                     latitude = isValid ? lat : 0;
                                     isValid = decimal.TryParse(fields[7], out decimal lng);
@@ -334,6 +346,8 @@ namespace DataClasses
                     }
                 }
             }
+
+            return lastWriteTime;
         }
 
         private static void ExtractHeadersFromFields(string[] fields)

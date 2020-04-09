@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -568,7 +569,7 @@ namespace Viewer.ViewModels
             var files = dir.GetFiles("*.csv");
             foreach (var file in files)
             {
-                var fileDateTime = file.LastWriteTime;
+                var fileDateTime = file.LastWriteTime.TrimMilliseconds();
                 if (fileDateTime >= dateTime)
                 {
                     fileList.Add(file.FullName);
@@ -584,6 +585,8 @@ namespace Viewer.ViewModels
 
         private void Background_LoadDataDoWork(object sender, DoWorkEventArgs e)
         {
+            DateTime? lastWriteTime = null;
+
             var clearAllData = (bool)e.Argument;
             if (clearAllData)
             {
@@ -600,20 +603,28 @@ namespace Viewer.ViewModels
             }
 
             ShowBusyPanel("Checking for new data...");
-            if (DatabaseManager.ImportSwaps(ReplacementsPath, LastReplacementDateTime))
+            lastWriteTime = DatabaseManager.ImportSwaps(ReplacementsPath, LastReplacementDateTime);
+            if (lastWriteTime != null)
             {
-                LastReplacementDateTime = DateTime.Now;
+                LastReplacementDateTime = (DateTime)lastWriteTime;
                 if (!clearAllData)
                 {
+                    /* 
+                     * Error keeps happening here since I changed MessagePanel to a UserControl
+                     * System.InvalidOperationException: 'The calling thread cannot access this object because a different thread owns it.'
+                     */
                     // Replacements are new; tell the user a full refresh may be needed
-                    AssociatedWindow.MessagePanel.Show("New replacement data", "New replacement data was found and read. " +
-                        "This will require a full refresh to ensure that the swaps are applied to older data.");
+                    //AssociatedWindow.MessagePanel.Show("New replacement data", "New replacement data was found and read. " +
+                    //    "This will require a full refresh to ensure that the swaps are applied to older data.");
+                    MessageBox.Show("New replacement data was found and read.\nThis will require a full refresh to ensure that the swaps are applied to older data.",
+                        "New replacement data");
                 }
             }
 
-            if (DatabaseManager.ImportCountryStats(CountryStatsPath, LastCountryStatsDateTime))
+            lastWriteTime = DatabaseManager.ImportCountryStats(CountryStatsPath, LastCountryStatsDateTime);
+            if (lastWriteTime != null)
             {
-                LastCountryStatsDateTime = DateTime.Now;
+                LastCountryStatsDateTime = (DateTime)lastWriteTime;
             }
 
             // Create a list of files to import
@@ -632,8 +643,7 @@ namespace Viewer.ViewModels
                     DatabaseManager.Clear(clearDate);
                 }
 
-                LastImportDateTime = DateTime.Now;
-
+                DateTime? fileWriteTime = null;
                 for (int i = 0; i < fileList.Count; i++)
                 {
                     if (worker.CancellationPending)
@@ -645,8 +655,11 @@ namespace Viewer.ViewModels
                     var filePath = fileList[i];
                     var fileName = Path.GetFileNameWithoutExtension(filePath);
                     BusyPanelTitle = $"Reading {fileName}";
-                    DatabaseManager.ImportData(filePath, worker, BusyProgressMaximum);
+                    fileWriteTime = DatabaseManager.ImportData(filePath, worker, BusyProgressMaximum);
                 }
+                // When the loop finishes, the fileWriteTime will be that of the last file imported
+                // and that should be used for the start date for the next data check
+                LastImportDateTime = (DateTime)fileWriteTime;
             }
         }
 
