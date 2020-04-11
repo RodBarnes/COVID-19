@@ -27,6 +27,8 @@ namespace Viewer.ViewModels
 
     public partial class MainVM : INotifyPropertyChanged
     {
+        #region Constants
+
         private const string BASE_PATH = @"D:\Source\BitBucket\3rd Party\COVID-19";
         private const string GIT_PULL_COMMAND = @"""D:\Program Files\Git\cmd\git.exe"" pull";
         private const string GIT_CLONE_COMMAND = "git clone https://github.com/libgit2/libgit2";
@@ -49,8 +51,10 @@ namespace Viewer.ViewModels
         private const string VISIBILITY_COLLAPSED = "Collapsed";
         private const string VISIBILITY_VISIBLE = "Visible";
 
+        #endregion
+
         private BackgroundWorker worker;
-        private MainWindow AssociatedWindow;
+        private readonly MainWindow AssociatedWindow;
 
         public MainVM(MainWindow wdw)
         {
@@ -603,7 +607,7 @@ namespace Viewer.ViewModels
             // Get a list of the files in LastWriteTime order
             var dir = new DirectoryInfo(DataPath);
             var files = dir.GetFiles("*.csv")
-                .Where(f => f.LastWriteTime.TrimMilliseconds() >= LastImportDateTime)
+                .Where(f => f.LastWriteTime.TrimMilliseconds() > LastImportDateTime)
                 .OrderBy(f => f.LastWriteTime);
 
             // Go through the list
