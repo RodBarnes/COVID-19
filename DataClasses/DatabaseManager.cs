@@ -39,7 +39,7 @@ namespace DataClasses
         {
             using (var db = new DatabaseConnection())
             {
-                db.ClearDataFromDate(lastImportDate);
+                db.ClearDataForDate(lastImportDate);
             }
             reports.Clear();
         }
@@ -147,10 +147,8 @@ namespace DataClasses
             return list;
         }
 
-        public static DateTime? ImportData(string filePath, BackgroundWorker worker = null, double maxProgressValue = 0)
+        public static void ImportData(string filePath, BackgroundWorker worker = null, double maxProgressValue = 0)
         {
-            DateTime? lastWriteTime = null;
-
             using (var db = new DatabaseConnection())
             {
                 // Used to provide progress bar values
@@ -159,9 +157,6 @@ namespace DataClasses
 
                 // Used when checking for missing country-only entries
                 var countries = new List<string>();
-
-                // Retrieve the actual writetime on the file for use in checking later
-                lastWriteTime = File.GetLastWriteTime(filePath);
 
                 // Used to store the date of the collected data -- see details below where the value is set
                 DateTime fileDate = DateTime.Now;
@@ -346,8 +341,6 @@ namespace DataClasses
                     }
                 }
             }
-
-            return lastWriteTime;
         }
 
         private static void ExtractHeadersFromFields(string[] fields)

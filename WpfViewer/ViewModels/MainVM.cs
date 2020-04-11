@@ -553,30 +553,10 @@ namespace Viewer.ViewModels
             var result = Utility.RunCommand(GitCommand, RepositoryPath);
             if (!result.Contains("Already up to date."))
             {
-                AssociatedWindow.MessagePanel.Show("Result", result);
+                // Getting "Can't do that from here" thread errors
+                //AssociatedWindow.MessagePanel.Show("Result", result);
+                MessageBox.Show(AssociatedWindow, result, "Result");
             }
-        }
-
-        private List<string> GetFileList(string path, DateTime? dateTime)
-        {
-            List<string> fileList = new List<string>();
-            if (dateTime == null)
-            {
-                dateTime = DateTime.Parse(BASE_DATE);
-            }
-
-            var dir = new DirectoryInfo(path);
-            var files = dir.GetFiles("*.csv");
-            foreach (var file in files)
-            {
-                var fileDateTime = file.LastWriteTime.TrimMilliseconds();
-                if (fileDateTime >= dateTime)
-                {
-                    fileList.Add(file.FullName);
-                }
-            }
-
-            return fileList;
         }
 
         #endregion
@@ -588,6 +568,13 @@ namespace Viewer.ViewModels
             DateTime? lastWriteTime = null;
 
             var clearAllData = (bool)e.Argument;
+            if (PullData == "True")
+            {
+                ShowBusyPanel("Pulling latest data...");
+                PullLastestData();
+            }
+
+            // If the user requested it, just reimport everything
             if (clearAllData)
             {
                 var dateTime = DateTime.Parse(BASE_DATE);
@@ -596,30 +583,7 @@ namespace Viewer.ViewModels
                 LastCountryStatsDateTime = dateTime;
             }
 
-            if (PullData == "True")
-            {
-                ShowBusyPanel("Pulling latest data...");
-                PullLastestData();
-            }
-
             ShowBusyPanel("Checking for new data...");
-            lastWriteTime = DatabaseManager.ImportSwaps(ReplacementsPath, LastReplacementDateTime);
-            if (lastWriteTime != null)
-            {
-                LastReplacementDateTime = (DateTime)lastWriteTime;
-                if (!clearAllData)
-                {
-                    /* 
-                     * Error keeps happening here since I changed MessagePanel to a UserControl
-                     * System.InvalidOperationException: 'The calling thread cannot access this object because a different thread owns it.'
-                     */
-                    // Replacements are new; tell the user a full refresh may be needed
-                    //AssociatedWindow.MessagePanel.Show("New replacement data", "New replacement data was found and read. " +
-                    //    "This will require a full refresh to ensure that the swaps are applied to older data.");
-                    MessageBox.Show(AssociatedWindow, "New replacement data was found and read.\nThis will require a full refresh to ensure that the swaps are applied to older data.",
-                        "New replacement data");
-                }
-            }
 
             lastWriteTime = DatabaseManager.ImportCountryStats(CountryStatsPath, LastCountryStatsDateTime);
             if (lastWriteTime != null)
@@ -627,39 +591,45 @@ namespace Viewer.ViewModels
                 LastCountryStatsDateTime = (DateTime)lastWriteTime;
             }
 
-            // Create a list of files to import
-            List<string> fileList = GetFileList(DataPath, LastImportDateTime);
-
-            if (fileList.Count > 0)
+            lastWriteTime = DatabaseManager.ImportSwaps(ReplacementsPath, LastReplacementDateTime);
+            if (lastWriteTime != null)
             {
-                if (clearAllData)
+                LastReplacementDateTime = (DateTime)lastWriteTime;
+                // Reimport all the COVID-19 data since the replacements have been changed
+                var dateTime = DateTime.Parse(BASE_DATE);
+                LastImportDateTime = dateTime;
+            }
+
+            // Get a list of the files in LastWriteTime order
+            var dir = new DirectoryInfo(DataPath);
+            var files = dir.GetFiles("*.csv")
+                .Where(f => f.LastWriteTime.TrimMilliseconds() >= LastImportDateTime)
+                .OrderBy(f => f.LastWriteTime);
+
+            // Go through the list
+            foreach (var file in files)
+            {
+                if (worker.CancellationPending)
                 {
-                    DatabaseManager.ClearAll(CLEAR_SCRIPT_PATH);
-                }
-                else
-                {
-                    var file = fileList.Min();
-                    var clearDate = DateTime.Parse(Path.GetFileNameWithoutExtension(file));
-                    DatabaseManager.Clear(clearDate);
+                    e.Cancel = true;
+                    return;
                 }
 
-                DateTime? fileWriteTime = null;
-                for (int i = 0; i < fileList.Count; i++)
-                {
-                    if (worker.CancellationPending)
-                    {
-                        e.Cancel = true;
-                        return;
-                    }
+                // Clear the existing data for this file
+                var clearDate = DateTime.Parse(Path.GetFileNameWithoutExtension(file.FullName));
+                DatabaseManager.Clear(clearDate);
 
-                    var filePath = fileList[i];
-                    var fileName = Path.GetFileNameWithoutExtension(filePath);
-                    BusyPanelTitle = $"Reading {fileName}";
-                    fileWriteTime = DatabaseManager.ImportData(filePath, worker, BusyProgressMaximum);
-                }
-                // When the loop finishes, the fileWriteTime will be that of the last file imported
-                // and that should be used for the start date for the next data check
-                LastImportDateTime = (DateTime)fileWriteTime;
+                var fileName = Path.GetFileNameWithoutExtension(file.FullName);
+                BusyPanelTitle = $"Importing data for {fileName}";
+
+                // Import the new data
+                DatabaseManager.ImportData(file.FullName, worker, BusyProgressMaximum);
+            }
+            // Since the files were processed in LastWriteTime order, the last file processed
+            // will have the latest date and it should be used for the start date on the next data check
+            if (files.Count() > 0)
+            {
+                LastImportDateTime = files.Max(f => f.LastWriteTime.TrimMilliseconds());
             }
         }
 
@@ -682,7 +652,6 @@ namespace Viewer.ViewModels
             }
             else
             {
-                LastImportDateTime = DateTime.Now;
                 ReadData();
                 HideBusyPanel();
             }
