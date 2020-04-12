@@ -398,6 +398,45 @@ namespace Viewer.ViewModels
 
         #region Chart Methods
 
+        private void ShowDailyDataGrid(TotalReport report)
+        {
+            var list = DatabaseManager.ReadDailyTotalsForReport(report);
+            DailyTotalReports = new ObservableCollection<DailyReport>(list);
+
+            DailyTotalsView.Source = DailyTotalReports;
+            DailyTotalsView.SortDescriptions.Add(new SortDescription("State", ListSortDirection.Ascending));
+            DailyTotalsView.SortDescriptions.Add(new SortDescription("FileDate", ListSortDirection.Descending));
+        }
+
+        private void SetDisplayView(ViewType type)
+        {
+            switch (type)
+            {
+                case ViewType.LineSeriesChart:
+                    SeriesChartVisibility = VISIBILITY_VISIBLE;
+                    ColumnChartVisibility = VISIBILITY_COLLAPSED;
+                    DataGridVisibility = VISIBILITY_COLLAPSED;
+                    break;
+                case ViewType.AreaSeriesChart:
+                    SeriesChartVisibility = VISIBILITY_VISIBLE;
+                    ColumnChartVisibility = VISIBILITY_COLLAPSED;
+                    DataGridVisibility = VISIBILITY_COLLAPSED;
+                    break;
+                case ViewType.StackedColumnChart:
+                    SeriesChartVisibility = VISIBILITY_COLLAPSED;
+                    ColumnChartVisibility = VISIBILITY_VISIBLE;
+                    DataGridVisibility = VISIBILITY_COLLAPSED;
+                    break;
+                case ViewType.DataGrid:
+                    SeriesChartVisibility = VISIBILITY_COLLAPSED;
+                    ColumnChartVisibility = VISIBILITY_COLLAPSED;
+                    DataGridVisibility = VISIBILITY_VISIBLE;
+                    break;
+                default:
+                    break;
+            }
+        }
+
         private void ShowLineChart(TotalReport report)
         {
             LineSeriesCollection = new SeriesCollection
@@ -491,45 +530,6 @@ namespace Viewer.ViewModels
             LineFormatter = value => value.ToString();
         }
 
-        private void ShowDailyDataGrid(TotalReport report)
-        {
-            var list = DatabaseManager.ReadDailyTotalsForReport(report);
-            DailyTotalReports = new ObservableCollection<DailyReport>(list);
-
-            DailyTotalsView.Source = DailyTotalReports;
-            DailyTotalsView.SortDescriptions.Add(new SortDescription("State", ListSortDirection.Ascending));
-            DailyTotalsView.SortDescriptions.Add(new SortDescription("FileDate", ListSortDirection.Descending));
-        }
-
-        private void SetDisplayView(ViewType type)
-        {
-            switch (type)
-            {
-                case ViewType.LineSeriesChart:
-                    SeriesChartVisibility = VISIBILITY_VISIBLE;
-                    ColumnChartVisibility = VISIBILITY_COLLAPSED;
-                    DataGridVisibility = VISIBILITY_COLLAPSED;
-                    break;
-                case ViewType.AreaSeriesChart:
-                    SeriesChartVisibility = VISIBILITY_VISIBLE;
-                    ColumnChartVisibility = VISIBILITY_COLLAPSED;
-                    DataGridVisibility = VISIBILITY_COLLAPSED;
-                    break;
-                case ViewType.StackedColumnChart:
-                    SeriesChartVisibility = VISIBILITY_COLLAPSED;
-                    ColumnChartVisibility = VISIBILITY_VISIBLE;
-                    DataGridVisibility = VISIBILITY_COLLAPSED;
-                    break;
-                case ViewType.DataGrid:
-                    SeriesChartVisibility = VISIBILITY_COLLAPSED;
-                    ColumnChartVisibility = VISIBILITY_COLLAPSED;
-                    DataGridVisibility = VISIBILITY_VISIBLE;
-                    break;
-                default:
-                    break;
-            }
-        }
-
         #endregion
 
         #region Import Methods
@@ -557,7 +557,7 @@ namespace Viewer.ViewModels
             var result = Utility.RunCommand(GitCommand, RepositoryPath);
             if (!result.Contains("Already up to date."))
             {
-                // Getting "Can't do that from here" thread errors
+                // Getting "Can't do that from here" thread errors even with MessageBox.Show()
                 //AssociatedWindow.MessagePanel.Show("Result", result);
                 MessageBox.Show(AssociatedWindow, result, "Result");
             }
