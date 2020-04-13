@@ -57,6 +57,7 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
+			
             <lvc:CartesianChart x:Name="SeriesChartPanel" Grid.Column="2" Grid.Row="2" Visibility="{Binding SeriesChartVisibility}"
                                 Series="{Binding LineSeriesCollection}" LegendLocation="Right" Background="LightBlue" >
                 <lvc:CartesianChart.AxisX>
