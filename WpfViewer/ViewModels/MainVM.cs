@@ -30,8 +30,8 @@ namespace Viewer.ViewModels
         #region Constants
 
         private const string BASE_PATH = @"D:\Source\BitBucket\3rd Party\COVID-19";
-        private const string GIT_PULL_COMMAND = @"""D:\Program Files\Git\cmd\git.exe"" pull";
-        private const string GIT_CLONE_COMMAND = "git clone https://github.com/libgit2/libgit2";
+        private const string GIT_PULL_COMMAND = @"""C:\Users\rodba\AppData\Local\Atlassian\SourceTree\git_local\bin\git.exe"" pull";
+        private const string GIT_CLONE_COMMAND = @"""C:\Users\rodba\AppData\Local\Atlassian\SourceTree\git_local\bin\git.exe"" clone https://github.com/libgit2/libgit2";
         private const string CLEAR_SCRIPT_PATH = @"D:\Source\BitBucket\COVID-19\Clear all data.sql";
 
         private const string BASE_DATE = "10/1/2019";
@@ -81,7 +81,7 @@ namespace Viewer.ViewModels
 
         #region Commands
 
-        public ICommand RefreshDataCommand { get; set; }
+        public Command RefreshDataCommand { get; set; }
 
         #endregion
 
@@ -552,15 +552,13 @@ namespace Viewer.ViewModels
             }
         }
 
-        private void PullLastestData()
+        private string PullLastestData()
         {
-            var result = Utility.RunCommand(GitCommand, RepositoryPath);
-            if (!result.Contains("Already up to date."))
-            {
-                // Getting "Can't do that from here" thread errors even with MessageBox.Show()
-                //AssociatedWindow.MessagePanel.Show("Result", result);
-                MessageBox.Show(AssociatedWindow, result, "Result");
-            }
+            string result;
+
+            result = Utility.RunCommand(GitCommand, RepositoryPath);
+
+            return result;
         }
 
         #endregion
@@ -575,7 +573,11 @@ namespace Viewer.ViewModels
             if (PullData == "True")
             {
                 ShowBusyPanel("Pulling latest data...");
-                PullLastestData();
+                var result = PullLastestData();
+                //if (!result.Contains("Already up to date."))
+                //{
+                //    AssociatedWindow.MessagePanel.Show("Result", result);
+                //}
             }
 
             // If the user requested it, just reimport everything

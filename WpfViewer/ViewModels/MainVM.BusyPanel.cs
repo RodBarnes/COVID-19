@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Windows.Input;
 using Common;
 
 /// <summary>
@@ -22,7 +21,7 @@ namespace Viewer.ViewModels
 
         #region Commands
 
-        public ICommand BusyCancelCommand { get; set; }
+        public Command BusyCancelCommand { get; set; }
 
         #endregion
 
