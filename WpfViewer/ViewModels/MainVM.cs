@@ -642,7 +642,7 @@ namespace Viewer.ViewModels
         private void Background_LoadDataProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             BusyProgressValue = e.ProgressPercentage;
-            BusyProgressText = e.ProgressPercentage.ToString();
+            BusyProgressText = $"{e.ProgressPercentage}%";
         }
 
         private void Background_LoadDataRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

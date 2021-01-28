@@ -99,7 +99,7 @@ namespace Viewer.ViewModels
         private string busyProgressText;
         public string BusyProgressText
         {
-            get => $"{busyProgressText}%";
+            get => busyProgressText;
             set
             {
                 busyProgressText = value;
