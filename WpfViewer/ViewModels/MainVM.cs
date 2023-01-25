@@ -556,7 +556,7 @@ namespace Viewer.ViewModels
         {
             string result;
 
-            result = Utility.RunCommand(GitCommand, RepositoryPath);
+            result = ProcessManagement.RunCommand(GitCommand, RepositoryPath);
 
             return result;
         }
