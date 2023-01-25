@@ -1,0 +1,2 @@
+# What is COVID-19 solution #
+This solution relies upon public data collected by and made available from Johns Hopkins University to show the status of COVID-19 infections, deaths, etc. and display this in charts by geographic region and over time for comparison.
